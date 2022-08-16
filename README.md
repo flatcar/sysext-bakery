@@ -37,11 +37,9 @@ storage:
         remote:
           url: https://myserver.net/mydocker.raw
     - path: /etc/systemd/system-generators/torcx-generator
-  links:
-    - path: /etc/extensions/docker-flatcar.raw
-      target: /dev/null
-    - path: /etc/extensions/containerd-flatcar.raw
-      target: /dev/null
+  directories:
+    - path: /etc/extensions/docker-flatcar
+    - path: /etc/extensions/containerd-flatcar
 ```
 
 ## Systemd-sysext on other distributions
