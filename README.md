@@ -54,7 +54,7 @@ SYSEXT_LEVEL=1.0
 This means other distributions will reject to load the sysext image by default.
 Use the configuration parameters in the tools to build for your distribution.
 
-To add the automatic systemd unit loading to your distribution, store [`ensure-sysext.service`](https://raw.githubusercontent.com/flatcar-linux/init/a22b550c7cf689661970a2a23dd457870dd84c97/systemd/system/ensure-sysext.service) in your systemd folder (e.g., `/etc/systemd/system/`) and enable the units: `systemctl enable --now ensure-sysext.service systemd-sysext.service`.
+To add the automatic systemd unit loading to your distribution, store [`ensure-sysext.service`](https://raw.githubusercontent.com/flatcar/init/ccade77b6d568094fb4e4d4cf71b867819551798/systemd/system/ensure-sysext.service) in your systemd folder (e.g., `/etc/systemd/system/`) and enable the units: `systemctl enable --now ensure-sysext.service systemd-sysext.service`.
 
 ## Recipes in this repository
 
