@@ -96,6 +96,8 @@ cat > "${SYSEXTNAME}/usr/lib/systemd/system/containerd.service" <<-'EOF'
 	[Install]
 	WantedBy=multi-user.target
 EOF
+mkdir -p "${SYSEXTNAME}/usr/lib/systemd/system/multi-user.target.wants"
+ln -s ../containerd.service "${SYSEXTNAME}/usr/lib/systemd/system/multi-user.target.wants/containerd.service"
 mkdir -p "${SYSEXTNAME}/usr/share/containerd"
 cat > "${SYSEXTNAME}/usr/share/containerd/config.toml" <<-'EOF'
 	version = 2
