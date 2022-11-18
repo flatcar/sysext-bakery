@@ -79,6 +79,9 @@ OS=fedora ARCH=aarch64 ./create_docker_sysext.sh 20.10.13 mydocker
 
 See the above intro section on how to use the resulting sysext image.
 
+You can also limit the sysext image to only Docker (without containerd and runc) or only containerd (no Docker but runc) by passing the environment variables `ONLY_DOCKER=1` or `ONLY_CONTAINERD=1`.
+If you build both sysext images that way, you can load both combined and, e.g., only load the Docker sysext image for debugging while using the containerd sysext image by default for Kubernetes.
+
 ### Converting a Torcx image
 
 Torcx was a solution for switching between different Docker versions on Flatcar.

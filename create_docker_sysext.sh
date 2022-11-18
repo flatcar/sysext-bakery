@@ -3,6 +3,9 @@ set -euo pipefail
 
 ARCH="${ARCH-x86_64}"
 OS="${OS-flatcar}"
+ONLY_CONTAINERD="${ONLY_CONTAINERD:-0}"
+ONLY_DOCKER="${ONLY_DOCKER:-0}"
+FORMAT="${FORMAT:-squashfs}"
 
 if [ $# -lt 2 ] || [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
   echo "Usage: $0 VERSION SYSEXTNAME"
@@ -10,10 +13,22 @@ if [ $# -lt 2 ] || [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
   echo "A temporary directory named SYSEXTNAME in the current folder will be created and deleted again."
   echo "All files in the sysext image will be owned by root."
   echo "The necessary systemd services will be created by this script, by default only docker.socket will be enabled."
+  echo "To only package containerd without Docker, pass ONLY_CONTAINERD=1 as environment variable (current value is '${ONLY_CONTAINERD}')."
+  echo "To only package Docker without containerd and runc, pass ONLY_DOCKER=1 as environment variable (current value is '${ONLY_DOCKER}')."
   echo "To use arm64 pass 'ARCH=aarch64' as environment variable (current value is '${ARCH}')."
   echo "To build for another OS than Flatcar, pass 'OS=myosid' as environment variable (current value is '${OS}'), e.g., 'fedora' as found in 'ID' under '/etc/os-release'."
   echo "The '/etc/os-release' file of your OS has to include 'SYSEXT_LEVEL=1.0' as done in Flatcar."
+  echo "If the mksquashfs tool is missing you can pass FORMAT=btrfs or FORMAT=ext4 as environment variable but the files won't be owned by root."
   echo
+  exit 1
+fi
+
+if [ "${ONLY_CONTAINERD}" = 1 ] && [ "${ONLY_DOCKER}" = 1 ]; then
+  echo "Cannot set both ONLY_CONTAINERD and ONLY_DOCKER" >&2
+  exit 1
+fi
+if [ "${FORMAT}" != "squashfs" ] && [ "${FORMAT}" != "btrfs" ] && [ "${FORMAT}" != "ext4" ]; then
+  echo "Expected FORMAT=squashfs, FORMAT=btrfs, or FORMAT=ext4, got '${FORMAT}'" >&2
   exit 1
 fi
 
@@ -22,6 +37,7 @@ SYSEXTNAME="$2"
 
 rm -f "docker-${VERSION}.tgz"
 curl -o "docker-${VERSION}.tgz" -fsSL "https://download.docker.com/linux/static/stable/${ARCH}/docker-${VERSION}.tgz"
+# TODO: Also allow to consume upstream containerd and runc release binaries with their respective versions
 rm -rf "${SYSEXTNAME}"
 mkdir -p "${SYSEXTNAME}"
 tar -xf "docker-${VERSION}.tgz" -C "${SYSEXTNAME}"
@@ -30,7 +46,13 @@ mkdir -p "${SYSEXTNAME}"/usr/bin
 mv "${SYSEXTNAME}"/docker/* "${SYSEXTNAME}"/usr/bin/
 rmdir "${SYSEXTNAME}"/docker
 mkdir -p "${SYSEXTNAME}/usr/lib/systemd/system"
-cat > "${SYSEXTNAME}/usr/lib/systemd/system/docker.socket" <<-'EOF'
+if [ "${ONLY_CONTAINERD}" = 1 ]; then
+  rm "${SYSEXTNAME}/usr/bin/docker" "${SYSEXTNAME}/usr/bin/dockerd" "${SYSEXTNAME}/usr/bin/docker-init" "${SYSEXTNAME}/usr/bin/docker-proxy"
+elif [ "${ONLY_DOCKER}" = 1 ]; then
+  rm "${SYSEXTNAME}/usr/bin/containerd" "${SYSEXTNAME}/usr/bin/containerd-shim" "${SYSEXTNAME}/usr/bin/containerd-shim-runc-v2" "${SYSEXTNAME}/usr/bin/ctr" "${SYSEXTNAME}/usr/bin/runc"
+fi
+if [ "${ONLY_CONTAINERD}" != 1 ]; then
+  cat > "${SYSEXTNAME}/usr/lib/systemd/system/docker.socket" <<-'EOF'
 	[Unit]
 	PartOf=docker.service
 	Description=Docker Socket for the API
@@ -42,9 +64,9 @@ cat > "${SYSEXTNAME}/usr/lib/systemd/system/docker.socket" <<-'EOF'
 	[Install]
 	WantedBy=sockets.target
 EOF
-mkdir -p "${SYSEXTNAME}/usr/lib/systemd/system/sockets.target.wants"
-ln -s ../docker.socket "${SYSEXTNAME}/usr/lib/systemd/system/sockets.target.wants/docker.socket"
-cat > "${SYSEXTNAME}/usr/lib/systemd/system/docker.service" <<-'EOF'
+  mkdir -p "${SYSEXTNAME}/usr/lib/systemd/system/sockets.target.wants"
+  ln -s ../docker.socket "${SYSEXTNAME}/usr/lib/systemd/system/sockets.target.wants/docker.socket"
+  cat > "${SYSEXTNAME}/usr/lib/systemd/system/docker.service" <<-'EOF'
 	[Unit]
 	Description=Docker Application Container Engine
 	After=containerd.service docker.socket network-online.target
@@ -76,7 +98,9 @@ cat > "${SYSEXTNAME}/usr/lib/systemd/system/docker.service" <<-'EOF'
 	[Install]
 	WantedBy=multi-user.target
 EOF
-cat > "${SYSEXTNAME}/usr/lib/systemd/system/containerd.service" <<-'EOF'
+fi
+if [ "${ONLY_DOCKER}" != 1 ]; then
+  cat > "${SYSEXTNAME}/usr/lib/systemd/system/containerd.service" <<-'EOF'
 	[Unit]
 	Description=containerd container runtime
 	After=network.target
@@ -96,8 +120,10 @@ cat > "${SYSEXTNAME}/usr/lib/systemd/system/containerd.service" <<-'EOF'
 	[Install]
 	WantedBy=multi-user.target
 EOF
-mkdir -p "${SYSEXTNAME}/usr/share/containerd"
-cat > "${SYSEXTNAME}/usr/share/containerd/config.toml" <<-'EOF'
+  mkdir -p "${SYSEXTNAME}/usr/lib/systemd/system/multi-user.target.wants"
+  ln -s ../containerd.service "${SYSEXTNAME}/usr/lib/systemd/system/multi-user.target.wants/containerd.service"
+  mkdir -p "${SYSEXTNAME}/usr/share/containerd"
+  cat > "${SYSEXTNAME}/usr/share/containerd/config.toml" <<-'EOF'
 	version = 2
 	# set containerd's OOM score
 	oom_score = -999
@@ -107,10 +133,22 @@ cat > "${SYSEXTNAME}/usr/share/containerd/config.toml" <<-'EOF'
 	[plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc.options]
 	SystemdCgroup = true
 EOF
-sed 's/SystemdCgroup = true/SystemdCgroup = false/g' "${SYSEXTNAME}/usr/share/containerd/config.toml" > "${SYSEXTNAME}/usr/share/containerd/config-cgroupfs.toml"
+  sed 's/SystemdCgroup = true/SystemdCgroup = false/g' "${SYSEXTNAME}/usr/share/containerd/config.toml" > "${SYSEXTNAME}/usr/share/containerd/config-cgroupfs.toml"
+fi
 mkdir -p "${SYSEXTNAME}/usr/lib/extension-release.d"
 { echo "ID=${OS}" ; echo "SYSEXT_LEVEL=1.0" ; } > "${SYSEXTNAME}/usr/lib/extension-release.d/extension-release.${SYSEXTNAME}"
 rm -f "${SYSEXTNAME}".raw
-mksquashfs "${SYSEXTNAME}" "${SYSEXTNAME}".raw -all-root
+if [ "${FORMAT}" = "btrfs" ]; then
+  # Note: We didn't chown to root:root, meaning that the file ownership is left as is
+  mkfs.btrfs --mixed -m single -d single --shrink --rootdir "${SYSEXTNAME}" "${SYSEXTNAME}".raw
+  # This is for testing purposes and makes not much sense to use because --rootdir doesn't allow to enable compression
+elif [ "${FORMAT}" = "ext4" ]; then
+  # Assuming that 1 GB is enough
+  truncate -s 1G "${SYSEXTNAME}".raw
+  # Note: We didn't chown to root:root, meaning that the file ownership is left as is
+  mkfs.ext4 -E root_owner=0:0 -d "${SYSEXTNAME}" "${SYSEXTNAME}".raw
+else
+  mksquashfs "${SYSEXTNAME}" "${SYSEXTNAME}".raw -all-root
+fi
 rm -rf "${SYSEXTNAME}"
 echo "Created ${SYSEXTNAME}.raw"
