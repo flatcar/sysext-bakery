@@ -64,8 +64,8 @@ if [ "${ONLY_CONTAINERD}" != 1 ]; then
 	[Install]
 	WantedBy=sockets.target
 EOF
-  mkdir -p "${SYSEXTNAME}/usr/lib/systemd/system/sockets.target.wants"
-  ln -s ../docker.socket "${SYSEXTNAME}/usr/lib/systemd/system/sockets.target.wants/docker.socket"
+  mkdir -p "${SYSEXTNAME}/usr/lib/systemd/system/sockets.target.d"
+  { echo "[Unit]"; echo "Upholds=docker.socket"; } > "${SYSEXTNAME}/usr/lib/systemd/system/sockets.target.d/10-docker-socket.conf"
   cat > "${SYSEXTNAME}/usr/lib/systemd/system/docker.service" <<-'EOF'
 	[Unit]
 	Description=Docker Application Container Engine
@@ -120,8 +120,8 @@ if [ "${ONLY_DOCKER}" != 1 ]; then
 	[Install]
 	WantedBy=multi-user.target
 EOF
-  mkdir -p "${SYSEXTNAME}/usr/lib/systemd/system/multi-user.target.wants"
-  ln -s ../containerd.service "${SYSEXTNAME}/usr/lib/systemd/system/multi-user.target.wants/containerd.service"
+  mkdir -p "${SYSEXTNAME}/usr/lib/systemd/system/multi-user.target.d"
+  { echo "[Unit]"; echo "Upholds=containerd.service"; } > "${SYSEXTNAME}/usr/lib/systemd/system/multi-user.target.d/10-containerd-service.conf"
   mkdir -p "${SYSEXTNAME}/usr/share/containerd"
   cat > "${SYSEXTNAME}/usr/share/containerd/config.toml" <<-'EOF'
 	version = 2
