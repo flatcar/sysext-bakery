@@ -30,7 +30,7 @@ rm -f "wasmtime-${VERSION}.tar.xz"
 curl -o "wasmtime-${VERSION}.tar.xz" -fsSL "https://github.com/bytecodealliance/wasmtime/releases/download/v${VERSION}/wasmtime-v${VERSION}-${ARCH}-linux.tar.xz"
 rm -rf "${SYSEXTNAME}"
 mkdir -p "${SYSEXTNAME}"
-tar -xf "wasmtime-${VERSION}.tar.xz" -C "${SYSEXTNAME}"
+tar --force-local -xf "wasmtime-${VERSION}.tar.xz" -C "${SYSEXTNAME}"
 rm "wasmtime-${VERSION}.tar.xz"
 mkdir -p "${SYSEXTNAME}"/usr/bin
 mv "${SYSEXTNAME}"/"wasmtime-v${VERSION}-${ARCH}-linux"/wasmtime "${SYSEXTNAME}"/usr/bin/

@@ -40,7 +40,7 @@ curl -o "docker-${VERSION}.tgz" -fsSL "https://download.docker.com/linux/static/
 # TODO: Also allow to consume upstream containerd and runc release binaries with their respective versions
 rm -rf "${SYSEXTNAME}"
 mkdir -p "${SYSEXTNAME}"
-tar -xf "docker-${VERSION}.tgz" -C "${SYSEXTNAME}"
+tar --force-local -xf "docker-${VERSION}.tgz" -C "${SYSEXTNAME}"
 rm "docker-${VERSION}.tgz"
 mkdir -p "${SYSEXTNAME}"/usr/bin
 mv "${SYSEXTNAME}"/docker/* "${SYSEXTNAME}"/usr/bin/

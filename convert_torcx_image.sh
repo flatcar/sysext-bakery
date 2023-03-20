@@ -15,7 +15,7 @@ SYSEXTNAME="$2"
 
 rm -rf "${SYSEXTNAME}"
 mkdir -p "${SYSEXTNAME}"
-tar -xf "${TORCXTAR}" -C "${SYSEXTNAME}"
+tar --force-local -xf "${TORCXTAR}" -C "${SYSEXTNAME}"
 rm -rf "${SYSEXTNAME}"/.torcx
 mkdir -p "${SYSEXTNAME}"/usr
 if [ -e "${SYSEXTNAME}"/bin ]; then
