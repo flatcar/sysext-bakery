@@ -15,8 +15,8 @@ At runtime executing `systemctl restart systemd-sysext` will reload the sysext i
 A manual `systemd-sysext refresh` is not recommended.
 
 The compatibility mechanism of sysext images requires a metadata file in the image under `usr/lib/extension-release.d/extension-release.NAME`.
-It has to contain a matching OS `ID`, and either a matching `VERSION` or `SYSEXT_LEVEL`.
-Since the rapid release cycle and automatic updates of Flatcar Container Linux make it hard to rely on particular OS libraries by specifying a dependency of the sysext image to the OS version, it is not recommended to match by `VERSION`.
+It has to contain a matching OS `ID`, and either a matching `VERSION_ID` or `SYSEXT_LEVEL`.
+Since the rapid release cycle and automatic updates of Flatcar Container Linux make it hard to rely on particular OS libraries by specifying a dependency of the sysext image to the OS version, it is not recommended to match by `VERSION_ID`.
 Instead, Flatcar defined the `SYSEXT_LEVEL` value `1.0` to match for.
 The sysext image should only include static binaries.
 
