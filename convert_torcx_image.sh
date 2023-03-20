@@ -15,7 +15,7 @@ SYSEXTNAME="$2"
 
 rm -rf "${SYSEXTNAME}"
 mkdir -p "${SYSEXTNAME}"
-tar -xf "${TORCXTAR}" -C "${SYSEXTNAME}"
+tar --force-local -xf "${TORCXTAR}" -C "${SYSEXTNAME}"
 rm -rf "${SYSEXTNAME}"/.torcx
 mkdir -p "${SYSEXTNAME}"/usr
 if [ -e "${SYSEXTNAME}"/bin ]; then
@@ -31,6 +31,12 @@ for FILE in "${SYSEXTNAME}"/usr/lib/systemd/system/*.service "${SYSEXTNAME}"/usr
       -e "s,\[Service\],\[Service\]\nEnvironment=TORCX_BINDIR=/usr/bin\nEnvironment=TORCX_UNPACKDIR=/\nEnvironment=TORCX_IMAGEDIR=,g" \
       -e 's,After=torcx.target,,g' -e 's,Requires=torcx.target,,g' "${FILE}"
   fi
+done
+for ENTRY in "${SYSEXTNAME}/usr/lib/systemd/system/"*.wants/*; do
+  UNIT=$(basename "${ENTRY}")
+  TARGET=$(echo "${ENTRY}" | rev | cut -d / -f 2 | rev | sed 's/.wants$//')
+  mkdir -p "${SYSEXTNAME}/usr/lib/systemd/system/${TARGET}.d"
+  { echo "[Unit]"; echo "Upholds=${UNIT}"; } > "${SYSEXTNAME}/usr/lib/systemd/system/${TARGET}.d/10-${UNIT/./-}.conf"
 done
 mkdir -p "${SYSEXTNAME}/usr/lib/extension-release.d"
 { echo "ID=flatcar" ; echo "SYSEXT_LEVEL=1.0" ; } > "${SYSEXTNAME}/usr/lib/extension-release.d/extension-release.${SYSEXTNAME}"

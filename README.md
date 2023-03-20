@@ -9,19 +9,32 @@ The current focus is on Docker and containerd, contributions are welcome for oth
 
 The `NAME.raw` sysext images (or `NAME` sysext directories) can be placed under `/etc/extensions/` or `/var/lib/extensions` in Flatcar to be activated on boot.
 While systemd-sysext images are not really meant to also include the systemd service, Flatcar ships `ensure-sysext.service` as workaround to automatically load the image's services.
-It reloads the unit files from disk and reevaluates `multi-user.target`, `sockets.target`, and `timers.target`, making sure your enabled systemd units run.
-This service is bound to `systemd-sysext.service` which activates the sysext images on boot.
-At runtime executing `systemctl restart systemd-sysext` will reload the sysext images and start the services.
+This helper service is bound to `systemd-sysext.service` which activates the sysext images on boot.
+Currently it reloads the unit files from disk and reevaluates `multi-user.target`, `sockets.target`, and `timers.target`, making sure your enabled systemd units run.
+In the future `systemd-sysext` will only reload the unit files when this is upstream behavior (the current upstream behavior is to do nothing and leave it to the user).
+That means you need to use `Upholds=` drop-ins for the target units to start your units.
+At runtime executing `systemctl restart systemd-sysext ensure-sysext` will reload the sysext images and start the services.
 A manual `systemd-sysext refresh` is not recommended.
 
 The compatibility mechanism of sysext images requires a metadata file in the image under `usr/lib/extension-release.d/extension-release.NAME`.
-It has to contain a matching OS `ID`, and either a matching `VERSION` or `SYSEXT_LEVEL`.
-Since the rapid release cycle and automatic updates of Flatcar Container Linux make it hard to rely on particular OS libraries by specifying a dependency of the sysext image to the OS version, it is not recommended to match by `VERSION`.
+It needs to contain a matching OS `ID`, and either a matching `VERSION_ID` or `SYSEXT_LEVEL`.
+Since the rapid release cycle and automatic updates of Flatcar Container Linux make it hard to rely on particular OS libraries by specifying a dependency of the sysext image to the OS version, it is not recommended to match by `VERSION_ID`.
 Instead, Flatcar defined the `SYSEXT_LEVEL` value `1.0` to match for.
 The sysext image should only include static binaries.
 
 Inside the image, binaries should be placed under `usr/bin/` and systemd units under `usr/lib/systemd/system/`.
-To enable systemd units, symlinks should be included in the image itself in the same way as systemd would normally generate them when enabling the units, e.g., `sockets.target.wants/my.socket` → `../my.socket`.
+While placing symlinks in the image itself to enable the units in the same way as systemd would normally do (like `sockets.target.wants/my.socket` → `../my.socket`) is still currently supported, this is not a recommended practice.
+The recommended way is to ship drop-ins for the target units that start your unit.
+The drop-in file should use the `Upholds=` property in the `[Unit]` section.
+For example, for starting `docker.socket` we would use a drop-in for `sockets.target` placed in `usr/lib/systemd/system/sockets.target.d/10-docker-socket.conf` with the following contents:
+
+```
+[Unit]
+Upholds=docker.socket
+```
+
+This can be done also for services, so for `docker.service` started by `multi-user.target`, the drop-in would reside in `usr/lib/systemd/system/multi-user.target.d/10-docker-service.conf` and it would have a `Upholds=docker.service` line instead.
+
 
 The following Container Linux Config (CLC YAML) can be be transpiled to Ignition JSON and will download a custom Docker+containerd sysext image on first boot.
 It also takes care of disabling Torcx and future inbuild Docker and containerd sysext images we plan to ship in Flatcar.
