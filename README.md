@@ -5,9 +5,9 @@ Flatcar Container Linux as an OS without a package manager is a good fit for ext
 The tools in this repository help you to create your own sysext images bundeling software to extend your base OS.
 The current focus is on Docker and containerd, contributions are welcome for other software.
 
-## Systemd-sysext on Flatcar
+## Systemd-sysext
 
-The `NAME.raw` sysext images (or `NAME` sysext directories) can be placed under `/etc/extensions/` or `/var/lib/extensions` in Flatcar to be activated on boot.
+The `NAME.raw` sysext images (or `NAME` sysext directories) can be placed under `/etc/extensions/` or `/var/lib/extensions` to be activated on boot by `systemd-sysext.service`.
 While systemd-sysext images are not really meant to also include the systemd service, Flatcar ships `ensure-sysext.service` as workaround to automatically load the image's services.
 This helper service is bound to `systemd-sysext.service` which activates the sysext images on boot.
 Currently it reloads the unit files from disk and reevaluates `multi-user.target`, `sockets.target`, and `timers.target`, making sure your enabled systemd units run.
@@ -20,6 +20,7 @@ The compatibility mechanism of sysext images requires a metadata file in the ima
 It needs to contain a matching OS `ID`, and either a matching `VERSION_ID` or `SYSEXT_LEVEL`.
 Since the rapid release cycle and automatic updates of Flatcar Container Linux make it hard to rely on particular OS libraries by specifying a dependency of the sysext image to the OS version, it is not recommended to match by `VERSION_ID`.
 Instead, Flatcar defined the `SYSEXT_LEVEL` value `1.0` to match for.
+With systemd 252 you can also use `ID=_any` and then neither `SYSEXT_LEVEL` nor `VERSION_ID` are needed.
 The sysext image should only include static binaries.
 
 Inside the image, binaries should be placed under `usr/bin/` and systemd units under `usr/lib/systemd/system/`.
@@ -65,7 +66,8 @@ SYSEXT_LEVEL=1.0
 ```
 
 This means other distributions will reject to load the sysext image by default.
-Use the configuration parameters in the tools to build for your distribution.
+Use the configuration parameters in the tools to build for your distribution (pass `OS=` to be the OS ID from `/etc/os-release`) or to build for any distribution (pass `OS=_any`).
+You can also set the architecture to be arm64 to fetch the right binaries and encode this information in the sysext image metadata.
 
 To add the automatic systemd unit loading to your distribution, store [`ensure-sysext.service`](https://raw.githubusercontent.com/flatcar/init/ccade77b6d568094fb4e4d4cf71b867819551798/systemd/system/ensure-sysext.service) in your systemd folder (e.g., `/etc/systemd/system/`) and enable the units: `systemctl enable --now ensure-sysext.service systemd-sysext.service`.
 
@@ -83,10 +85,10 @@ To ease the process, the `create_docker_sysext.sh` helper script takes care of d
 [… writes mydocker.raw into current directory …]
 ```
 
-Pass the `OS` or `ARCH` environment variables to build for another target than Flatcar amd64, e.g., for Fedora arm64:
+Pass the `OS` or `ARCH` environment variables to build for another target than Flatcar amd64, e.g., for any distro with arm64:
 
 ```
-OS=fedora ARCH=aarch64 ./create_docker_sysext.sh 20.10.13 mydocker
+OS=_any ARCH=aarch64 ./create_docker_sysext.sh 20.10.13 mydocker
 [… writes mydocker.raw into current directory …]
 ```
 

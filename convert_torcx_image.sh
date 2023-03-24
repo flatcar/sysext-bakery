@@ -1,12 +1,15 @@
 #!/bin/bash
 set -euo pipefail
 
+SCRIPTFOLDER="$(dirname "$(readlink -f "$0")")"
+
 if [ $# -lt 2 ] || [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
   echo "Usage: $0 TORCXTAR SYSEXTNAME"
   echo "The script will unpack the Torcx tar ball and create a sysext squashfs image with the name SYSEXTNAME.raw in the current folder."
   echo "A temporary directory named SYSEXTNAME in the current folder will be created and deleted again."
   echo "All files in the sysext image will be owned by root."
   echo "The conversion is done on best effort, and only the TORCX_BINDIR (/usr/bin), TORCX_UNPACKDIR (/), and TORCX_IMAGEDIR ('') env vars in the systemd units get replaced."
+  "${SCRIPTFOLDER}"/bake.sh --help
   exit 1
 fi
 
@@ -38,9 +41,6 @@ for ENTRY in "${SYSEXTNAME}/usr/lib/systemd/system/"*.wants/*; do
   mkdir -p "${SYSEXTNAME}/usr/lib/systemd/system/${TARGET}.d"
   { echo "[Unit]"; echo "Upholds=${UNIT}"; } > "${SYSEXTNAME}/usr/lib/systemd/system/${TARGET}.d/10-${UNIT/./-}.conf"
 done
-mkdir -p "${SYSEXTNAME}/usr/lib/extension-release.d"
-{ echo "ID=flatcar" ; echo "SYSEXT_LEVEL=1.0" ; } > "${SYSEXTNAME}/usr/lib/extension-release.d/extension-release.${SYSEXTNAME}"
-rm -f "${SYSEXTNAME}".raw
-mksquashfs "${SYSEXTNAME}" "${SYSEXTNAME}".raw -all-root
+
+"${SCRIPTFOLDER}"/bake.sh "${SYSEXTNAME}"
 rm -rf "${SYSEXTNAME}"
-echo "Created ${SYSEXTNAME}.raw"
