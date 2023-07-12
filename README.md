@@ -37,19 +37,18 @@ Upholds=docker.socket
 This can be done also for services, so for `docker.service` started by `multi-user.target`, the drop-in would reside in `usr/lib/systemd/system/multi-user.target.d/10-docker-service.conf` and it would have a `Upholds=docker.service` line instead.
 
 
-The following Container Linux Config (CLC YAML) can be be transpiled to Ignition JSON and will download a custom Docker+containerd sysext image on first boot.
+The following Butane Config (YAML) can be be transpiled to Ignition JSON and will download a custom Docker+containerd sysext image on first boot.
 It also takes care of disabling Torcx and future inbuild Docker and containerd sysext images we plan to ship in Flatcar.
 If your sysext image doesn't replace Flatcar's inbuilt Docker/containerd, omit the two `links` entries and the `torcx-generator` entry.
 
 ```
+variant: flatcar
+version: 1.0.0
 storage:
   files:
     - path: /etc/extensions/mydocker.raw
-      filesystem: root
-      mode: 0644
       contents:
-        remote:
-          url: https://myserver.net/mydocker.raw
+        source: https://myserver.net/mydocker.raw
     - path: /etc/systemd/system-generators/torcx-generator
   links:
     - path: /etc/extensions/docker-flatcar.raw
