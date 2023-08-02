@@ -1,0 +1,47 @@
+name: Build and release Systemd sysext images
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    permissions:
+      # allow the action to create a release
+      contents: write
+    steps:
+      # checkout the sources
+      - uses: actions/checkout@v3
+      # build the images and generate a manifest
+      - name: build
+        run: |
+          set -euo pipefail
+
+          sudo apt update -qq && sudo apt install -yqq \
+            curl \
+            jq \
+            squashfs-tools \
+            xz-utils
+
+          images=(
+              "kubernetes-v1.27.4"
+              "docker-24.0.5"
+              "docker_compose-2.17.2"
+              "wasmtime-11.0.1"
+          )
+
+          for image in ${images[@]}; do
+              component="${image%-*}"
+              version="${image#*-}"
+              "./create_${component}_sysext.sh" "${version}" "${component}"
+              mv "${component}.raw" "${image}.raw"
+          done
+
+          sha256sum *.raw > SHA256SUMS
+      # create a Github release with the generated artifacts
+      - name: release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            SHA256SUMS
+            *.raw
