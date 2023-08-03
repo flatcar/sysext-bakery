@@ -78,6 +78,74 @@ To add the automatic systemd unit loading to your distribution, store [`ensure-s
 
 The tools normally generate squashfs images not only because of the compression benefits but also because it doesn't need root permissions and loop device mounts.
 
+### Consuming the published images
+
+There is a Github Action to build current recipes and to publish the built images as release artifacts. It's possible to directly consume the latest release from a Butane/Ignition configuration, example:
+```yaml
+# butane < config.yaml > config.json
+# ./flatcar_production_qemu.sh -i ./config.json
+variant: flatcar
+version: 1.0.0
+storage:
+  files:
+    - path: /opt/extensions/docker/docker-24.0.5.raw
+      contents:
+        source: https://github.com/flatcar/sysext-bakery/releases/download/20230803/docker-24.0.5.raw
+    - path: /opt/extensions/kubernetes/kubernetes-v1.27.4.raw
+      contents:
+        source: https://github.com/flatcar/sysext-bakery/releases/download/20230803/kubernetes-v1.27.4.raw
+    - path: /etc/systemd/system-generators/torcx-generator
+  links:
+    - target: /opt/extensions/docker/docker-24.0.5.raw
+      path: /etc/extensions/docker.raw
+      hard: false
+    - target: /opt/extensions/kubernetes/kubernetes-v1.27.4.raw
+      path: /etc/extensions/kubernetes.raw
+      hard: false
+```
+
+In the generated artifacts, there is a `SHA256SUMS` holding the list of built images with their respective SHA256 digest. It allows to use `https://github.com/flatcar/sysext-bakery/releases/latest/download/` in a [`systemd-sysupdate`](https://www.freedesktop.org/software/systemd/man/sysupdate.d.html) configuration file, example:
+```yaml
+# butane < config.yaml > config.json
+# ./flatcar_production_qemu.sh -i ./config.json
+variant: flatcar
+version: 1.0.0
+storage:
+  files:
+    - path: /etc/sysupdate.kubernetes.d/kubernetes.conf
+      contents:
+        inline: |
+          [Transfer]
+          Verify=false
+
+          [Source]
+          Type=url-file
+          Path=https://github.com/flatcar/sysext-bakery/releases/latest/download/
+          MatchPattern=kubernetes-@v.raw
+
+          [Target]
+          InstancesMax=3
+          Type=regular-file
+          Path=/opt/extensions/kubernetes
+          CurrentSymlink=/etc/extensions/kubernetes.raw
+    - path: /etc/sysupdate.docker.d/docker.conf
+      contents:
+        inline: |
+          [Transfer]
+          Verify=false
+
+          [Source]
+          Type=url-file
+          Path=https://github.com/flatcar/sysext-bakery/releases/latest/download/
+          MatchPattern=docker-@v.raw
+
+          [Target]
+          InstancesMax=3
+          Type=regular-file
+          Path=/opt/extensions/docker
+          CurrentSymlink=/etc/extensions/docker.raw
+```
+
 ### Creating a custom Docker sysext image
 
 The Docker releases publish static binaries including containerd and the only missing piece are the systemd units.
