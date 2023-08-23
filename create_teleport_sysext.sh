@@ -21,12 +21,10 @@ if [ "${ARCH}" = aarch64 ]; then
 fi
 rm -f teleport
 
-# install kubernetes binaries.
-curl "https://get.gravitational.com/teleport-v${VERSION}-linux-${ARCH}-bin.tar.gz" | tar xvz --strip-components=1 teleport/teleport
-
+# install teleport binaries.
 rm -rf "${SYSEXTNAME}"
 mkdir -p "${SYSEXTNAME}"/usr/bin
-mv teleport "${SYSEXTNAME}"/usr/bin
+curl "https://get.gravitational.com/teleport-v${VERSION}-linux-${ARCH}-bin.tar.gz" | tar xvz -C "${SYSEXTNAME}"/usr/bin --strip-components=1 teleport/teleport
 
 chmod +x "${SYSEXTNAME}"/usr/bin/teleport
 
