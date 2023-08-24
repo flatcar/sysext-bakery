@@ -43,7 +43,6 @@ Type=simple
 Restart=on-failure
 Environment=TELEPORT_OPTIONS=
 EnvironmentFile=-/etc/default/teleport
-EnvironmentFile=/etc/os-release
 # Set the nodes roles with the `--roles`
 # In most production environments you will not
 # want to run all three roles on a single host
