@@ -46,7 +46,7 @@ Restart=on-failure
 # want to run all three roles on a single host
 # --roles='proxy,auth,node' is the default value
 # if none is set
-ExecStart=/usr/bin/teleport start --roles=node --config=/etc/teleport.yaml --pid-file=/run/teleport.pid --token=$(cat /etc/machine-id)
+ExecStart=/usr/bin/teleport start --roles=node --config=/etc/teleport.yaml --pid-file=/run/teleport.pid --token=%m --nodename=%H
 ExecReload=/bin/kill -HUP $MAINPID
 PIDFile=/run/teleport.pid
 LimitNOFILE=524288
