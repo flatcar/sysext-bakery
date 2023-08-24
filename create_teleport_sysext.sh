@@ -41,12 +41,13 @@ Requires=systemd-machine-id-commit.service
 [Service]
 Type=simple
 Restart=on-failure
+EnvironmentFile=-/etc/default/teleport
 # Set the nodes roles with the `--roles`
 # In most production environments you will not
 # want to run all three roles on a single host
 # --roles='proxy,auth,node' is the default value
 # if none is set
-ExecStart=/usr/bin/teleport start --roles=node --config=/etc/teleport.yaml --pid-file=/run/teleport.pid --token=%m --nodename=%H --labels %o=%w --skip-version-check
+ExecStart=/usr/bin/teleport start --roles=node --config=/etc/teleport.yaml --pid-file=/run/teleport.pid $TELEPORT_OPTIONS
 ExecReload=/bin/kill -HUP $MAINPID
 PIDFile=/run/teleport.pid
 LimitNOFILE=524288
