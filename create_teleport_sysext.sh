@@ -34,6 +34,9 @@ cat > "${SYSEXTNAME}/usr/lib/systemd/system/teleport.service" <<-'EOF'
 [Unit]
 Description=Teleport SSH Service
 After=network.target
+After=systemd-machine-id-commit.service
+Requires=systemd-machine-id-commit.service
+
 
 [Service]
 Type=simple
@@ -43,7 +46,7 @@ Restart=on-failure
 # want to run all three roles on a single host
 # --roles='proxy,auth,node' is the default value
 # if none is set
-ExecStart=/usr/bin/teleport start --roles=node --config=/etc/teleport.yaml --pid-file=/run/teleport.pid --token=${MACHINE_ID}
+ExecStart=/usr/bin/teleport start --roles=node --config=/etc/teleport.yaml --pid-file=/run/teleport.pid --token=$(cat /etc/machine-id)
 ExecReload=/bin/kill -HUP $MAINPID
 PIDFile=/run/teleport.pid
 LimitNOFILE=524288
