@@ -1,10 +1,9 @@
 name: Build and release Systemd sysext images
 on:
-  push:
-    tags:
-      - '*'
+  workflow_dispatch:
 jobs:
   build:
+    name: Build
     runs-on: ubuntu-22.04
     permissions:
       # allow the action to create a release
@@ -13,15 +12,9 @@ jobs:
       # checkout the sources
       - uses: actions/checkout@v3
       # build the images and generate a manifest
-      - name: build
+      - name: Build
         run: |
           set -euo pipefail
-
-          sudo apt update -qq && sudo apt install -yqq \
-            curl \
-            jq \
-            squashfs-tools \
-            xz-utils
 
           images=(
               "teleport-9.3.26"
@@ -38,7 +31,47 @@ jobs:
 
           sha256sum *.raw > SHA256SUMS
       # create a Github release with the generated artifacts
-      - name: release
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            SHA256SUMS
+            *.raw
+  multi-build:
+    name: Multi version build
+    runs-on: ubuntu-22.04
+    container:  mediadepot/flatcar-developer:${{ matrix.flatcarversion }}
+    strategy:
+      max-parallel: 6
+      matrix:
+        flatcarversion: ["3510.2.6"]
+    permissions:
+      # allow the action to create a release
+      contents: write
+    steps:
+      # checkout the sources
+      - uses: actions/checkout@v3
+      # build the images and generate a manifest
+      - name: Build
+        run: |
+          set -euo pipefail
+
+          images=(
+              "zfs-2.1.11-${{ matrix.flatcarversion }}"
+          )
+
+          for image in ${images[@]}; do
+              component="${image%%-*}"
+              flatcarversion="${image##*-}"
+              temp="${image#*-}"
+              version="${temp%-*}"
+              "./create_${component}_sysext.sh" "${version}" "${component}" "${flatcarversion}"
+              mv "${component}.raw" "${image}.raw"
+          done
+
+          sha256sum *.raw > SHA256SUMS
+      # create a Github release with the generated artifacts
+      - name: Release
         uses: softprops/action-gh-release@v1
         with:
           files: |
