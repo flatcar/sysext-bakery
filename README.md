@@ -118,6 +118,16 @@ variant: flatcar
 version: 1.0.0
 storage:
   files:
+    - path: /etc/sysupdate.d/noop.conf
+      contents:
+        inline: |
+          [Source]
+          Type=regular-file
+          Path=/
+          MatchPattern=invalid@v.raw
+          [Target]
+          Type=regular-file
+          Path=/
     - path: /etc/sysupdate.kubernetes.d/kubernetes.conf
       contents:
         inline: |
@@ -150,6 +160,24 @@ storage:
           Type=regular-file
           Path=/opt/extensions/docker
           CurrentSymlink=/etc/extensions/docker.raw
+systemd:
+  units:
+    - name: systemd-sysupdate.timer
+      enabled: true
+    - name: systemd-sysupdate.service
+      dropins:
+        - name: docker.conf
+          contents: |
+            [Service]
+            ExecStartPre=/usr/lib/systemd/systemd-sysupdate -C docker update
+        - name: kubernetes.conf
+          contents: |
+            [Service]
+            ExecStartPre=/usr/lib/systemd/systemd-sysupdate -C kubernetes update
+        - name: sysext.conf
+          contents: |
+            [Service]
+            ExecStartPost=systemctl restart systemd-sysext
 ```
 
 ### Creating a custom Docker sysext image
