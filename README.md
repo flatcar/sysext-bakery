@@ -102,6 +102,12 @@ storage:
     - target: /opt/extensions/kubernetes/kubernetes-v1.27.4.raw
       path: /etc/extensions/kubernetes.raw
       hard: false
+    - path: /etc/extensions/docker-flatcar.raw
+      target: /dev/null
+      overwrite: true
+    - path: /etc/extensions/containerd-flatcar.raw
+      target: /dev/null
+      overwrite: true
 ```
 
 In the generated artifacts, there is a `SHA256SUMS` holding the list of built images with their respective SHA256 digest. It allows to use `https://github.com/flatcar/sysext-bakery/releases/latest/download/` in a [`systemd-sysupdate`](https://www.freedesktop.org/software/systemd/man/sysupdate.d.html) configuration file, example:
