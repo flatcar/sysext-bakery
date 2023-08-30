@@ -102,6 +102,12 @@ storage:
     - target: /opt/extensions/kubernetes/kubernetes-v1.27.4.raw
       path: /etc/extensions/kubernetes.raw
       hard: false
+    - path: /etc/extensions/docker-flatcar.raw
+      target: /dev/null
+      overwrite: true
+    - path: /etc/extensions/containerd-flatcar.raw
+      target: /dev/null
+      overwrite: true
 ```
 
 In the generated artifacts, there is a `SHA256SUMS` holding the list of built images with their respective SHA256 digest. It allows to use `https://github.com/flatcar/sysext-bakery/releases/latest/download/` in a [`systemd-sysupdate`](https://www.freedesktop.org/software/systemd/man/sysupdate.d.html) configuration file, example:
@@ -112,6 +118,16 @@ variant: flatcar
 version: 1.0.0
 storage:
   files:
+    - path: /etc/sysupdate.d/noop.conf
+      contents:
+        inline: |
+          [Source]
+          Type=regular-file
+          Path=/
+          MatchPattern=invalid@v.raw
+          [Target]
+          Type=regular-file
+          Path=/
     - path: /etc/sysupdate.kubernetes.d/kubernetes.conf
       contents:
         inline: |
@@ -144,6 +160,24 @@ storage:
           Type=regular-file
           Path=/opt/extensions/docker
           CurrentSymlink=/etc/extensions/docker.raw
+systemd:
+  units:
+    - name: systemd-sysupdate.timer
+      enabled: true
+    - name: systemd-sysupdate.service
+      dropins:
+        - name: docker.conf
+          contents: |
+            [Service]
+            ExecStartPre=/usr/lib/systemd/systemd-sysupdate -C docker update
+        - name: kubernetes.conf
+          contents: |
+            [Service]
+            ExecStartPre=/usr/lib/systemd/systemd-sysupdate -C kubernetes update
+        - name: sysext.conf
+          contents: |
+            [Service]
+            ExecStartPost=systemctl restart systemd-sysext
 ```
 
 ### Creating a custom Docker sysext image
