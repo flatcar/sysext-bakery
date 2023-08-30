@@ -27,7 +27,7 @@ jobs:
               "kubernetes-v1.27.4"
               "docker-24.0.5"
               "docker_compose-2.17.2"
-              "wasmtime-11.0.1"
+              "wasmtime-12.0.1"
           )
 
           for image in ${images[@]}; do
