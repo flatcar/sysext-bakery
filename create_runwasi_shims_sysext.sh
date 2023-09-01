@@ -2,7 +2,6 @@
 set -euo pipefail
 
 export ARCH="${ARCH-x86_64}"
-export FILE_ARCH="x86-64"
 SCRIPTFOLDER="$(dirname "$(readlink -f "$0")")"
 
 if [ $# -lt 2 ] || [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
@@ -17,33 +16,32 @@ fi
 
 VERSION="$1"
 SYSEXTNAME="$2"
-set -x
+
+echo "https://github.com/deislabs/containerd-wasm-shims/releases/download/${VERSION}/containerd-wasm-shims-v1-linux-${ARCH}.tar.gz --output containerd-wasm-shims-v1-linux-${ARCH}.tar.gz"
+
 # clean and obtain the specified version
-rm -f "wasmtime-v${VERSION}-${ARCH}-linux.tar.xz"
-curl -o "wasmtime-v${VERSION}-${ARCH}-linux.tar.xz" -L "https://github.com/bytecodealliance/wasmtime/releases/download/v${VERSION}/wasmtime-v${VERSION}-${ARCH}-linux.tar.xz"
+rm -f "containerd-wasm-shims-v1-linux-${VERSION}-${ARCH}.tar.gz"
+curl -o "containerd-wasm-shims-v1-linux-${VERSION}-${ARCH}.tar.gz" -fsSL "https://github.com/deislabs/containerd-wasm-shims/releases/download/${VERSION}/containerd-wasm-shims-v1-linux-${ARCH}.tar.gz" --output "containerd-wasm-shims-v1-linux-${ARCH}.tar.gz"
 
 # clean earlier SYSEXTNAME directory and recreate
 rm -rf "${SYSEXTNAME}"
 mkdir -p "${SYSEXTNAME}"
 
 # extract wasmtime into SYSEXTNAME/
-tar --force-local -xvf "wasmtime-v${VERSION}-${ARCH}-linux.tar.xz" -C "${SYSEXTNAME}"
+tar --force-local -xf "containerd-wasm-shims-v1-linux-${VERSION}-${ARCH}.tar.gz" -C "${SYSEXTNAME}"
 
 # clean downloaded tarball
-rm "wasmtime-v${VERSION}-${ARCH}-linux.tar.xz"
+rm "containerd-wasm-shims-v1-linux-${VERSION}-${ARCH}.tar.gz"
 
 # create deployment directory in SYSEXTNAME/ and move wasmtime into it
 mkdir -p "${SYSEXTNAME}"/usr/bin
-mv "${SYSEXTNAME}"/"wasmtime-v${VERSION}-${ARCH}-linux"/wasmtime "${SYSEXTNAME}"/usr/bin/
+mv "${SYSEXTNAME}"/containerd-shim* "${SYSEXTNAME}"/usr/bin/
 
 # clean up any extracted mess
-rm -r "${SYSEXTNAME}"/"wasmtime-v${VERSION}-${ARCH}-linux"
+rm -r "${SYSEXTNAME}"/*
 
-# bake the .raw. This process uses the generic binary name for layer metadata
-"${SCRIPTFOLDER}"/bake.sh "${SYSEXTNAME}"
-
-# rename the file to the specific version and arch.
-mv "./${SYSEXTNAME}.raw" "./${SYSEXTNAME}-v${VERSION}-${FILE_ARCH}.raw"
+# bake the .raw
+"${SCRIPTFOLDER}"/bake.sh "${SYSEXTNAME}-${VERSION}-${ARCH}"
 
 # clean again just in case
-rm -rf "${SYSEXTNAME}" 
+rm -rf "${SYSEXTNAME}"
