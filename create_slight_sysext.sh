@@ -2,6 +2,7 @@
 set -euo pipefail
 
 export ARCH="${ARCH-x86_64}"
+export FILE_ARCH="x86-64"
 SCRIPTFOLDER="$(dirname "$(readlink -f "$0")")"
 
 if [ $# -lt 2 ] || [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
@@ -19,7 +20,7 @@ SYSEXTNAME="$2"
 
 # clean and download x86 first
 rm -f "slight.tgz"
-curl -L -s https://github.com/deislabs/spiderlightning/releases/download/${SLIGHT_VERSION}/slight-linux-x86_64.tar.gz -o slight.tgz
+curl -L -s https://github.com/deislabs/spiderlightning/releases/download/v${SLIGHT_VERSION}/slight-linux-x86_64.tar.gz -o slight.tgz
 
 #clean old sysextname directory and remake it
 rm -rf "${SYSEXTNAME}"
@@ -42,6 +43,9 @@ rm -r "${SYSEXTNAME}"/"release"
 
 # bake the image
 "${SCRIPTFOLDER}"/bake.sh "${SYSEXTNAME}"
+
+# rename the file to the specific version and arch.
+mv "./${SYSEXTNAME}.raw" "./${SYSEXTNAME}-v${SLIGHT_VERSION}-${FILE_ARCH}.raw"
 
 #clean up the sysextname directory
 rm -rf "${SYSEXTNAME}"

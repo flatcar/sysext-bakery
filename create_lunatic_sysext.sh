@@ -1,9 +1,8 @@
 #!/bin/bash
 set -euo pipefail
-set -x 
+set -x
 export ARCH="${ARCH-x86_64}"
 export FILE_ARCH="x86-64"
-
 SCRIPTFOLDER="$(dirname "$(readlink -f "$0")")"
 
 if [ $# -lt 2 ] || [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
@@ -19,33 +18,34 @@ fi
 VERSION="$1"
 SYSEXTNAME="$2"
 
-echo "https://github.com/deislabs/containerd-wasm-shims/releases/download/v${VERSION}/containerd-wasm-shims-v1-linux-${ARCH}.tar.gz --output containerd-wasm-shims-v1-linux-${ARCH}.tar.gz"
-# clean and obtain the specified version
-rm -f "containerd-wasm-shims-v1-linux-${VERSION}-${ARCH}.tar.gz"
-curl -o "containerd-wasm-shims-v1-linux-${VERSION}-${ARCH}.tar.gz" -fsSL "https://github.com/deislabs/containerd-wasm-shims/releases/download/v${VERSION}/containerd-wasm-shims-v1-linux-${ARCH}.tar.gz" --output "containerd-wasm-shims-v1-linux-${ARCH}.tar.gz"
+# clean and download x86 first
+rm -f "lunatic.gz"
+curl -L -s https://github.com/lunatic-solutions/lunatic/releases/download/v${VERSION}/lunatic-linux-amd64.tar.gz -o lunatic.gz
 
-# clean earlier SYSEXTNAME directory and recreate
+#clean old sysextname directory and remake it
 rm -rf "${SYSEXTNAME}"
 mkdir -p "${SYSEXTNAME}"
 
-# extract wasmtime into SYSEXTNAME/
-tar --force-local -xf "containerd-wasm-shims-v1-linux-${VERSION}-${ARCH}.tar.gz" -C "${SYSEXTNAME}"
+# tar into systextname directory the lunatic binary
+tar --force-local -xf "lunatic.gz" -C "${SYSEXTNAME}"
 
-# clean downloaded tarball
-rm "containerd-wasm-shims-v1-linux-${VERSION}-${ARCH}.tar.gz"
+#clean up remaining local lunatic
+rm "lunatic.gz"
 
-# create deployment directory in SYSEXTNAME/ and move wasmtime into it
+# make a /usr/bin in sysextname directory
 mkdir -p "${SYSEXTNAME}"/usr/bin
-mv "${SYSEXTNAME}"/containerd-shim* "${SYSEXTNAME}"/usr/bin/
+
+# move lunatic into sysextname/usr/bin/
+mv "${SYSEXTNAME}"/lunatic "${SYSEXTNAME}/usr/bin"
 
 # clean up any extracted mess
-rm -r "${SYSEXTNAME}"/*
+rm -rf "${SYSEXTNAME}"/LICEN* "${SYSEXTNAME}"/README.md
 
-# bake the .raw
+# bake the image
 "${SCRIPTFOLDER}"/bake.sh "${SYSEXTNAME}"
 
 # rename the file to the specific version and arch.
 mv "./${SYSEXTNAME}.raw" "./${SYSEXTNAME}-v${VERSION}-${FILE_ARCH}.raw"
 
-# clean again just in case
+#clean up the sysextname directory
 rm -rf "${SYSEXTNAME}"

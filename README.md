@@ -1,114 +1,145 @@
-# sysext-bakery: Recipes for baking systemd-sysext images
+<div align="center">
+    <a href="https://lunatic.solutions/" target="_blank">
+        <img width="60" 
+             src="https://raw.githubusercontent.com/lunatic-solutions/lunatic/main/assets/logo.svg"
+             alt="lunatic logo"
+        >
+    </a>
+    <p>&nbsp;</p>
+</div>
 
-[Systemd-sysext images](https://www.freedesktop.org/software/systemd/man/systemd-sysext.html) are overlay images for `/usr`, allowing to extend the base OS with custom (static) binaries.
-Flatcar Container Linux as an OS without a package manager is a good fit for extension through systemd-sysext.
-The tools in this repository help you to create your own sysext images bundeling software to extend your base OS.
-The current focus is on Docker and containerd, contributions are welcome for other software.
+Lunatic is a universal runtime for **fast**, **robust** and **scalable** server-side applications.
+It's inspired by Erlang and can be used from any language that compiles to [WebAssembly][1].
+You can read more about the motivation behind Lunatic [here][2].
 
-## Systemd-sysext
+We currently provide libraries to take full advantage of Lunatic's features for:
 
-The `NAME.raw` sysext images (or `NAME` sysext directories) can be placed under `/etc/extensions/` or `/var/lib/extensions` to be activated on boot by `systemd-sysext.service`.
-While systemd-sysext images are not really meant to also include the systemd service, Flatcar ships `ensure-sysext.service` as workaround to automatically load the image's services.
-This helper service is bound to `systemd-sysext.service` which activates the sysext images on boot.
-Currently it reloads the unit files from disk and reevaluates `multi-user.target`, `sockets.target`, and `timers.target`, making sure your enabled systemd units run.
-In the future `systemd-sysext` will only reload the unit files when this is upstream behavior (the current upstream behavior is to do nothing and leave it to the user).
-That means you need to use `Upholds=` drop-ins for the target units to start your units.
-At runtime executing `systemctl restart systemd-sysext ensure-sysext` will reload the sysext images and start the services.
-A manual `systemd-sysext refresh` is not recommended.
+- [Rust][3]
+- [AssemblyScript][11]
 
-The compatibility mechanism of sysext images requires a metadata file in the image under `usr/lib/extension-release.d/extension-release.NAME`.
-It needs to contain a matching OS `ID`, and either a matching `VERSION_ID` or `SYSEXT_LEVEL`.
-Since the rapid release cycle and automatic updates of Flatcar Container Linux make it hard to rely on particular OS libraries by specifying a dependency of the sysext image to the OS version, it is not recommended to match by `VERSION_ID`.
-Instead, Flatcar defined the `SYSEXT_LEVEL` value `1.0` to match for.
-With systemd 252 you can also use `ID=_any` and then neither `SYSEXT_LEVEL` nor `VERSION_ID` are needed.
-The sysext image should only include static binaries.
+If you would like to see other languages supported or just follow the discussions around Lunatic,
+[join our discord server][4].
 
-Inside the image, binaries should be placed under `usr/bin/` and systemd units under `usr/lib/systemd/system/`.
-While placing symlinks in the image itself to enable the units in the same way as systemd would normally do (like `sockets.target.wants/my.socket` → `../my.socket`) is still currently supported, this is not a recommended practice.
-The recommended way is to ship drop-ins for the target units that start your unit.
-The drop-in file should use the `Upholds=` property in the `[Unit]` section.
-For example, for starting `docker.socket` we would use a drop-in for `sockets.target` placed in `usr/lib/systemd/system/sockets.target.d/10-docker-socket.conf` with the following contents:
+## Supported features
 
-```
-[Unit]
-Upholds=docker.socket
-```
+- [x] Creating, cancelling & waiting on processes
+- [x] Fine-grained process permissions
+- [x] Process supervision
+- [x] Channel based message passing
+- [x] TCP networking
+- [x] Filesystem access
+- [x] Distributed nodes
+- [ ] Hot reloading
 
-This can be done also for services, so for `docker.service` started by `multi-user.target`, the drop-in would reside in `usr/lib/systemd/system/multi-user.target.d/10-docker-service.conf` and it would have a `Upholds=docker.service` line instead.
+## Installation
 
+If you have rust (cargo) installed, you can build and install the lunatic runtime with:
 
-The following Container Linux Config (CLC YAML) can be be transpiled to Ignition JSON and will download a custom Docker+containerd sysext image on first boot.
-It also takes care of disabling Torcx and future inbuild Docker and containerd sysext images we plan to ship in Flatcar.
-If your sysext image doesn't replace Flatcar's inbuilt Docker/containerd, omit the two `links` entries and the `torcx-generator` entry.
-
-```
-storage:
-  files:
-    - path: /etc/extensions/mydocker.raw
-      filesystem: root
-      mode: 0644
-      contents:
-        remote:
-          url: https://myserver.net/mydocker.raw
-    - path: /etc/systemd/system-generators/torcx-generator
-  links:
-    - path: /etc/extensions/docker-flatcar.raw
-      target: /dev/null
-      overwrite: true
-    - path: /etc/extensions/containerd-flatcar.raw
-      target: /dev/null
-      overwrite: true
+```bash
+cargo install lunatic-runtime
 ```
 
-## Systemd-sysext on other distributions
+---
 
-The tools here will by default build for Flatcar and create the metadata file `usr/lib/extension-release.d/extension-release.NAME` as follows:
+On **macOS** you can use [Homebrew][6] too:
 
-```
-ID=flatcar
-SYSEXT_LEVEL=1.0
-```
-
-This means other distributions will reject to load the sysext image by default.
-Use the configuration parameters in the tools to build for your distribution (pass `OS=` to be the OS ID from `/etc/os-release`) or to build for any distribution (pass `OS=_any`).
-You can also set the architecture to be arm64 to fetch the right binaries and encode this information in the sysext image metadata.
-
-To add the automatic systemd unit loading to your distribution, store [`ensure-sysext.service`](https://raw.githubusercontent.com/flatcar/init/ccade77b6d568094fb4e4d4cf71b867819551798/systemd/system/ensure-sysext.service) in your systemd folder (e.g., `/etc/systemd/system/`) and enable the units: `systemctl enable --now ensure-sysext.service systemd-sysext.service`.
-
-## Recipes in this repository
-
-The tools normally generate squashfs images not only because of the compression benefits but also because it doesn't need root permissions and loop device mounts.
-
-### Creating a custom Docker sysext image
-
-The Docker releases publish static binaries including containerd and the only missing piece are the systemd units.
-To ease the process, the `create_docker_sysext.sh` helper script takes care of downloading the release binaries and adding the systemd unit files, and creates a combined Docker+containerd sysext image:
-
-```
-./create_docker_sysext.sh 20.10.13 mydocker
-[… writes mydocker.raw into current directory …]
+```bash
+brew tap lunatic-solutions/lunatic
+brew install lunatic
 ```
 
-Pass the `OS` or `ARCH` environment variables to build for another target than Flatcar amd64, e.g., for any distro with arm64:
+---
 
-```
-OS=_any ARCH=aarch64 ./create_docker_sysext.sh 20.10.13 mydocker
-[… writes mydocker.raw into current directory …]
-```
+We also provide pre-built binaries for **Windows**, **Linux** and **macOS** on the
+[releases page][5], that you can include in your `PATH`.
 
-See the above intro section on how to use the resulting sysext image.
+---
 
-You can also limit the sysext image to only Docker (without containerd and runc) or only containerd (no Docker but runc) by passing the environment variables `ONLY_DOCKER=1` or `ONLY_CONTAINERD=1`.
-If you build both sysext images that way, you can load both combined and, e.g., only load the Docker sysext image for debugging while using the containerd sysext image by default for Kubernetes.
+And as always, you can also clone this repository and build it locally. The only dependency is
+[a rust compiler][7]:
 
-### Converting a Torcx image
-
-Torcx was a solution for switching between different Docker versions on Flatcar.
-In case you have an existing Torcx image you can convert it with the `convert_torcx_image.sh` helper script (Currently only Torcx tar balls are supported and the conversion is done on best effort):
-
-```
-./convert_torcx_image.sh TORCXTAR SYSEXTNAME
-[… writes SYSEXTNAME.raw into the current directory …]
+```bash
+# Clone the repository
+git clone https://github.com/lunatic-solutions/lunatic.git
+# Jump into the cloned folder
+cd lunatic
+# Build and install lunatic
+cargo install --path .
 ```
 
-Please make also sure that your don't have a `containerd.service` drop in file under `/etc` that uses Torcx paths.
+## Usage
+
+After installation, you can use the `lunatic` binary to run WASM modules.
+
+To learn how to build modules, check out language-specific bindings:
+
+- [Rust](https://github.com/lunatic-solutions/rust-lib)
+- [AssemblyScript](https://github.com/lunatic-solutions/as-lunatic)
+
+## Architecture
+
+Lunatic's design is all about spawning _super lightweight_ processes, also known as green threads or
+[go-routines][8] in other runtimes. Lunatic's processes are fast to create, have a small memory footprint
+and a low scheduling overhead. They are designed for **massive** concurrency. It's not uncommon to have
+hundreds of thousands of such processes concurrently running in your app.
+
+Some common use cases for processes are:
+
+- HTTP request handling
+- Long running requests, like WebSocket connections
+- Long running background tasks, like email sending
+- Calling untrusted libraries in an sandboxed environment
+
+### Isolation
+
+What makes the last use case possible are the sandboxing capabilities of [WebAssembly][1]. WebAssembly was
+originally developed to run in the browser and provides extremely strong sandboxing on multiple levels.
+Lunatic's processes inherit these properties.
+
+Each process has its own stack, heap, and even syscalls. If one process fails, it will not affect the rest
+of the system. This allows you to create very powerful and fault-tolerant abstraction.
+
+This is also true for some other runtimes, but Lunatic goes one step further and makes it possible to use C
+bindings directly in your app without any fear. If the C code contains any security vulnerabilities or crashes,
+those issues will only affect the process currently executing the code. The only requirement is that the C
+code can be compiled to WebAssembly.
+
+It's possible to give per process fine-grained access to resources (filesystem, memory, network connections, ...).
+This is enforced on the syscall level.
+
+### Scheduling
+
+All processes running on Lunatic are preemptively scheduled and executed by a [work stealing async executor][9]. This
+gives you the freedom to write simple _blocking_ code, but the runtime is going to make sure it actually never blocks
+a thread if waiting on I/O.
+
+Even if you have an infinite loop somewhere in your code, the scheduling will always be fair and not permanently block
+the execution thread. The best part is that you don't need to do anything special to achieve this, the runtime will take
+care of it no matter which programming language you use.
+
+### Compatibility
+
+We intend to eventually make Lunatic completely compatible with [WASI][10]. Ideally, you could take existing code,
+compile it to WebAssembly and run on top of Lunatic; creating the best developer experience possible. We're not
+quite there yet.
+
+## License
+
+Licensed under either of
+
+- Apache License, Version 2.0, ([LICENSE-APACHE](LICENSE-APACHE) or http://www.apache.org/licenses/LICENSE-2.0)
+- MIT license ([LICENSE-MIT](LICENSE-MIT) or http://opensource.org/licenses/MIT)
+
+at your option.
+
+[1]: https://webassembly.org/
+[2]: https://kolobara.com/lunatic/index.html#motivation
+[3]: https://crates.io/crates/lunatic
+[4]: https://discord.gg/b7zDqpXpB4
+[5]: https://github.com/lunatic-solutions/lunatic/releases
+[6]: https://brew.sh/
+[7]: https://rustup.rs/
+[8]: https://golangbot.com/goroutines
+[9]: https://tokio.rs
+[10]: https://wasi.dev/
+[11]: https://github.com/lunatic-solutions/as-lunatic
