@@ -88,18 +88,27 @@ variant: flatcar
 version: 1.0.0
 storage:
   files:
-    - path: /opt/extensions/docker/docker-24.0.5.raw
+    - path: /opt/extensions/docker/docker-24.0.5-x86-64.raw
       contents:
-        source: https://github.com/flatcar/sysext-bakery/releases/download/20230803/docker-24.0.5.raw
-    - path: /opt/extensions/kubernetes/kubernetes-v1.27.4.raw
+        source: https://github.com/flatcar/sysext-bakery/releases/download/20230901/docker-24.0.5-x86-64.raw
+    - path: /opt/extensions/kubernetes/kubernetes-v1.27.4-x86-64.raw
       contents:
-        source: https://github.com/flatcar/sysext-bakery/releases/download/20230803/kubernetes-v1.27.4.raw
+        source: https://github.com/flatcar/sysext-bakery/releases/download/20230901/kubernetes-v1.27.4-x86-64.raw
     - path: /etc/systemd/system-generators/torcx-generator
+    - path: /etc/sysupdate.d/noop.conf
+      contents:
+        source: https://github.com/flatcar/sysext-bakery/releases/download/20230901/noop.conf
+    - path: /etc/sysupdate.docker.d/docker.conf
+      contents:
+        source: https://github.com/flatcar/sysext-bakery/releases/download/20230901/docker.conf
+    - path: /etc/sysupdate.kubernetes.d/kubernetes.conf
+      contents:
+        source: https://github.com/flatcar/sysext-bakery/releases/download/20230901/kubernetes.conf
   links:
-    - target: /opt/extensions/docker/docker-24.0.5.raw
+    - target: /opt/extensions/docker/docker-24.0.5-x86-64.raw
       path: /etc/extensions/docker.raw
       hard: false
-    - target: /opt/extensions/kubernetes/kubernetes-v1.27.4.raw
+    - target: /opt/extensions/kubernetes/kubernetes-v1.27.4-x86-64.raw
       path: /etc/extensions/kubernetes.raw
       hard: false
     - path: /etc/extensions/docker-flatcar.raw
@@ -108,58 +117,6 @@ storage:
     - path: /etc/extensions/containerd-flatcar.raw
       target: /dev/null
       overwrite: true
-```
-
-In the generated artifacts, there is a `SHA256SUMS` holding the list of built images with their respective SHA256 digest. It allows to use `https://github.com/flatcar/sysext-bakery/releases/latest/download/` in a [`systemd-sysupdate`](https://www.freedesktop.org/software/systemd/man/sysupdate.d.html) configuration file, example:
-```yaml
-# butane < config.yaml > config.json
-# ./flatcar_production_qemu.sh -i ./config.json
-variant: flatcar
-version: 1.0.0
-storage:
-  files:
-    - path: /etc/sysupdate.d/noop.conf
-      contents:
-        inline: |
-          [Source]
-          Type=regular-file
-          Path=/
-          MatchPattern=invalid@v.raw
-          [Target]
-          Type=regular-file
-          Path=/
-    - path: /etc/sysupdate.kubernetes.d/kubernetes.conf
-      contents:
-        inline: |
-          [Transfer]
-          Verify=false
-
-          [Source]
-          Type=url-file
-          Path=https://github.com/flatcar/sysext-bakery/releases/latest/download/
-          MatchPattern=kubernetes-@v.raw
-
-          [Target]
-          InstancesMax=3
-          Type=regular-file
-          Path=/opt/extensions/kubernetes
-          CurrentSymlink=/etc/extensions/kubernetes.raw
-    - path: /etc/sysupdate.docker.d/docker.conf
-      contents:
-        inline: |
-          [Transfer]
-          Verify=false
-
-          [Source]
-          Type=url-file
-          Path=https://github.com/flatcar/sysext-bakery/releases/latest/download/
-          MatchPattern=docker-@v.raw
-
-          [Target]
-          InstancesMax=3
-          Type=regular-file
-          Path=/opt/extensions/docker
-          CurrentSymlink=/etc/extensions/docker.raw
 systemd:
   units:
     - name: systemd-sysupdate.timer
@@ -180,6 +137,13 @@ systemd:
             ExecStartPost=systemctl restart systemd-sysext
 ```
 
+This also configures systemd-sysupdate for auto-updates. The `noop.conf` is a workaround for systemd-sysupdate to run without error messages.
+Since the configuration sets up a custom Docker version, it also disables Torcx and the future `docker-flatcar` and `containerd-flatcar` extensions to prevent conflicts.
+
+In the [Flatcar docs](https://www.flatcar.org/docs/latest/provisioning/sysext/) you can find an Ignition configuration that explicitly sets the update configurations instead of downloading them.
+
+The updates works by [`systemd-sysupdate`](https://www.freedesktop.org/software/systemd/man/sysupdate.d.html) fetching the `SHA256SUMS` file of the generated artifacts, which holds the list of built images with their respective SHA256 digest.
+
 ### Creating a custom Docker sysext image
 
 The Docker releases publish static binaries including containerd and the only missing piece are the systemd units.
@@ -193,7 +157,7 @@ To ease the process, the `create_docker_sysext.sh` helper script takes care of d
 Pass the `OS` or `ARCH` environment variables to build for another target than Flatcar amd64, e.g., for any distro with arm64:
 
 ```
-OS=_any ARCH=aarch64 ./create_docker_sysext.sh 20.10.13 mydocker
+OS=_any ARCH=arm64 ./create_docker_sysext.sh 20.10.13 mydocker
 [… writes mydocker.raw into current directory …]
 ```
 

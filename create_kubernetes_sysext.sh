@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
-export ARCH="${ARCH-amd64}"
+export ARCH="${ARCH-x86-64}"
 SCRIPTFOLDER="$(dirname "$(readlink -f "$0")")"
 
 if [ $# -lt 2 ] || [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
@@ -18,9 +18,15 @@ fi
 VERSION="$1"
 SYSEXTNAME="$2"
 CNI_VERSION="${3-latest}"
-if [ "${ARCH}" = aarch64 ]; then
-  ARCH=arm64
+
+# The github release uses different arch identifiers (not the same as in the other scripts here),
+# we map them here and rely on bake.sh to map them back to what systemd expects
+if [ "${ARCH}" = "x86_64" ] || [ "${ARCH}" = "x86-64" ]; then
+  ARCH="amd64"
+elif [ "${ARCH}" = "aarch64" ]; then
+  ARCH="arm64"
 fi
+
 rm -f kubectl kubeadm kubelet
 
 # install kubernetes binaries.
