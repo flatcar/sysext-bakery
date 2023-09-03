@@ -51,4 +51,4 @@ rm -rf "${SYSEXTNAME}"/WasmEdge-0.13.3-Linux/bin/ "${SYSEXTNAME}"/WasmEdge-0.13.
 mv "./${SYSEXTNAME}.raw" "./${SYSEXTNAME}-v${VERSION}-${FILE_ARCH}.raw"
 
 # clean again just in case
-#rm -rf "${SYSEXTNAME}" 
+rm -rf "${SYSEXTNAME}" 
