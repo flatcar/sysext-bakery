@@ -19,20 +19,30 @@ fi
 VERSION="$1"
 SYSEXTNAME="$2"
 
-echo "https://github.com/deislabs/containerd-wasm-shims/releases/download/v${VERSION}/containerd-wasm-shims-v1-linux-${ARCH}.tar.gz --output containerd-wasm-shims-v1-linux-${ARCH}.tar.gz"
 # clean and obtain the specified version
-rm -f "containerd-wasm-shims-v1-linux-${VERSION}-${ARCH}.tar.gz"
-curl -o "containerd-wasm-shims-v1-linux-${VERSION}-${ARCH}.tar.gz" -fsSL "https://github.com/deislabs/containerd-wasm-shims/releases/download/v${VERSION}/containerd-wasm-shims-v1-linux-${ARCH}.tar.gz" --output "containerd-wasm-shims-v1-linux-${ARCH}.tar.gz"
+rm -f "containerd-wasm-shims-v1-slight-linux-${VERSION}-${ARCH}.tar.gz"
+rm -f "containerd-wasm-shims-v1-spin-linux-${VERSION}-${ARCH}.tar.gz"
+rm -f "containerd-wasm-shims-v1-wws-linux-${VERSION}-${ARCH}.tar.gz"
+rm -f "containerd-wasm-shims-v1-lunatic-linux-${VERSION}-${ARCH}.tar.gz"
+curl -o "containerd-wasm-shims-v1-slight-linux-${VERSION}-${ARCH}.tar.gz" -fsSL "https://github.com/deislabs/containerd-wasm-shims/releases/download/v${VERSION}/containerd-wasm-shims-v1-slight-linux-${ARCH}.tar.gz" --output "containerd-wasm-shims-v1-slight-linux-${ARCH}.tar.gz"
+curl -o "containerd-wasm-shims-v1-spin-linux-${VERSION}-${ARCH}.tar.gz" -fsSL "https://github.com/deislabs/containerd-wasm-shims/releases/download/v${VERSION}/containerd-wasm-shims-v1-spin-linux-${ARCH}.tar.gz" --output "containerd-wasm-shims-v1-spin-linux-${ARCH}.tar.gz"
+curl -o "containerd-wasm-shims-v1-wws-linux-${VERSION}-${ARCH}.tar.gz" -fsSL "https://github.com/deislabs/containerd-wasm-shims/releases/download/v${VERSION}/containerd-wasm-shims-v1-wws-linux-${ARCH}.tar.gz" --output "containerd-wasm-shims-v1-wws-linux-${ARCH}.tar.gz"
+curl -o "containerd-wasm-shims-v1-lunatic-linux-${VERSION}-${ARCH}.tar.gz" -fsSL "https://github.com/deislabs/containerd-wasm-shims/releases/download/v${VERSION}/containerd-wasm-shims-v1-lunatic-linux-${ARCH}.tar.gz" --output "containerd-wasm-shims-v1-lunatic-linux-${ARCH}.tar.gz"
 
 # clean earlier SYSEXTNAME directory and recreate
 rm -rf "${SYSEXTNAME}"
 mkdir -p "${SYSEXTNAME}"
 
 # extract wasmtime into SYSEXTNAME/
-tar --force-local -xf "containerd-wasm-shims-v1-linux-${VERSION}-${ARCH}.tar.gz" -C "${SYSEXTNAME}"
-
+tar --force-local -xf "containerd-wasm-shims-v1-slight-linux-${VERSION}-${ARCH}.tar.gz" -C "${SYSEXTNAME}"
+tar --force-local -xf "containerd-wasm-shims-v1-spin-linux-${VERSION}-${ARCH}.tar.gz" -C "${SYSEXTNAME}"
+tar --force-local -xf "containerd-wasm-shims-v1-wws-linux-${VERSION}-${ARCH}.tar.gz" -C "${SYSEXTNAME}"
+tar --force-local -xf "containerd-wasm-shims-v1-lunatic-linux-${VERSION}-${ARCH}.tar.gz" -C "${SYSEXTNAME}"
 # clean downloaded tarball
-rm "containerd-wasm-shims-v1-linux-${VERSION}-${ARCH}.tar.gz"
+rm -f "containerd-wasm-shims-v1-slight-linux-${VERSION}-${ARCH}.tar.gz"
+rm -f "containerd-wasm-shims-v1-spin-linux-${VERSION}-${ARCH}.tar.gz"
+rm -f "containerd-wasm-shims-v1-wws-linux-${VERSION}-${ARCH}.tar.gz"
+rm -f "containerd-wasm-shims-v1-lunatic-linux-${VERSION}-${ARCH}.tar.gz"
 
 # create deployment directory in SYSEXTNAME/ and move wasmtime into it
 mkdir -p "${SYSEXTNAME}"/usr/bin
