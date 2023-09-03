@@ -34,14 +34,14 @@ mkdir -p "${SYSEXTNAME}"
 tar --force-local -xvf "iwasm-${VERSION}-${ARCH}-ubuntu-22.04.tar.gz" -C "${SYSEXTNAME}"
 
 # clean downloaded tarball
-rm "iwasm-${VERSION}-${ARCH}-ubuntu-22.04.tar.gz"
+# rm "iwasm-${VERSION}-${ARCH}-ubuntu-22.04.tar.gz"
 
 # create deployment directory in SYSEXTNAME/ and move wasmtime into it
 mkdir -p "${SYSEXTNAME}"/usr/bin
 mv "${SYSEXTNAME}"/iwasm "${SYSEXTNAME}"/usr/bin/
 
 # clean up any extracted mess
-rm -r "${SYSEXTNAME}"
+#rm -r "${SYSEXTNAME}"
 
 # bake the .raw
 "${SCRIPTFOLDER}"/bake.sh "${SYSEXTNAME}"

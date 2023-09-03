@@ -49,7 +49,7 @@ mkdir -p "${SYSEXTNAME}"/usr/bin
 mv "${SYSEXTNAME}"/containerd-shim* "${SYSEXTNAME}"/usr/bin/
 
 # clean up any extracted mess
-rm -r "${SYSEXTNAME}"/*
+ #rm -r "${SYSEXTNAME}"/*
 
 # bake the .raw
 "${SCRIPTFOLDER}"/bake.sh "${SYSEXTNAME}"

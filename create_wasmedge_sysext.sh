@@ -35,8 +35,11 @@ tar --force-local -xvf "WasmEdge-${VERSION}-ubuntu20.04_${ARCH}.tar.gz" -C "${SY
 rm "WasmEdge-${VERSION}-ubuntu20.04_${ARCH}.tar.gz"
 
 # create deployment directory in SYSEXTNAME/ and move wasmtime into it
-mkdir -p "${SYSEXTNAME}"/usr/bin
+mkdir -p "${SYSEXTNAME}"/usr/bin # binary
+mkdir -p "${SYSEXTNAME}"/usr/lib/wasmedge # .so files
+
 mv "${SYSEXTNAME}"/WasmEdge-0.13.3-Linux/bin/wasmedge "${SYSEXTNAME}"/usr/bin/
+mv "${SYSEXTNAME}"/WasmEdge-0.13.3-Linux/lib/* "${SYSEXTNAME}"/usr/lib/wasmedge/
 
 # clean up any extracted mess # currently in WasmEdge-0.13.3-Linux/bin/wasmedge -- there's bin/ include/ lib/ to clean up
 rm -rf "${SYSEXTNAME}"/WasmEdge-0.13.3-Linux/bin/ "${SYSEXTNAME}"/WasmEdge-0.13.3-Linux/include/ "${SYSEXTNAME}"/WasmEdge-0.13.3-Linux/lib
@@ -48,4 +51,4 @@ rm -rf "${SYSEXTNAME}"/WasmEdge-0.13.3-Linux/bin/ "${SYSEXTNAME}"/WasmEdge-0.13.
 mv "./${SYSEXTNAME}.raw" "./${SYSEXTNAME}-v${VERSION}-${FILE_ARCH}.raw"
 
 # clean again just in case
-rm -rf "${SYSEXTNAME}" 
+#rm -rf "${SYSEXTNAME}" 
