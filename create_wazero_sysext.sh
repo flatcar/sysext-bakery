@@ -7,7 +7,7 @@ SCRIPTFOLDER="$(dirname "$(readlink -f "$0")")"
 
 if [ $# -lt 2 ] || [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
   echo "Usage: $0 VERSION SYSEXTNAME"
-  echo "The script will download the wasmtime release tar ball (e.g., for 4.0.0) and create a sysext squashfs image with the name SYSEXTNAME.raw in the current folder."
+  echo "The script will download the wazero release tar ball (e.g., for 4.0.0) and create a sysext squashfs image with the name SYSEXTNAME.raw in the current folder."
   echo "A temporary directory named SYSEXTNAME in the current folder will be created and deleted again."
   echo "All files in the sysext image will be owned by root."
   echo "To use arm64 pass 'ARCH=aarch64' as environment variable (current value is '${ARCH}')."
@@ -19,25 +19,25 @@ VERSION="$1"
 SYSEXTNAME="$2"
 
 # clean and obtain the specified version
-rm -f "wasmtime-v${VERSION}-${ARCH}-linux.tar.xz"
-curl -o "wasmtime-v${VERSION}-${ARCH}-linux.tar.xz" -L "https://github.com/bytecodealliance/wasmtime/releases/download/v${VERSION}/wasmtime-v${VERSION}-${ARCH}-linux.tar.xz"
+rm -f "wazero_${VERSION}_linux_amd64.tar.gz"
+curl -o "wazero_${VERSION}_linux_amd64.tar.gz" -L "https://github.com/tetratelabs/wazero/releases/download/v${VERSION}/wazero_${VERSION}_linux_amd64.tar.gz"
 
 # clean earlier SYSEXTNAME directory and recreate
 rm -rf "${SYSEXTNAME}"
 mkdir -p "${SYSEXTNAME}"
 
 # extract wasmtime into SYSEXTNAME/
-tar --force-local -xvf "wasmtime-v${VERSION}-${ARCH}-linux.tar.xz" -C "${SYSEXTNAME}"
+tar --force-local -xvf "wazero_${VERSION}_linux_amd64.tar.gz" -C "${SYSEXTNAME}"
 
 # clean downloaded tarball
-rm "wasmtime-v${VERSION}-${ARCH}-linux.tar.xz"
+rm "wazero_${VERSION}_linux_amd64.tar.gz"
 
 # create deployment directory in SYSEXTNAME/ and move wasmtime into it
 mkdir -p "${SYSEXTNAME}"/usr/bin
-mv "${SYSEXTNAME}"/"wasmtime-v${VERSION}-${ARCH}-linux"/wasmtime "${SYSEXTNAME}"/usr/bin/
+mv "${SYSEXTNAME}"/wazero "${SYSEXTNAME}"/usr/bin/
 
 # clean up any extracted mess
-rm -r "${SYSEXTNAME}"/"wasmtime-v${VERSION}-${ARCH}-linux"
+#rm -r "${SYSEXTNAME}"/"wasmtime-v${VERSION}-${ARCH}-linux"
 
 # bake the .raw. This process uses the generic binary name for layer metadata
 "${SCRIPTFOLDER}"/bake.sh "${SYSEXTNAME}"
