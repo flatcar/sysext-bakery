@@ -26,18 +26,18 @@ curl -o "wazero_${VERSION}_linux_amd64.tar.gz" -L "https://github.com/tetratelab
 rm -rf "${SYSEXTNAME}"
 mkdir -p "${SYSEXTNAME}"
 
-# extract wasmtime into SYSEXTNAME/
+# extract wazero into SYSEXTNAME/
 tar --force-local -xvf "wazero_${VERSION}_linux_amd64.tar.gz" -C "${SYSEXTNAME}"
 
 # clean downloaded tarball
 rm "wazero_${VERSION}_linux_amd64.tar.gz"
 
-# create deployment directory in SYSEXTNAME/ and move wasmtime into it
+# create deployment directory in SYSEXTNAME/ and move wazero into it
 mkdir -p "${SYSEXTNAME}"/usr/bin
 mv "${SYSEXTNAME}"/wazero "${SYSEXTNAME}"/usr/bin/
 
 # clean up any extracted mess
-#rm -r "${SYSEXTNAME}"/"wasmtime-v${VERSION}-${ARCH}-linux"
+#rm -r "${SYSEXTNAME}"/"wazero-v${VERSION}-${ARCH}-linux"
 
 # bake the .raw. This process uses the generic binary name for layer metadata
 "${SCRIPTFOLDER}"/bake.sh "${SYSEXTNAME}"

@@ -33,7 +33,7 @@ mkdir -p "${SYSEXTNAME}"
 # clean downloaded tarball
 # not necessary
 
-# create deployment directory in SYSEXTNAME/ and move wasmtime into it
+# create deployment directory in SYSEXTNAME/ and move wamr into it
 mkdir -p "${SYSEXTNAME}"/usr/bin
 mv ./wasm3-linux-x64.elf  "${SYSEXTNAME}"/usr/bin/wasm3
 

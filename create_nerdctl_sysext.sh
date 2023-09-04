@@ -6,7 +6,7 @@ SCRIPTFOLDER="$(dirname "$(readlink -f "$0")")"
 
 if [ $# -lt 2 ] || [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
   echo "Usage: $0 VERSION SYSEXTNAME"
-  echo "The script will download the wasmtime release tar ball (e.g., for 4.0.0) and create a sysext squashfs image with the name SYSEXTNAME.raw in the current folder."
+  echo "The script will download the nerdctl release tar ball (e.g., for 4.0.0) and create a sysext squashfs image with the name SYSEXTNAME.raw in the current folder."
   echo "A temporary directory named SYSEXTNAME in the current folder will be created and deleted again."
   echo "All files in the sysext image will be owned by root."
   echo "To use arm64 pass 'ARCH=aarch64' as environment variable (current value is '${ARCH}')."

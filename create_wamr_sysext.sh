@@ -30,13 +30,13 @@ curl -o "iwasm-${VERSION}-${ARCH}-ubuntu-22.04.tar.gz" -fsSL "https://github.com
 rm -rf "${SYSEXTNAME}"
 mkdir -p "${SYSEXTNAME}"
 
-# extract wasmtime into SYSEXTNAME/
+# extract wamr into SYSEXTNAME/
 tar --force-local -xvf "iwasm-${VERSION}-${ARCH}-ubuntu-22.04.tar.gz" -C "${SYSEXTNAME}"
 
 # clean downloaded tarball
 # rm "iwasm-${VERSION}-${ARCH}-ubuntu-22.04.tar.gz"
 
-# create deployment directory in SYSEXTNAME/ and move wasmtime into it
+# create deployment directory in SYSEXTNAME/ and move wamr into it
 mkdir -p "${SYSEXTNAME}"/usr/bin
 mv "${SYSEXTNAME}"/iwasm "${SYSEXTNAME}"/usr/bin/
 

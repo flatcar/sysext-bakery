@@ -28,13 +28,13 @@ curl -o "modsurfer-${ARCH}-unknown-linux-gnu.tar.gz" -L "https://github.com/dyli
 rm -rf "${SYSEXTNAME}"
 mkdir -p "${SYSEXTNAME}"
 
-# extract wasmtime into SYSEXTNAME/
+# extract modsurfer into SYSEXTNAME/
 tar --force-local -xvf "modsurfer-${ARCH}-unknown-linux-gnu.tar.gz" -C "${SYSEXTNAME}"
 
 # clean downloaded tarball
 rm "modsurfer-${ARCH}-unknown-linux-gnu.tar.gz"
 
-# create deployment directory in SYSEXTNAME/ and move wasmtime into it
+# create deployment directory in SYSEXTNAME/ and move modsurfer into it
 mkdir -p "${SYSEXTNAME}"/usr/bin
 mv "${SYSEXTNAME}"/modsurfer "${SYSEXTNAME}"/usr/bin/
 
