@@ -71,8 +71,8 @@ EnvironmentFile=-/var/lib/kubelet/kubeadm-flags.env
 # the .NodeRegistration.KubeletExtraArgs object in the configuration files instead. KUBELET_EXTRA_ARGS should be sourced from this file.
 EnvironmentFile=-/etc/sysconfig/kubelet
 ExecStart=
-ExecStartPre=/usr/bin/mkdir -p /opt/libexec /opt/libexec.work
-ExecStartPre=/usr/bin/cp -r /usr/local/bin/cni/ /opt/bin/cni
+ExecStartPre=/usr/bin/mkdir -p /opt/cni/bin
+ExecStartPre=/usr/bin/cp -r /usr/local/bin/cni/. /opt/cni/bin/
 ExecStartPre=/usr/bin/cp /usr/local/share/kubernetes-version /etc/kubernetes-version
 ExecStartPre=/usr/bin/mkdir -p /var/kubernetes/kubelet-plugins/volume/exec/
 ExecStart=/usr/bin/kubelet $KUBELET_KUBECONFIG_ARGS $KUBELET_CONFIG_ARGS $KUBELET_KUBEADM_ARGS $KUBELET_EXTRA_ARGS
