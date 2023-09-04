@@ -22,7 +22,7 @@ SYSEXTNAME="$2"
 echo "Currently only the x86_64 architecture, though it supports a lot of them"
 rm -f "wasm3-linux-x64.elf"
 curl -o "wasm3-linux-x64.elf" -L "https://github.com/wasm3/wasm3/releases/download/v0.5.0/wasm3-linux-x64.elf"
-
+chmod +x "wasm3-linux-x64.elf"
 # clean earlier SYSEXTNAME directory and recreate
 rm -rf "${SYSEXTNAME}"
 mkdir -p "${SYSEXTNAME}"
