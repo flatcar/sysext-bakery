@@ -44,7 +44,7 @@ jobs:
     strategy:
       max-parallel: 6
       matrix:
-        flatcarversion: ["3510.2.6"]
+        flatcarversion: ["3510.2.6", "3510.2.7"]
     permissions:
       # allow the action to create a release
       contents: write
