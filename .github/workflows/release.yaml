@@ -30,17 +30,29 @@ jobs:
           done
 
           sha256sum *.raw > SHA256SUMS
+      - name: Get git tag
+        id: tag
+        uses: devops-actions/action-get-tag@v1.0.2
+
+      - name: (Pre)Release check
+        run: |
+          if [[ ${{ steps.tag.outputs.tag }} =~ ^[0-9]+$ ]]; then
+             echo "TAG_TYPE=numeric" >> $GITHUB_ENV
+          else
+             echo "TAG_TYPE=alphanumeric" >> $GITHUB_ENV
+          fi
+
       # create a Github release with the generated artifacts
       - name: Release
         uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/') && isMatch(github.ref, '^refs/tags/[0-9]+$')
+        if: env.TAG_TYPE == 'numeric'
         with:
           files: |
             SHA256SUMS
             *.raw
       - name: Pre Release
         uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/') && !isMatch(github.ref, '^refs/tags/[0-9]+$')
+        if: env.TAG_TYPE == 'alphanumeric'
         with:
           prerelease: true
           files: |
@@ -80,17 +92,29 @@ jobs:
           done
 
           sha256sum *.raw > SHA256SUMS
+      - name: Get git tag
+        id: tag
+        uses: devops-actions/action-get-tag@v1.0.2
+
+      - name: (Pre)Release check
+        run: |
+          if [[ ${{ steps.tag.outputs.tag }} =~ ^[0-9]+$ ]]; then
+             echo "TAG_TYPE=numeric" >> $GITHUB_ENV
+          else
+             echo "TAG_TYPE=alphanumeric" >> $GITHUB_ENV
+          fi
+
       # create a Github release with the generated artifacts
       - name: Release
         uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/') && isMatch(github.ref, '^refs/tags/[0-9]+$')
+        if: env.TAG_TYPE == 'numeric'
         with:
           files: |
             SHA256SUMS
             *.raw
       - name: Pre Release
         uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/') && !isMatch(github.ref, '^refs/tags/[0-9]+$')
+        if: env.TAG_TYPE == 'alphanumeric'
         with:
           prerelease: true
           files: |
