@@ -20,6 +20,7 @@ elif [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
 fi
 
 SYSEXTNAME="$1"
+VERSION_ID="${2:-}"
 
 if [ "${FORMAT}" != "squashfs" ] && [ "${FORMAT}" != "btrfs" ] && [ "${FORMAT}" != "ext4" ] && [ "${FORMAT}" != "ext2" ]; then
   echo "Expected FORMAT=squashfs, FORMAT=btrfs, FORMAT=ext4, or FORMAT=ext2, got '${FORMAT}'" >&2
@@ -36,7 +37,9 @@ fi
 mkdir -p "${SYSEXTNAME}/usr/lib/extension-release.d"
 {
   echo "ID=${OS}"
-  if [ "${OS}" != "_any" ]; then
+  if [ "${VERSION_ID}" != "" ]; then
+    echo "VERSION_ID=${VERSION_ID}"
+  elif [ "${OS}" != "_any" ]; then
     echo "SYSEXT_LEVEL=1.0"
   fi
   if [ "${ARCH}" != "" ]; then
