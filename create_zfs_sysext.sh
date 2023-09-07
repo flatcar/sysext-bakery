@@ -60,5 +60,5 @@ rm -rf ${SYSEXTNAME}/usr/include
 
 
 
-"${SCRIPTFOLDER}"/bake.sh "${SYSEXTNAME}" "${FLATCAR_VERSION}"
+"${SCRIPTFOLDER}"/bake.sh "${SYSEXTNAME}" "${FLATCARVERSION}"
 rm -rf "${SYSEXTNAME}"
