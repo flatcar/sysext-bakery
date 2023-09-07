@@ -73,7 +73,16 @@ jobs:
       # create a Github release with the generated artifacts
       - name: Release
         uses: softprops/action-gh-release@v1
+        if: github.ref == 'refs/heads/main'
         with:
+          files: |
+            SHA256SUMS
+            *.raw
+      - name: Pre Release
+        uses: softprops/action-gh-release@v1
+        if: github.ref != 'refs/heads/main'
+        with:
+          prerelease: true
           files: |
             SHA256SUMS
             *.raw
