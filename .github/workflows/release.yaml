@@ -33,10 +33,20 @@ jobs:
       # create a Github release with the generated artifacts
       - name: Release
         uses: softprops/action-gh-release@v1
+        if: github.ref == 'refs/heads/main'
         with:
           files: |
             SHA256SUMS
             *.raw
+      - name: Pre Release
+        uses: softprops/action-gh-release@v1
+        if: github.ref != 'refs/heads/main'
+        with:
+          prerelease: true
+          files: |
+            SHA256SUMS
+            *.raw
+
   multi-build:
     name: Multi version build
     runs-on: ubuntu-22.04
@@ -44,7 +54,7 @@ jobs:
     strategy:
       max-parallel: 6
       matrix:
-        flatcarversion: ["3510.2.6"]
+        flatcarversion: ["3510.2.6", "3510.2.7"]
     permissions:
       # allow the action to create a release
       contents: write
@@ -73,7 +83,16 @@ jobs:
       # create a Github release with the generated artifacts
       - name: Release
         uses: softprops/action-gh-release@v1
+        if: github.ref == 'refs/heads/main'
         with:
+          files: |
+            SHA256SUMS
+            *.raw
+      - name: Pre Release
+        uses: softprops/action-gh-release@v1
+        if: github.ref != 'refs/heads/main'
+        with:
+          prerelease: true
           files: |
             SHA256SUMS
             *.raw

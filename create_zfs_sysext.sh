@@ -46,8 +46,6 @@ mkdir -p ${SYSEXTNAME}/lib/modules
 rsync -a /lib/modules/${kernel} ${SYSEXTNAME}/lib/modules/
 echo "========== Emerge packages"
 pkgs=$(emerge 2>/dev/null --usepkgonly --pretend zfs| awk -F'] ' '/binary/{ print $ 2 }' | awk '{ print "="$1 }'); emerge --usepkgonly --root=${SYSEXTNAME} --nodeps $pkgs
-echo "========== Create sysext metadata file"
-mkdir -p ${SYSEXTNAME}/usr/lib/extension-release.d && echo -e 'ID=flatcar\nSYSEXT_LEVEL=1.0' >${SYSEXTNAME}/usr/lib/extension-release.d/extension-release.zfs
 mv ${SYSEXTNAME}/etc ${SYSEXTNAME}/usr/etc
 echo "========== Copy static files (systemd) to workdir"
 rsync -a files/zfs/usr/ ${SYSEXTNAME}/usr/
@@ -62,5 +60,5 @@ rm -rf ${SYSEXTNAME}/usr/include
 
 
 
-"${SCRIPTFOLDER}"/bake.sh "${SYSEXTNAME}"
+"${SCRIPTFOLDER}"/bake.sh "${SYSEXTNAME}" "${FLATCARVERSION}"
 rm -rf "${SYSEXTNAME}"
