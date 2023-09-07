@@ -33,14 +33,14 @@ jobs:
       # create a Github release with the generated artifacts
       - name: Release
         uses: softprops/action-gh-release@v1
-        if: github.ref == 'refs/heads/main'
+        if: startsWith(github.ref, 'refs/tags/') && isMatch(github.ref, '^refs/tags/[0-9]+$')
         with:
           files: |
             SHA256SUMS
             *.raw
       - name: Pre Release
         uses: softprops/action-gh-release@v1
-        if: github.ref != 'refs/heads/main'
+        if: startsWith(github.ref, 'refs/tags/') && !isMatch(github.ref, '^refs/tags/[0-9]+$')
         with:
           prerelease: true
           files: |
@@ -83,14 +83,14 @@ jobs:
       # create a Github release with the generated artifacts
       - name: Release
         uses: softprops/action-gh-release@v1
-        if: github.ref == 'refs/heads/main'
+        if: startsWith(github.ref, 'refs/tags/') && isMatch(github.ref, '^refs/tags/[0-9]+$')
         with:
           files: |
             SHA256SUMS
             *.raw
       - name: Pre Release
         uses: softprops/action-gh-release@v1
-        if: github.ref != 'refs/heads/main'
+        if: startsWith(github.ref, 'refs/tags/') && !isMatch(github.ref, '^refs/tags/[0-9]+$')
         with:
           prerelease: true
           files: |
