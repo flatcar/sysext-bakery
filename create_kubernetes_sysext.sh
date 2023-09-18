@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 set -euo pipefail
 
 export ARCH="${ARCH-x86-64}"
@@ -30,9 +30,10 @@ fi
 rm -f kubectl kubeadm kubelet
 
 # install kubernetes binaries.
-curl -o kubectl -fsSL "https://dl.k8s.io/${VERSION}/bin/linux/${ARCH}/kubectl"
-curl -o kubeadm -fsSL "https://dl.k8s.io/${VERSION}/bin/linux/${ARCH}/kubeadm"
-curl -o kubelet -fsSL "https://dl.k8s.io/${VERSION}/bin/linux/${ARCH}/kubelet"
+curl --parallel --fail --silent --show-error --location \
+  --output kubectl "https://dl.k8s.io/${VERSION}/bin/linux/${ARCH}/kubectl" \
+  --output kubeadm "https://dl.k8s.io/${VERSION}/bin/linux/${ARCH}/kubeadm" \
+  --output kubelet "https://dl.k8s.io/${VERSION}/bin/linux/${ARCH}/kubelet"
 
 rm -rf "${SYSEXTNAME}"
 mkdir -p "${SYSEXTNAME}"/usr/bin
