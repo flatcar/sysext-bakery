@@ -24,10 +24,10 @@ jobs:
             xz-utils
 
           images=(
-              "kubernetes-v1.27.4"
-              "docker-24.0.5"
-              "docker_compose-2.17.2"
-              "wasmtime-12.0.1"
+              "kubernetes-v1.27.6"
+              "docker-24.0.6"
+              "docker_compose-2.22.0"
+              "wasmtime-13.0.0"
           )
 
           for image in ${images[@]}; do
