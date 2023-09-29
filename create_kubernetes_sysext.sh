@@ -82,9 +82,9 @@ EOF
 mkdir -p "${SYSEXTNAME}/usr/local/share/"
 echo "${VERSION}" > "${SYSEXTNAME}/usr/local/share/kubernetes-version"
 
-mkdir -p "${SYSEXTNAME}/usr/libexec/kubernetes/kubelet-plugins/volume/exec/"
+mkdir -p "${SYSEXTNAME}/usr/libexec/kubernetes/kubelet-plugins/volume/"
 # /var/kubernetes/... will be created at runtime by the kubelet unit.
-ln -sf "/var/kubernetes/kubelet-plugins/volume/exec/" "${SYSEXTNAME}/usr/libexec/kubernetes/kubelet-plugins/volume/exec/"
+ln -sf "/var/kubernetes/kubelet-plugins/volume/exec" "${SYSEXTNAME}/usr/libexec/kubernetes/kubelet-plugins/volume/exec"
 
 mkdir -p "${SYSEXTNAME}/usr/lib/systemd/system/multi-user.target.d"
 { echo "[Unit]"; echo "Upholds=kubelet.service"; } > "${SYSEXTNAME}/usr/lib/systemd/system/multi-user.target.d/10-kubelet-service.conf"
