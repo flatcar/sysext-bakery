@@ -1,0 +1,73 @@
+name: Build and release Systemd sysext images
+on:
+  push:
+    tags:
+      - '*'
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    permissions:
+      # allow the action to create a release
+      contents: write
+    steps:
+      # checkout the sources
+      - uses: actions/checkout@v3
+      # build the images and generate a manifest
+      - name: build
+        run: |
+          set -euxo pipefail
+
+          sudo apt update -qq && sudo apt install -yqq \
+            curl \
+            jq \
+            squashfs-tools \
+            xz-utils
+
+          images=(
+              "kubernetes-v1.27.6"
+              "docker-24.0.6"
+              "docker_compose-2.22.0"
+              "wasmtime-13.0.0"
+          )
+
+          for image in ${images[@]}; do
+              component="${image%-*}"
+              version="${image#*-}"
+              for arch in x86-64 arm64; do
+                ARCH="${arch}" "./create_${component}_sysext.sh" "${version}" "${component}"
+                mv "${component}.raw" "${image}-${arch}.raw"
+              done
+              cat << EOF > "${component}.conf"
+           [Transfer]
+           Verify=false
+           [Source]
+           Type=url-file
+           Path=https://github.com/flatcar/sysext-bakery/releases/latest/download/
+           MatchPattern=${component}-@v-%a.raw
+           [Target]
+           InstancesMax=3
+           Type=regular-file
+           Path=/opt/extensions/${component}
+           CurrentSymlink=/etc/extensions/${component}.raw
+          EOF
+          done
+
+          cat << EOF > "noop.conf"
+          [Source]
+          Type=regular-file
+          Path=/
+          MatchPattern=invalid@v.raw
+          [Target]
+          Type=regular-file
+          Path=/
+          EOF
+
+          sha256sum *.raw > SHA256SUMS
+      # create a Github release with the generated artifacts
+      - name: release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            SHA256SUMS
+            *.raw
+            *.conf

@@ -1,9 +1,11 @@
-#!/bin/bash
+#!/usr/bin/env bash
 set -euo pipefail
 
 OS="${OS-flatcar}"
 FORMAT="${FORMAT:-squashfs}"
 ARCH="${ARCH-}"
+SOURCE_DATE_EPOCH="${SOURCE_DATE_EPOCH-0}"
+export SOURCE_DATE_EPOCH
 
 # This script is to be called as helper by other scripts but can also be used standalone
 if [ $# -lt 1 ]; then
@@ -15,6 +17,7 @@ elif [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
   echo "To build for another OS than Flatcar, pass 'OS=myosid' as environment variable (current value is '${OS}'), e.g., 'fedora' as found in 'ID' under '/etc/os-release', or pass 'OS=_any' for any OS."
   echo "The '/etc/os-release' file of your OS has to include 'SYSEXT_LEVEL=1.0' as done in Flatcar (not needed for 'OS=_any')."
   echo "If the mksquashfs tool is missing you can pass FORMAT=btrfs, FORMAT=ext4, or FORMAT=ext2 as environment variable (current value is '${FORMAT}') but the script won't change the ownership of the files in the SYSEXTNAME directory, so make sure that they are owned by root before creating the sysext image to avoid any problems."
+  echo "To make builds reproducible the SOURCE_DATE_EPOCH environment variable will be set to 0 if not defined."
   echo
   exit 1
 fi
