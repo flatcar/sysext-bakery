@@ -49,7 +49,11 @@ mkdir -p "${SYSEXTNAME}/usr/lib/systemd/system"
 if [ "${ONLY_CONTAINERD}" = 1 ]; then
   rm "${SYSEXTNAME}/usr/bin/docker" "${SYSEXTNAME}/usr/bin/dockerd" "${SYSEXTNAME}/usr/bin/docker-init" "${SYSEXTNAME}/usr/bin/docker-proxy"
 elif [ "${ONLY_DOCKER}" = 1 ]; then
-  rm "${SYSEXTNAME}/usr/bin/containerd" "${SYSEXTNAME}/usr/bin/containerd-shim" "${SYSEXTNAME}/usr/bin/containerd-shim-runc-v2" "${SYSEXTNAME}/usr/bin/ctr" "${SYSEXTNAME}/usr/bin/runc"
+  rm "${SYSEXTNAME}/usr/bin/containerd" "${SYSEXTNAME}/usr/bin/containerd-shim-runc-v2" "${SYSEXTNAME}/usr/bin/ctr" "${SYSEXTNAME}/usr/bin/runc"
+  if [[ "${VERSION%%.*}" -lt 23 ]] ; then
+    # Binary releases 23 and higher don't ship containerd-shim
+    rm "${SYSEXTNAME}/usr/bin/containerd-shim"
+  fi
 fi
 if [ "${ONLY_CONTAINERD}" != 1 ]; then
   cat > "${SYSEXTNAME}/usr/lib/systemd/system/docker.socket" <<-'EOF'
