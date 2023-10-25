@@ -229,6 +229,7 @@ src_configure() {
 		$(usex minimal --without-python --with-python="${EPYTHON}")
 	)
 
+        unset am_cv_python_version
 	econf "${myconf[@]}"
 }
 
