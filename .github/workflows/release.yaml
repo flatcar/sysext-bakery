@@ -24,7 +24,6 @@ jobs:
             xz-utils
 
           images=(
-              "kubernetes-v1.27.6"
               "kubernetes-v1.28.2"
               "docker-24.0.6"
               "docker_compose-2.22.0"
