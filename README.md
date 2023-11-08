@@ -90,20 +90,20 @@ storage:
   files:
     - path: /opt/extensions/docker/docker-24.0.5-x86-64.raw
       contents:
-        source: https://github.com/flatcar/sysext-bakery/releases/download/20230901/docker-24.0.5-x86-64.raw
+        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/docker-24.0.5-x86-64.raw
     - path: /opt/extensions/kubernetes/kubernetes-v1.27.4-x86-64.raw
       contents:
-        source: https://github.com/flatcar/sysext-bakery/releases/download/20230901/kubernetes-v1.27.4-x86-64.raw
+        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/kubernetes-v1.27.4-x86-64.raw
     - path: /etc/systemd/system-generators/torcx-generator
     - path: /etc/sysupdate.d/noop.conf
       contents:
-        source: https://github.com/flatcar/sysext-bakery/releases/download/20230901/noop.conf
+        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/noop.conf
     - path: /etc/sysupdate.docker.d/docker.conf
       contents:
-        source: https://github.com/flatcar/sysext-bakery/releases/download/20230901/docker.conf
+        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/docker.conf
     - path: /etc/sysupdate.kubernetes.d/kubernetes.conf
       contents:
-        source: https://github.com/flatcar/sysext-bakery/releases/download/20230901/kubernetes.conf
+        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/kubernetes.conf
   links:
     - target: /opt/extensions/docker/docker-24.0.5-x86-64.raw
       path: /etc/extensions/docker.raw
