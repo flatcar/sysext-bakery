@@ -25,6 +25,7 @@ jobs:
 
           images=(
               "kubernetes-v1.27.6"
+              "kubernetes-v1.28.2"
               "docker-24.0.6"
               "docker_compose-2.22.0"
               "wasmtime-13.0.0"
