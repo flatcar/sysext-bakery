@@ -34,7 +34,7 @@ jobs:
         id: tag
         uses: devops-actions/action-get-tag@v1.0.2
 
-      - name: (Pre)Release check
+      - name: (Draft)Release check
         run: |
           if [[ ${{ steps.tag.outputs.tag }} =~ ^[0-9]+$ ]]; then
              echo "TAG_TYPE=numeric" >> $GITHUB_ENV
@@ -50,11 +50,11 @@ jobs:
           files: |
             SHA256SUMS
             *.raw
-      - name: Pre Release
+      - name: Draft Release
         uses: softprops/action-gh-release@v1
         if: env.TAG_TYPE == 'alphanumeric'
         with:
-          prerelease: true
+          draft: true
           files: |
             SHA256SUMS
             *.raw
@@ -96,7 +96,7 @@ jobs:
         id: tag
         uses: devops-actions/action-get-tag@v1.0.2
 
-      - name: (Pre)Release check
+      - name: (Draft)Release check
         run: |
           if [[ ${{ steps.tag.outputs.tag }} =~ ^[0-9]+$ ]]; then
              echo "TAG_TYPE=numeric" >> $GITHUB_ENV
@@ -112,11 +112,11 @@ jobs:
           files: |
             SHA256SUMS
             *.raw
-      - name: Pre Release
+      - name: Draft Release
         uses: softprops/action-gh-release@v1
         if: env.TAG_TYPE == 'alphanumeric'
         with:
-          prerelease: true
+          draft: true
           files: |
             SHA256SUMS
             *.raw
