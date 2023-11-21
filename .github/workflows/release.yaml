@@ -58,6 +58,9 @@ jobs:
           files: |
             SHA256SUMS
             *.raw
+      - name: Blinky
+        run: |
+          curl -o /dev/null https://app.getblinky.io/api/v1/ingest/webhook/be6f78fd-ca93-4642-8bae-678f73eb0014
 
   multi-build:
     name: Multi version build
