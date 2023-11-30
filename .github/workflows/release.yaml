@@ -20,6 +20,9 @@ jobs:
               "teleport-9.3.26"
               "teleport-10.3.16"
               "teleport-11.3.22"
+              "teleport-12.4.28"
+              "teleport-13.4.7"
+              "teleport-14.2.0"
           )
 
           for image in ${images[@]}; do
