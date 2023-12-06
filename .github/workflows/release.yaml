@@ -29,14 +29,22 @@ jobs:
               "docker_compose-2.22.0"
               "wasmtime-13.0.0"
           )
+          streams=()
 
-          for image in ${images[@]}; do
+          for image in "${images[@]}"; do
               component="${image%-*}"
               version="${image#*-}"
               for arch in x86-64 arm64; do
                 ARCH="${arch}" "./create_${component}_sysext.sh" "${version}" "${component}"
                 mv "${component}.raw" "${image}-${arch}.raw"
               done
+              streams+=("${component}")
+              if [ "${component}" = "kubernetes" ]; then
+                streams+=("kubernetes-${version%.*}")
+                # Should give, e.g., v1.28 for v1.28.2 (use ${version#*.*.} to get 2)
+              fi
+          done
+          for component in "${streams[@]}"; do
               cat << EOF > "${component}.conf"
            [Transfer]
            Verify=false
