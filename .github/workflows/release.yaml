@@ -38,24 +38,26 @@ jobs:
                 ARCH="${arch}" "./create_${component}_sysext.sh" "${version}" "${component}"
                 mv "${component}.raw" "${image}-${arch}.raw"
               done
-              streams+=("${component}")
+              streams+=("${component}:-@v")
               if [ "${component}" = "kubernetes" ]; then
-                streams+=("kubernetes-${version%.*}")
+                streams+=("kubernetes-${version%.*}:.@v")
                 # Should give, e.g., v1.28 for v1.28.2 (use ${version#*.*.} to get 2)
               fi
           done
-          for component in "${streams[@]}"; do
+          for stream in "${streams[@]}"; do
+              component="${stream%:*}"
+              pattern="${stream#*:}"
               cat << EOF > "${component}.conf"
            [Transfer]
            Verify=false
            [Source]
            Type=url-file
            Path=https://github.com/flatcar/sysext-bakery/releases/latest/download/
-           MatchPattern=${component}-@v-%a.raw
+           MatchPattern=${component}${pattern}-%a.raw
            [Target]
            InstancesMax=3
            Type=regular-file
-           Path=/opt/extensions/${component}
+           Path=/opt/extensions/${component%-*}
            CurrentSymlink=/etc/extensions/${component}.raw
           EOF
           done
