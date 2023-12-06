@@ -58,7 +58,7 @@ jobs:
            InstancesMax=3
            Type=regular-file
            Path=/opt/extensions/${component%-*}
-           CurrentSymlink=/etc/extensions/${component}.raw
+           CurrentSymlink=/etc/extensions/${component%-*}.raw
           EOF
           done
 
