@@ -88,28 +88,28 @@ variant: flatcar
 version: 1.0.0
 storage:
   files:
+    - path: /opt/extensions/wasmtime/wasmtime-13.0.0-x86-64.raw
+      contents:
+        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/wasmtime-13.0.0-x86-64.raw
     - path: /opt/extensions/docker/docker-24.0.5-x86-64.raw
       contents:
         source: https://github.com/flatcar/sysext-bakery/releases/download/latest/docker-24.0.5-x86-64.raw
-    - path: /opt/extensions/kubernetes/kubernetes-v1.27.4-x86-64.raw
-      contents:
-        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/kubernetes-v1.27.4-x86-64.raw
     - path: /etc/systemd/system-generators/torcx-generator
     - path: /etc/sysupdate.d/noop.conf
       contents:
         source: https://github.com/flatcar/sysext-bakery/releases/download/latest/noop.conf
+    - path: /etc/sysupdate.wasmtime.d/wasmtime.conf
+      contents:
+        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/wasmtime.conf
     - path: /etc/sysupdate.docker.d/docker.conf
       contents:
         source: https://github.com/flatcar/sysext-bakery/releases/download/latest/docker.conf
-    - path: /etc/sysupdate.kubernetes.d/kubernetes.conf
-      contents:
-        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/kubernetes.conf
   links:
+    - target: /opt/extensions/wasmtime/wasmtime-13.0.0-x86-64.raw
+      path: /etc/extensions/wasmtime.raw
+      hard: false
     - target: /opt/extensions/docker/docker-24.0.5-x86-64.raw
       path: /etc/extensions/docker.raw
-      hard: false
-    - target: /opt/extensions/kubernetes/kubernetes-v1.27.4-x86-64.raw
-      path: /etc/extensions/kubernetes.raw
       hard: false
     - path: /etc/extensions/docker-flatcar.raw
       target: /dev/null
@@ -123,14 +123,14 @@ systemd:
       enabled: true
     - name: systemd-sysupdate.service
       dropins:
+        - name: wasmtime.conf
+          contents: |
+            [Service]
+            ExecStartPre=/usr/lib/systemd/systemd-sysupdate -C wasmtime update
         - name: docker.conf
           contents: |
             [Service]
             ExecStartPre=/usr/lib/systemd/systemd-sysupdate -C docker update
-        - name: kubernetes.conf
-          contents: |
-            [Service]
-            ExecStartPre=/usr/lib/systemd/systemd-sysupdate -C kubernetes update
         - name: sysext.conf
           contents: |
             [Service]
