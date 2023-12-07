@@ -72,7 +72,11 @@ jobs:
           Path=/
           EOF
 
-          sha256sum *.raw > SHA256SUMS
+          # Fetch the current SHA256SUMS to append to it the new list of sha256 sums.
+          curl -fsSLO https://github.com/flatcar/sysext-bakery/releases/download/latest/SHA256SUMS
+          sha256sum *.raw >> SHA256SUMS
+          sort --unique --key 2 --output SHA256SUMS SHA256SUMS
+
       # create a Github release with the generated artifacts
       - name: release
         uses: softprops/action-gh-release@v1
