@@ -4,6 +4,8 @@ on:
 jobs:
   build:
     name: Build
+    concurrency:
+      group: ${{ github.ref }}
     runs-on: ubuntu-22.04
     permissions:
       # allow the action to create a release
@@ -11,6 +13,40 @@ jobs:
     steps:
       # checkout the sources
       - uses: actions/checkout@v3
+
+      - name: Get git tag
+        id: tag
+        uses: devops-actions/action-get-tag@v1.0.2
+
+      - name: Tag / Release checks
+        id: tagcheck
+        run: |
+          if [[ ${{ steps.tag.outputs.tag }} =~ ^[0-9]+$ ]]; then
+             echo "TAG_TYPE=numeric" >> $GITHUB_ENV
+             echo "DRAFT=${{ toJSON(false) }}" >> $GITHUB_OUTPUT
+          else
+             echo "TAG_TYPE=alphanumeric" >> $GITHUB_ENV
+             echo "DRAFT=${{ toJSON(true) }}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Get latest release
+        continue-on-error: true
+        id: get_release
+        uses: kaliber5/action-get-release@v1
+        with:
+          token: ${{ github.token }}
+          tag_name: ${{ steps.tag.outputs.tag }}
+          draft: ${{ fromJSON(steps.tagcheck.outputs.DRAFT) }}
+
+      - name: Asset download
+        continue-on-error: true
+        if: ${{ steps.get_release.outputs.id }}
+        uses: dsaltares/fetch-gh-release-asset@1.1.1
+        with:
+         version: ${{ steps.get_release.outputs.id }}
+         file: 'SHA256SUMS'
+         token: ${{ secrets.GITHUB_TOKEN }}
+
       # build the images and generate a manifest
       - name: Build
         run: |
@@ -19,10 +55,11 @@ jobs:
           images=(
               "teleport-9.3.26"
               "teleport-10.3.16"
-              "teleport-11.3.22"
-              "teleport-12.4.28"
-              "teleport-13.4.7"
-              "teleport-14.2.0"
+              "teleport-11.3.27"
+              "teleport-12.4.30"
+              "teleport-13.4.11"
+              "teleport-14.2.3"
+              "teleport-14.3.0"
           )
 
           for image in ${images[@]}; do
@@ -32,18 +69,7 @@ jobs:
               mv "${component}.raw" "${image}.raw"
           done
 
-          sha256sum *.raw > SHA256SUMS
-      - name: Get git tag
-        id: tag
-        uses: devops-actions/action-get-tag@v1.0.2
-
-      - name: (Draft)Release check
-        run: |
-          if [[ ${{ steps.tag.outputs.tag }} =~ ^[0-9]+$ ]]; then
-             echo "TAG_TYPE=numeric" >> $GITHUB_ENV
-          else
-             echo "TAG_TYPE=alphanumeric" >> $GITHUB_ENV
-          fi
+          sha256sum *.raw >> SHA256SUMS
 
       # create a Github release with the generated artifacts
       - name: Release
@@ -67,6 +93,8 @@ jobs:
 
   multi-build:
     name: Multi version build
+    concurrency:
+      group: ${{ github.ref }}
     runs-on: ubuntu-22.04
     container:  mediadepot/flatcar-developer:${{ matrix.flatcarversion }}
     strategy:
@@ -79,6 +107,40 @@ jobs:
     steps:
       # checkout the sources
       - uses: actions/checkout@v3
+
+      - name: Get git tag
+        id: tag
+        uses: devops-actions/action-get-tag@v1.0.2
+
+      - name: Tag / Release checks
+        id: tagcheck
+        run: |
+          if [[ ${{ steps.tag.outputs.tag }} =~ ^[0-9]+$ ]]; then
+             echo "TAG_TYPE=numeric" >> $GITHUB_ENV
+             echo "DRAFT=${{ toJSON(false) }}" >> $GITHUB_OUTPUT
+          else
+             echo "TAG_TYPE=alphanumeric" >> $GITHUB_ENV
+             echo "DRAFT=${{ toJSON(true) }}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Get latest release
+        continue-on-error: true
+        id: get_release
+        uses: kaliber5/action-get-release@v1
+        with:
+          token: ${{ github.token }}
+          tag_name: ${{ steps.tag.outputs.tag }}
+          draft: ${{ fromJSON(steps.tagcheck.outputs.DRAFT) }}
+
+      - name: Asset download
+        continue-on-error: true
+        if: ${{ steps.get_release.outputs.id }}
+        uses: dsaltares/fetch-gh-release-asset@1.1.1
+        with:
+         version: ${{ steps.get_release.outputs.id }}
+         file: 'SHA256SUMS'
+         token: ${{ secrets.GITHUB_TOKEN }}
+
       # build the images and generate a manifest
       - name: Build
         run: |
@@ -97,18 +159,7 @@ jobs:
               mv "${component}.raw" "${image}.raw"
           done
 
-          sha256sum *.raw > SHA256SUMS
-      - name: Get git tag
-        id: tag
-        uses: devops-actions/action-get-tag@v1.0.2
-
-      - name: (Draft)Release check
-        run: |
-          if [[ ${{ steps.tag.outputs.tag }} =~ ^[0-9]+$ ]]; then
-             echo "TAG_TYPE=numeric" >> $GITHUB_ENV
-          else
-             echo "TAG_TYPE=alphanumeric" >> $GITHUB_ENV
-          fi
+          sha256sum *.raw >> SHA256SUMS
 
       # create a Github release with the generated artifacts
       - name: Release
