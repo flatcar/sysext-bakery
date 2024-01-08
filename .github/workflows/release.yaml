@@ -98,7 +98,7 @@ jobs:
     runs-on: ubuntu-22.04
     container:  mediadepot/flatcar-developer:${{ matrix.flatcarversion }}
     strategy:
-      max-parallel: 6
+      max-parallel: 1
       matrix:
         flatcarversion: ["3602.2.0", "3602.2.1", "3602.2.2", "3602.2.3"]
     permissions:
