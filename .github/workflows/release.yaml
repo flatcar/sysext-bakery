@@ -2,7 +2,7 @@ name: Build and release Systemd sysext images
 on:
   push:
     tags:
-      - '*'
+      - 'latest'
 jobs:
   build:
     runs-on: ubuntu-22.04
@@ -12,8 +12,8 @@ jobs:
     steps:
       # checkout the sources
       - uses: actions/checkout@v3
-      # build the images and generate a manifest
-      - name: build
+      # prepare build host
+      - name: install prerequisites
         run: |
           set -euxo pipefail
 
@@ -24,70 +24,19 @@ jobs:
             xz-utils \
             gawk
 
-          KBS_VERS=$(curl -fsSL --retry-delay 1 --retry 60 --retry-connrefused --retry-max-time 60 --connect-timeout 20  https://raw.githubusercontent.com/kubernetes/website/main/data/releases/schedule.yaml | yq -r '.schedules[].previousPatches[0].release' | awk '{print "kubernetes-v"$1}')
-          [[ -z "${KBS_VERS}" ]] && echo "Failed fetching Kubernetes versions" && exit 1
+      - name: build release artifacts
+        run: release_build.sh
 
-          KBS_VERS_ARRAY=(${KBS_VERS})
+      - name: delete previous latest release
+  	    uses: actions/checkout@v3
+        run: gh release delete latest --cleanup-tag
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-          images=(
-              "docker-24.0.9"
-              "docker_compose-2.22.0"
-              "wasmtime-13.0.0"
-          )
-          images+=("${KBS_VERS_ARRAY[@]}")
-
-          streams=()
-
-          for image in "${images[@]}"; do
-              component="${image%-*}"
-              version="${image#*-}"
-              for arch in x86-64 arm64; do
-                ARCH="${arch}" "./create_${component}_sysext.sh" "${version}" "${component}"
-                mv "${component}.raw" "${image}-${arch}.raw"
-              done
-              streams+=("${component}:-@v")
-              if [ "${component}" = "kubernetes" ]; then
-                streams+=("kubernetes-${version%.*}:.@v")
-                # Should give, e.g., v1.28 for v1.28.2 (use ${version#*.*.} to get 2)
-              fi
-          done
-          for stream in "${streams[@]}"; do
-              component="${stream%:*}"
-              pattern="${stream#*:}"
-              cat << EOF > "${component}.conf"
-           [Transfer]
-           Verify=false
-           [Source]
-           Type=url-file
-           Path=https://github.com/flatcar/sysext-bakery/releases/latest/download/
-           MatchPattern=${component}${pattern}-%a.raw
-           [Target]
-           InstancesMax=3
-           Type=regular-file
-           Path=/opt/extensions/${component%-*}
-           CurrentSymlink=/etc/extensions/${component%-*}.raw
-          EOF
-          done
-
-          cat << EOF > "noop.conf"
-          [Source]
-          Type=regular-file
-          Path=/
-          MatchPattern=invalid@v.raw
-          [Target]
-          Type=regular-file
-          Path=/
-          EOF
-
-          # Fetch the current SHA256SUMS to append to it the new list of sha256 sums.
-          curl -fsSLO https://github.com/flatcar/sysext-bakery/releases/download/latest/SHA256SUMS
-          sha256sum *.raw >> SHA256SUMS
-          sort --unique --key 2 --output SHA256SUMS SHA256SUMS
-
-      # create a Github release with the generated artifacts
-      - name: release
+      - name: create a new latest release with all artifacts
         uses: softprops/action-gh-release@v1
         with:
+          body_path: Release.md
           files: |
             SHA256SUMS
             *.raw

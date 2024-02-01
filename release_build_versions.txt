@@ -1,0 +1,17 @@
+# Versions to build.
+
+# For Kubernetes, we fetch the latest versions to be built.
+# The below lists _additional_ kubernetes versions to be built.
+
+kubernetes-v1.28.5 # required for CAPO CI
+
+
+
+docker-24.0.9 # Used in README.md. Update readme when version changes.
+docker-25.0.2
+
+docker_compose-2.22.0
+docker_compose-2.24.5
+
+wasmtime-12.0.0
+wasmtime-13.0.0 # Used in README.md. Update readme when version changes.

@@ -91,9 +91,9 @@ storage:
     - path: /opt/extensions/wasmtime/wasmtime-13.0.0-x86-64.raw
       contents:
         source: https://github.com/flatcar/sysext-bakery/releases/download/latest/wasmtime-13.0.0-x86-64.raw
-    - path: /opt/extensions/docker/docker-24.0.5-x86-64.raw
+    - path: /opt/extensions/docker/docker-24.0.9-x86-64.raw
       contents:
-        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/docker-24.0.5-x86-64.raw
+        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/docker-24.0.9-x86-64.raw
     - path: /etc/systemd/system-generators/torcx-generator
     - path: /etc/sysupdate.d/noop.conf
       contents:
@@ -108,7 +108,7 @@ storage:
     - target: /opt/extensions/wasmtime/wasmtime-13.0.0-x86-64.raw
       path: /etc/extensions/wasmtime.raw
       hard: false
-    - target: /opt/extensions/docker/docker-24.0.5-x86-64.raw
+    - target: /opt/extensions/docker/docker-24.0.9-x86-64.raw
       path: /etc/extensions/docker.raw
       hard: false
     - path: /etc/extensions/docker-flatcar.raw
@@ -150,14 +150,14 @@ The Docker releases publish static binaries including containerd and the only mi
 To ease the process, the `create_docker_sysext.sh` helper script takes care of downloading the release binaries and adding the systemd unit files, and creates a combined Docker+containerd sysext image:
 
 ```
-./create_docker_sysext.sh 20.10.13 mydocker
+./create_docker_sysext.sh 24.0.9 mydocker
 [… writes mydocker.raw into current directory …]
 ```
 
 Pass the `OS` or `ARCH` environment variables to build for another target than Flatcar amd64, e.g., for any distro with arm64:
 
 ```
-OS=_any ARCH=arm64 ./create_docker_sysext.sh 20.10.13 mydocker
+OS=_any ARCH=arm64 ./create_docker_sysext.sh 24.0.9 mydocker
 [… writes mydocker.raw into current directory …]
 ```
 
