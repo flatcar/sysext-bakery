@@ -30,7 +30,7 @@ jobs:
           KBS_VERS_ARRAY=(${KBS_VERS})
 
           images=(
-              "docker-24.0.6"
+              "docker-24.0.9"
               "docker_compose-2.22.0"
               "wasmtime-13.0.0"
           )
