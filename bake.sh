@@ -6,6 +6,13 @@ FORMAT="${FORMAT:-squashfs}"
 ARCH="${ARCH-}"
 SOURCE_DATE_EPOCH="${SOURCE_DATE_EPOCH-0}"
 export SOURCE_DATE_EPOCH
+KEY="${KEY-}"
+CERT="${CERT-}"
+
+die() {
+  echo >&2 "$@"
+  exit 1
+}
 
 # This script is to be called as helper by other scripts but can also be used standalone
 if [ $# -lt 1 ]; then
@@ -22,12 +29,20 @@ elif [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
   exit 1
 fi
 
+if [ "${FORMAT}" = "verity" ]; then
+  [ -z "${KEY}" ] && die "\$KEY required for verity"
+  [ -z "${CERT}" ] && die "\$CERT required for verity"
+fi
+
 SYSEXTNAME="$1"
 
-if [ "${FORMAT}" != "squashfs" ] && [ "${FORMAT}" != "btrfs" ] && [ "${FORMAT}" != "ext4" ] && [ "${FORMAT}" != "ext2" ]; then
-  echo "Expected FORMAT=squashfs, FORMAT=btrfs, FORMAT=ext4, or FORMAT=ext2, got '${FORMAT}'" >&2
-  exit 1
-fi
+case ${FORMAT} in
+  squashfs) ;;
+  btrfs) ;;
+  ext4|ext2) ;;
+  verity) ;;
+  *) die "Unsupported format: '${FORMAT}'" ;;
+esac
 
 # Map to valid values for https://www.freedesktop.org/software/systemd/man/os-release.html#ARCHITECTURE=
 if [ "${ARCH}" = "amd64" ] || [ "${ARCH}" = "x86_64" ]; then
@@ -57,7 +72,11 @@ elif [ "${FORMAT}" = "ext4" ] || [ "${FORMAT}" = "ext2" ]; then
   # Note: We didn't chown to root:root, meaning that the file ownership is left as is
   mkfs."${FORMAT}" -E root_owner=0:0 -d "${SYSEXTNAME}" "${SYSEXTNAME}".raw
   resize2fs -M "${SYSEXTNAME}".raw
-else
+elif [ "${FORMAT}" = "squashfs" ]; then
   mksquashfs "${SYSEXTNAME}" "${SYSEXTNAME}".raw -all-root
+elif [ "${FORMAT}" = "verity" ]; then
+  systemd-repart --private-key="${KEY}" --certificate="${CERT}" --root="${SYSEXTNAME}" --no-pager --empty=create --size=auto --definitions=repart.d "${SYSEXTNAME}.raw"
+else
+  die "Unsupported format: ${FORMAT}"
 fi
 echo "Created ${SYSEXTNAME}.raw"

@@ -177,3 +177,14 @@ In case you have an existing Torcx image you can convert it with the `convert_to
 ```
 
 Please make also sure that your don't have a `containerd.service` drop in file under `/etc` that uses Torcx paths.
+
+
+### Verity
+
+To generate sysext protected by dm-verity with a signed root hash pass `FORMAT=verity` before invoking any of the scripts. This requires `systemd-repart` with a version >= v255. This also requires passing a path to a private key and certificate through `KEY` and `CERT`.
+
+Here's an example:
+```
+openssl req -batch -new -x509 -sha256 -newkey rsa:2048 -nodes -out root_key.crt -keyout root_key.pem -days 3650
+FORMAT=verity KEY=root_key.pem CERT=root_key.crt ./create_kubernetes_sysext.sh v1.27.3 k8s
+```
