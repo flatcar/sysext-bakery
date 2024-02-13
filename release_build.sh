@@ -36,7 +36,7 @@ curl -fsSL --retry-delay 1 --retry 60 --retry-connrefused \
 for asset in $(cat prev_release_sysexts.txt); do
     echo
     echo "  ## Fetching $(basename "${asset}") <-- ${asset}"
-    wget "${asset}"
+    curl -O -fsSL --retry-delay 1 --retry 60 --retry-connrefused --retry-max-time 60 --connect-timeout 20  "${asset}"
 done
 
 streams=()
@@ -49,7 +49,7 @@ mapfile -t images < <( awk '{ content=sub("[[:space:]]*#.*", ""); if ($0) print 
                        release_build_versions.txt )
 images+=("${KBS_VERS_ARRAY[@]}")
 
-echo "# Release 2024-02-01 16:44:51" > Release.md
+echo "# Release $(date '+%Y-%m-%d %R')" > Release.md
 echo "The release adds the following sysexts:" >> Release.md
 
 for image in "${images[@]}"; do
