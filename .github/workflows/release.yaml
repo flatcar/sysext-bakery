@@ -28,7 +28,6 @@ jobs:
         run: release_build.sh
 
       - name: delete previous latest release
-        uses: actions/checkout@v4
         run: gh release delete latest --cleanup-tag
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
