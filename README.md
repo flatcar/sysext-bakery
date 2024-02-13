@@ -177,3 +177,13 @@ In case you have an existing Torcx image you can convert it with the `convert_to
 ```
 
 Please make also sure that your don't have a `containerd.service` drop in file under `/etc` that uses Torcx paths.
+
+## For maintainers: how to release?
+
+CI can be kicked-off by overriding the `latest` tag. The `latest` release artifacts will be updated consequently here: https://github.com/flatcar/sysext-bakery/releases/tag/latest
+```
+git rebase origin/main
+git tag -d latest
+git tag -as latest
+git push origin --force latest
+```
