@@ -88,9 +88,9 @@ variant: flatcar
 version: 1.0.0
 storage:
   files:
-    - path: /opt/extensions/wasmtime/wasmtime-13.0.0-x86-64.raw
+    - path: /opt/extensions/wasmtime/wasmtime-17.0.1-x86-64.raw
       contents:
-        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/wasmtime-13.0.0-x86-64.raw
+        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/wasmtime-17.0.1-x86-64.raw
     - path: /opt/extensions/docker/docker-24.0.9-x86-64.raw
       contents:
         source: https://github.com/flatcar/sysext-bakery/releases/download/latest/docker-24.0.9-x86-64.raw
@@ -105,7 +105,7 @@ storage:
       contents:
         source: https://github.com/flatcar/sysext-bakery/releases/download/latest/docker.conf
   links:
-    - target: /opt/extensions/wasmtime/wasmtime-13.0.0-x86-64.raw
+    - target: /opt/extensions/wasmtime/wasmtime-17.0.1-x86-64.raw
       path: /etc/extensions/wasmtime.raw
       hard: false
     - target: /opt/extensions/docker/docker-24.0.9-x86-64.raw
