@@ -12,6 +12,9 @@ jobs:
     steps:
       # checkout the sources
       - uses: actions/checkout@v4
+        with:
+          path: bakery
+
       # prepare build host
       - name: install prerequisites
         run: |
@@ -25,18 +28,22 @@ jobs:
             gawk
 
       - name: build release artifacts
-        run: release_build.sh
+        run: |
+          pushd bakery
+          ./release_build.sh
 
       - name: delete previous latest release
-        run: gh release delete latest --cleanup-tag
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          pushd bakery
+          gh release delete latest --cleanup-tag
 
       - name: create a new latest release with all artifacts
         uses: softprops/action-gh-release@v1
         with:
-          body_path: Release.md
+          body_path: bakery/Release.md
           files: |
-            SHA256SUMS
-            *.raw
-            *.conf
+            bakery/SHA256SUMS
+            bakery/*.raw
+            bakery/*.conf
