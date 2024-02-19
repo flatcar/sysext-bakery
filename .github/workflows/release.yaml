@@ -101,7 +101,7 @@ jobs:
     strategy:
       max-parallel: 1
       matrix:
-        flatcarversion: ["3602.2.0", "3602.2.1", "3602.2.2", "3602.2.3"]
+        flatcarversion: ["3510.2.7", "3602.2.3", "3760.2.0", "3815.2.0"]
     permissions:
       # allow the action to create a release
       contents: write
