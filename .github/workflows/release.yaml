@@ -147,16 +147,16 @@ jobs:
           set -euo pipefail
 
           images=(
-              "zfs-2.1.12-${{ matrix.flatcarversion }}"
+              "zfs-${{ matrix.flatcarversion }}"
           )
 
           for image in ${images[@]}; do
-              component="${image%%-*}"
-              flatcarversion="${image##*-}"
-              temp="${image#*-}"
-              version="${temp%-*}"
-              "./create_${component}_sysext.sh" "${version}" "${component}" "${flatcarversion}"
-              mv "${component}.raw" "${image}.raw"
+              component="${image%-*}"
+              flatcarversion="${image#*-}"
+              "./create_${component}_sysext.sh" "${component}" "${flatcarversion}"
+              baked_component=$(ls ${component}-*.raw)
+              sysext_name="${baked_component%.raw}-${flatcarversion}.raw"
+              mv "$baked_component" "$sysext_name"
           done
 
           sha256sum *.raw >> SHA256SUMS

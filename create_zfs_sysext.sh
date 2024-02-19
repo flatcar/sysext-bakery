@@ -4,7 +4,7 @@ set -euo pipefail
 export ARCH="${ARCH-amd64}"
 SCRIPTFOLDER="$(dirname "$(readlink -f "$0")")"
 
-if [ $# -lt 3 ] || [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
+if [ $# -lt 2 ] || [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
   echo "Usage: $0 VERSION SYSEXTNAME FLATCARVERSION"
   echo "The script will build ZFS modules and tooling and create a sysext squashfs image with the name SYSEXTNAME.raw in the current folder."
   echo "A temporary directory named SYSEXTNAME in the current folder will be created and deleted again."
@@ -14,9 +14,8 @@ if [ $# -lt 3 ] || [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
   exit 1
 fi
 
-VERSION="$1"
-SYSEXTNAME="$2"
-FLATCARVERSION="$3"
+SYSEXTNAME="$1"
+FLATCARVERSION="$2"
 if [ "${ARCH}" = aarch64 ]; then
   ARCH=arm64
 fi
@@ -28,9 +27,12 @@ emerge-gitclone
 echo 'FEATURES="-network-sandbox -pid-sandbox -ipc-sandbox -usersandbox -sandbox"' >>/etc/portage/make.conf
 cp files/zfs/repos.conf /etc/portage/repos.conf/zfs.conf
 cp -r files/zfs/${FLATCARVERSION}/overlay/ /var/lib/portage/zfs-overlay/
+# fixme starting with  3760. Incorrect permission on some headers
+chmod -R +r /usr/lib/gcc/x86_64-cros-linux-gnu/
 
 # build zfs
-echo "========== Build ZFS"
+VERSION=$(emerge --search sys-fs/zfs$  | grep "Latest version available" | awk '{print $NF}')
+echo "========== Build ZFS $VERSION"
 kernel=$(ls /lib/modules) && KBUILD_OUTPUT=/lib/modules/${kernel}/build KERNEL_DIR=/lib/modules/${kernel}/source emerge -j$(nproc) --getbinpkg --onlydeps zfs
 emerge -j$(nproc) --getbinpkg --buildpkgonly zfs squashfs-tools
 
@@ -58,7 +60,6 @@ rm -rf ${SYSEXTNAME}/usr/share
 rm -rf ${SYSEXTNAME}/usr/src
 rm -rf ${SYSEXTNAME}/usr/include
 
-
-
 "${SCRIPTFOLDER}"/bake.sh "${SYSEXTNAME}" "${FLATCARVERSION}"
+mv "${SYSEXTNAME}.raw" "${SYSEXTNAME}-${VERSION}.raw"
 rm -rf "${SYSEXTNAME}"
