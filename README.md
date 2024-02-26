@@ -166,6 +166,36 @@ See the above intro section on how to use the resulting sysext image.
 You can also limit the sysext image to only Docker (without containerd and runc) or only containerd (no Docker but runc) by passing the environment variables `ONLY_DOCKER=1` or `ONLY_CONTAINERD=1`.
 If you build both sysext images that way, you can load both combined and, e.g., only load the Docker sysext image for debugging while using the containerd sysext image by default for Kubernetes.
 
+### Baking sysexts into Flatcar OS images
+
+Using the `bake_flatcar_image.sh` script, custom Flatcar OS images can be created which include one or more sysexts.
+The script will download a Flatcar OS release image, insert the desired sysexts, and optionally create a vendor (public / private cloud or bare metal) image.
+
+By default, the script operates with local sysexts (and optionally sysupdate configurations if present).
+However, the `--fetch` option may be specified to fetch the sysext `.raw` file and sysupdate config from the latest Bakery release.
+
+Sysexts can be added to the root partition or the OEM partition of the OS image (root is preferred).
+Read more about Flatcar's OS image disk layout here: https://www.flatcar.org/docs/latest/reference/developer-guides/sdk-disk-partitions/
+
+The script requires sudo access at certain points to manage loopback mounts for the OS image partitions and will then prompt for a password.
+
+Refer to `./bake_flatcar_image.sh --help` for more information.
+
+Example usage:
+```
+./bake_flatcar_image.sh --fetch --vendor qemu_uefi wasmtime:wasmtime-17.0.1-x86-64.raw
+```
+
+Example usage with local sysext:
+```
+ls -1
+  myext-1.0.1-x86-64.raw
+  myext.conf
+./bake_flatcar_image.sh --fetch --vendor qemu_uefi myext:myext-1.0.1-x86-64.raw
+```
+
+The script supports all vendors and clouds natively supported by Flatcar.
+
 ### Converting a Torcx image
 
 Torcx was a solution for switching between different Docker versions on Flatcar.
