@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-OS="${OS-flatcar}"
+OS="${OS-_any}"
 FORMAT="${FORMAT:-squashfs}"
 ARCH="${ARCH-}"
+RELOAD="${RELOAD-}"
 SOURCE_DATE_EPOCH="${SOURCE_DATE_EPOCH-0}"
 export SOURCE_DATE_EPOCH
 
@@ -14,8 +15,9 @@ if [ $# -lt 1 ]; then
   exit 1
 elif [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
   echo "If ARCH is specified as environment variable the sysext image will be required to run on the given architecture."
-  echo "To build for another OS than Flatcar, pass 'OS=myosid' as environment variable (current value is '${OS}'), e.g., 'fedora' as found in 'ID' under '/etc/os-release', or pass 'OS=_any' for any OS."
+  echo "To build for a specific OS, pass 'OS=myosid' as environment variable (current value is '${OS}'), e.g., 'fedora' as found in 'ID' under '/etc/os-release', or pass 'OS=_any' for any OS."
   echo "The '/etc/os-release' file of your OS has to include 'SYSEXT_LEVEL=1.0' as done in Flatcar (not needed for 'OS=_any')."
+  echo "To specify that systemd should do a daemon reload for the system when the extension is loaded/unloaded, set RELOAD=1 (current value is '${RELOAD}')."
   echo "If the mksquashfs tool is missing you can pass FORMAT=btrfs, FORMAT=ext4, or FORMAT=ext2 as environment variable (current value is '${FORMAT}') but the script won't change the ownership of the files in the SYSEXTNAME directory, so make sure that they are owned by root before creating the sysext image to avoid any problems."
   echo "To make builds reproducible the SOURCE_DATE_EPOCH environment variable will be set to 0 if not defined."
   echo
@@ -44,6 +46,9 @@ mkdir -p "${SYSEXTNAME}/usr/lib/extension-release.d"
   fi
   if [ "${ARCH}" != "" ]; then
     echo "ARCHITECTURE=${ARCH}"
+  fi
+  if [ "${RELOAD}" = 1 ]; then
+    echo "EXTENSION_RELOAD_MANAGER=1"
   fi
 } > "${SYSEXTNAME}/usr/lib/extension-release.d/extension-release.${SYSEXTNAME}"
 rm -f "${SYSEXTNAME}".raw

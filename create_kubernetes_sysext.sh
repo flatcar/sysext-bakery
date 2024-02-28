@@ -99,5 +99,5 @@ curl -o cni.tgz -fsSL "https://github.com/containernetworking/plugins/releases/d
 mkdir -p "${SYSEXTNAME}/usr/local/bin/cni"
 tar --force-local -xf "cni.tgz" -C "${SYSEXTNAME}/usr/local/bin/cni"
 
-"${SCRIPTFOLDER}"/bake.sh "${SYSEXTNAME}"
+RELOAD=1 "${SCRIPTFOLDER}"/bake.sh "${SYSEXTNAME}"
 rm -rf "${SYSEXTNAME}"

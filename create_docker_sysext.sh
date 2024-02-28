@@ -140,5 +140,5 @@ EOF
   sed 's/SystemdCgroup = true/SystemdCgroup = false/g' "${SYSEXTNAME}/usr/share/containerd/config.toml" > "${SYSEXTNAME}/usr/share/containerd/config-cgroupfs.toml"
 fi
 
-"${SCRIPTFOLDER}"/bake.sh "${SYSEXTNAME}"
+RELOAD=1 "${SCRIPTFOLDER}"/bake.sh "${SYSEXTNAME}"
 rm -rf "${SYSEXTNAME}"

@@ -42,5 +42,5 @@ for ENTRY in "${SYSEXTNAME}/usr/lib/systemd/system/"*.wants/*; do
   { echo "[Unit]"; echo "Upholds=${UNIT}"; } > "${SYSEXTNAME}/usr/lib/systemd/system/${TARGET}.d/10-${UNIT/./-}.conf"
 done
 
-"${SCRIPTFOLDER}"/bake.sh "${SYSEXTNAME}"
+RELOAD=1 "${SCRIPTFOLDER}"/bake.sh "${SYSEXTNAME}"
 rm -rf "${SYSEXTNAME}"

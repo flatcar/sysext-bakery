@@ -8,19 +8,16 @@ The current focus is on Docker and containerd, contributions are welcome for oth
 ## Systemd-sysext
 
 The `NAME.raw` sysext images (or `NAME` sysext directories) can be placed under `/etc/extensions/` or `/var/lib/extensions` to be activated on boot by `systemd-sysext.service`.
-While systemd-sysext images are not really meant to also include the systemd service, Flatcar ships `ensure-sysext.service` as workaround to automatically load the image's services.
-This helper service is bound to `systemd-sysext.service` which activates the sysext images on boot.
-Currently it reloads the unit files from disk and reevaluates `multi-user.target`, `sockets.target`, and `timers.target`, making sure your enabled systemd units run.
-In the future `systemd-sysext` will only reload the unit files when this is upstream behavior (the current upstream behavior is to do nothing and leave it to the user).
-That means you need to use `Upholds=` drop-ins for the target units to start your units.
-At runtime executing `systemctl restart systemd-sysext ensure-sysext` will reload the sysext images and start the services.
-A manual `systemd-sysext refresh` is not recommended.
+Images can specify to require systemd to do a daemon reload (needs systemd 255, Flatcar ships `ensure-sysext.service` as workaround to automatically load the image's services).
+
+A current limitation of `systemd-sysext` is that you need to use `TARGET.upholds` symlinks (supported from systemd 254, similar to `.wants`) or `Upholds=` drop-ins for the target units to start your units.
+For current versions of Flatcar (systemd 252) you need to use `systemctl restart systemd-sysext ensure-sysext` to reload the sysext images and start the services and a manual `systemd-sysext refresh` is not recommended.
 
 The compatibility mechanism of sysext images requires a metadata file in the image under `usr/lib/extension-release.d/extension-release.NAME`.
-It needs to contain a matching OS `ID`, and either a matching `VERSION_ID` or `SYSEXT_LEVEL`.
+It needs to contain a matching OS `ID`, and either a matching `VERSION_ID` or `SYSEXT_LEVEL`. Here you can also set `EXTENSION_RELOAD_MANAGER=1` for a systemd daemon reload.
 Since the rapid release cycle and automatic updates of Flatcar Container Linux make it hard to rely on particular OS libraries by specifying a dependency of the sysext image to the OS version, it is not recommended to match by `VERSION_ID`.
 Instead, Flatcar defined the `SYSEXT_LEVEL` value `1.0` to match for.
-With systemd 252 you can also use `ID=_any` and then neither `SYSEXT_LEVEL` nor `VERSION_ID` are needed.
+You can also use `ID=_any` and then neither `SYSEXT_LEVEL` nor `VERSION_ID` are needed.
 The sysext image should only include static binaries.
 
 Inside the image, binaries should be placed under `usr/bin/` and systemd units under `usr/lib/systemd/system/`.
@@ -61,18 +58,16 @@ storage:
 
 ## Systemd-sysext on other distributions
 
-The tools here will by default build for Flatcar and create the metadata file `usr/lib/extension-release.d/extension-release.NAME` as follows:
+The tools here will by default build for any OS and create the metadata file `usr/lib/extension-release.d/extension-release.NAME` as follows:
 
 ```
-ID=flatcar
-SYSEXT_LEVEL=1.0
+ID=_any
+# Depending on the image, e.g., for Docker systemd units, there is also:
+# EXTENSION_RELOAD_MANAGER=1
 ```
 
-This means other distributions will reject to load the sysext image by default.
 Use the configuration parameters in the tools to build for your distribution (pass `OS=` to be the OS ID from `/etc/os-release`) or to build for any distribution (pass `OS=_any`).
 You can also set the architecture to be arm64 to fetch the right binaries and encode this information in the sysext image metadata.
-
-To add the automatic systemd unit loading to your distribution, store [`ensure-sysext.service`](https://raw.githubusercontent.com/flatcar/init/ccade77b6d568094fb4e4d4cf71b867819551798/systemd/system/ensure-sysext.service) in your systemd folder (e.g., `/etc/systemd/system/`) and enable the units: `systemctl enable --now ensure-sysext.service systemd-sysext.service`.
 
 ## Recipes in this repository
 
