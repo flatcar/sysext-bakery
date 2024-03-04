@@ -28,3 +28,5 @@ crio-1.28.4
 k3s-v1.29.2+k3s1
 
 rke2-v1.29.2+rke2r1
+
+nvidia_runtime-v1.14.3
