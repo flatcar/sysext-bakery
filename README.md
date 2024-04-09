@@ -135,6 +135,80 @@ systemd:
 This also configures systemd-sysupdate for auto-updates. The `noop.conf` is a workaround for systemd-sysupdate to run without error messages.
 Since the configuration sets up a custom Docker version, it also disables Torcx and the future `docker-flatcar` and `containerd-flatcar` extensions to prevent conflicts.
 
+For another example of how you can further customize the recipes provided in this repository, the following recipe uses the image built with `create_wasmcloud_sysext.sh`:
+```yaml
+variant: flatcar
+version: 1.0.0
+storage:
+  files:
+    - path: /opt/extensions/wasmcloud/wasmcloud-0.82.0-x86-64.raw
+      contents:
+        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/wasmcloud-0.82.0-x86-64.raw
+    - path: /etc/sysupdate.d/noop.conf
+      contents:
+        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/noop.conf
+    - path: /etc/sysupdate.wasmcloud.d/wasmcloud.conf
+      contents:
+        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/wasmcloud.conf
+    - path: /etc/nats-server.conf
+      contents:
+        inline: |
+          jetstream {
+            domain: default
+          }
+          leafnodes {
+              remotes = [
+                  {
+                      url: "tls://connect.cosmonic.sh"
+                      credentials: "/etc/nats.creds"
+                  }
+              ]
+          }
+    - path: /etc/nats.creds
+      contents:
+        inline: |
+          <redacted>
+  links:
+    - target: /opt/extensions/wasmcloud/wasmcloud-0.82.0-x86-64.raw
+      path: /etc/extensions/wasmcloud.raw
+      hard: false
+systemd:
+  units:
+    - name: nats.service
+      enabled: true
+      dropins:
+        - name: 10-nats-env-override.conf
+          contents: |
+            [Service]
+            Environment=NATS_CONFIG=/etc/nats-server.conf
+    - name: wasmcloud.service
+      enabled: true
+      dropins:
+        - name: 10-wasmcloud-env-override.conf
+          contents: |
+            [Service]
+            Environment=WASMCLOUD_LATTICE=<redacted>
+    - name: systemd-sysupdate.timer
+      enabled: true
+    - name: systemd-sysupdate.service
+      dropins:
+        - name: wasmcloud.conf
+          contents: |
+            [Service]
+            ExecStartPre=/usr/lib/systemd/systemd-sysupdate -C wasmcloud update
+        - name: sysext.conf
+          contents: |
+            [Service]
+            ExecStartPost=systemctl restart systemd-sysext
+```
+
+This example uses Butane/Ignition configuration do the following customizations beyond simply including the image:
+
+1. Provide a different configuration to setup the nats-server to act as a leaf node to a pre-existing wasmCloud deployment (`/etc/nats-server.conf`).
+2. Provide a set of credentials for the nats-server leaf node to connect with (`/etc/nats.creds`).
+3. Override the bundled `NATS_CONFIG` environment variable to point it to the newly created configuration (`NATS_CONFIG=/etc/nats-server.conf`).
+4. Override the lattice the wasmCloud host is configured to connect (`WASMCLOUD_LATTICE=<redacted>`).
+
 In the [Flatcar docs](https://www.flatcar.org/docs/latest/provisioning/sysext/) you can find an Ignition configuration that explicitly sets the update configurations instead of downloading them.
 
 The updates works by [`systemd-sysupdate`](https://www.freedesktop.org/software/systemd/man/sysupdate.d.html) fetching the `SHA256SUMS` file of the generated artifacts, which holds the list of built images with their respective SHA256 digest.
