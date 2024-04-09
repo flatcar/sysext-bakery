@@ -70,6 +70,7 @@ RestartSec=5
 WantedBy=multi-user.target
 EOF
 
+# Based on https://github.com/nats-io/nats-server/blob/main/util/nats-server.service
 cat > "${SYSEXTNAME}/usr/lib/systemd/system/nats.service" <<-'EOF'
 [Unit]
 Description=NATS Server
