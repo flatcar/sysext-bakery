@@ -35,13 +35,13 @@ rm -rf "${SYSEXTNAME}"
 mkdir -p "${SYSEXTNAME}"/usr/bin
 
 VERSION="v${VERSION#v}"
-curl -o "${SYSEXTNAME}"/usr/bin/wasmcloud -fvSL "https://github.com/wasmcloud/wasmcloud/releases/download/${VERSION}/wasmcloud-${ARCH}-unknown-linux-musl"
+curl -o "${SYSEXTNAME}"/usr/bin/wasmcloud -fsSL "https://github.com/wasmcloud/wasmcloud/releases/download/${VERSION}/wasmcloud-${ARCH}-unknown-linux-musl"
 chmod +x "${SYSEXTNAME}"/usr/bin/wasmcloud
 
 # Install NATS
 version="${NATS_VERSION}"
 if [[ "${NATS_VERSION}" == "latest" ]]; then
-  version=$(curl -fvSL https://api.github.com/repos/nats-io/nats-server/releases/latest | jq -r .tag_name)
+  version=$(curl -fsSL https://api.github.com/repos/nats-io/nats-server/releases/latest | jq -r .tag_name)
   echo "Using latest version: ${version} for NATS Server"
 fi
 version="v${version#v}"
