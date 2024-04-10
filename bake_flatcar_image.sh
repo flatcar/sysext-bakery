@@ -322,7 +322,7 @@ mkdir "${workdir}"
     cd "${workdir}"
 
     download_all "$board" "${vendor}" "$release"
-    install_sysexts "${install_to}" "${sysexts}"
+    install_sysexts "${install_to}" "${sysexts[@]}"
     create_vendor_image "$board" "${vendor}"
     rm -f *.sig *.squashfs
 )
