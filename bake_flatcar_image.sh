@@ -273,7 +273,7 @@ while [ $# -gt 0 ]; do
     esac
 done
 
-if [ -z "${sysexts[@]}" ] ; then
+if [ -z "${sysexts[*]}" ] ; then
     echo -e "\nERROR: No sysexts specified.\n"
     print_help
     exit 1
@@ -322,7 +322,7 @@ mkdir "${workdir}"
     cd "${workdir}"
 
     download_all "$board" "${vendor}" "$release"
-    install_sysexts "${install_to}" "${sysexts}"
+    install_sysexts "${install_to}" "${sysexts[@]}"
     create_vendor_image "$board" "${vendor}"
     rm -f *.sig *.squashfs
 )
