@@ -273,7 +273,7 @@ while [ $# -gt 0 ]; do
     esac
 done
 
-if [ -z "${sysexts[@]}" ] ; then
+if [ -z "${sysexts[*]}" ] ; then
     echo -e "\nERROR: No sysexts specified.\n"
     print_help
     exit 1
