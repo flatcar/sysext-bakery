@@ -38,7 +38,7 @@ cd "${SCRIPTFOLDER}"
 rm -rf "${SYSEXTNAME}/tmp" 
 
 
-cat > ${SYSEXTNAME}/usr/share/crio/etc/crio/crio.conf <<'EOF'
+cat > "${SYSEXTNAME}/usr/share/crio/etc/crio/crio.conf" <<'EOF'
 # /etc/crio/crio.conf - Configuration file for crio
 # See /etc/crio/crio.conf.d/ for additional config files 
 #
