@@ -44,7 +44,7 @@ cat > "${SYSEXTNAME}/usr/share/crio/etc/crio/crio.conf" <<'EOF'
 #
 EOF
 
-cat > ${SYSEXTNAME}/usr/share/crio/README-flatcar <<'EOF'
+cat > "${SYSEXTNAME}/usr/share/crio/README-flatcar" <<'EOF'
 To use kubernetes with crio in flatcar, you will need to pass the criSocket to kubeadm. 
 Eg: kubeadm init --pod-network-cidr=10.244.0.0/16 --kubernetes-version v1.29.2 --cri-socket=unix:///var/run/crio/crio.sock'
 EOF
