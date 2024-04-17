@@ -63,6 +63,6 @@ elif [ "${FORMAT}" = "ext4" ] || [ "${FORMAT}" = "ext2" ]; then
   mkfs."${FORMAT}" -E root_owner=0:0 -d "${SYSEXTNAME}" "${SYSEXTNAME}".raw
   resize2fs -M "${SYSEXTNAME}".raw
 else
-  mksquashfs "${SYSEXTNAME}" "${SYSEXTNAME}".raw -all-root
+  mksquashfs "${SYSEXTNAME}" "${SYSEXTNAME}".raw -all-root -noappend -xattrs-exclude '^btrfs.'
 fi
 echo "Created ${SYSEXTNAME}.raw"
