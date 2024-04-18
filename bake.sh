@@ -63,6 +63,13 @@ elif [ "${FORMAT}" = "ext4" ] || [ "${FORMAT}" = "ext2" ]; then
   mkfs."${FORMAT}" -E root_owner=0:0 -d "${SYSEXTNAME}" "${SYSEXTNAME}".raw
   resize2fs -M "${SYSEXTNAME}".raw
 else
-  mksquashfs "${SYSEXTNAME}" "${SYSEXTNAME}".raw -all-root -noappend -xattrs-exclude '^btrfs.'
+  VER=$({ mksquashfs -version || true ; } | head -n1 | cut -d " " -f 3)
+  VERMAJ=$(echo "${VER}" | cut -d . -f 1)
+  VERMIN=$(echo "${VER}" | cut -d . -f 2)
+  ARG=(-all-root -noappend)
+  if [ "${VERMAJ}" -gt 4 ] && [ "${VERMIN}" -gt 6 ]; then
+    ARG+=('-xattrs-exclude' '^btrfs.')
+  fi
+  mksquashfs "${SYSEXTNAME}" "${SYSEXTNAME}".raw "${ARG[@]}"
 fi
 echo "Created ${SYSEXTNAME}.raw"
