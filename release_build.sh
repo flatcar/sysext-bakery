@@ -15,7 +15,7 @@ echo "================================================="
 KBS_VERS=$(curl -fsSL --retry-delay 1 --retry 60 --retry-connrefused \
                 --retry-max-time 60 --connect-timeout 20  \
                 https://raw.githubusercontent.com/kubernetes/website/main/data/releases/schedule.yaml \
-                | yq -r '.schedules[].previousPatches[0].release' \
+		| yq -r '.schedules[] | .previousPatches[0] // (.release = .release + ".0") | .release' \
                 | awk '{print "kubernetes-v"$1}')
 if [[ -z "${KBS_VERS}" ]] ; then
     echo "Failed fetching Kubernetes versions"
