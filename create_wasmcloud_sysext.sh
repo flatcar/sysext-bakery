@@ -6,7 +6,7 @@ SCRIPTFOLDER="$(dirname "$(readlink -f "$0")")"
 
 if [ $# -lt 2 ] || [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
   echo "Usage: $0 VERSION SYSEXTNAME [NATS_VERSION]"
-  echo "The script will download the wasmcloud release (e.g. 0.82.0) and create a sysext squashfs image with the name SYSEXTNAME.raw in the current folder."
+  echo "The script will download the wasmcloud release (e.g. 1.0.0) and create a sysext squashfs image with the name SYSEXTNAME.raw in the current folder."
   echo "A temporary directory named SYSEXTNAME in the current folder will be created and deleted again."
   echo "All files in the sysext image will be owned by root."
   echo "To use arm64 pass 'ARCH=arm64' as environment variable (current value is '${ARCH}')."
@@ -47,7 +47,7 @@ fi
 version="v${version#v}"
 
 rm -f "nats-server.tar.gz"
-curl -o nats-server.tar.gz -fvSL "https://github.com/nats-io/nats-server/releases/download/${version}/nats-server-${version}-linux-${GOARCH}.tar.gz"
+curl -o nats-server.tar.gz -fsSL "https://github.com/nats-io/nats-server/releases/download/${version}/nats-server-${version}-linux-${GOARCH}.tar.gz"
 tar -xf "nats-server.tar.gz" -C "${SYSEXTNAME}"
 mv "${SYSEXTNAME}/nats-server-${version}-linux-${GOARCH}/nats-server" "${SYSEXTNAME}/usr/bin/"
 rm -r "${SYSEXTNAME}/nats-server-${version}-linux-${GOARCH}"

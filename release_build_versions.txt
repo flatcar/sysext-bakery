@@ -19,3 +19,4 @@ wasmtime-17.0.1 # Used in README.md. Update readme when version changes.
 wasmtime-18.0.1
 
 wasmcloud-0.82.0
+wasmcloud-1.0.0
