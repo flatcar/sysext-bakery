@@ -76,7 +76,6 @@ git clone https://github.com/acassen/keepalived.git
     --enable-nftables \
     --enable-regex \
     --enable-json  --with-init=systemd --enable-vrrp --enable-libnl-dynamic
-set -ex && \
     cd /opt/keepalived && \
     make && \
     make DESTDIR=/install_root install && \
