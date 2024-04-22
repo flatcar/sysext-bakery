@@ -31,6 +31,8 @@ fi
 IMG=docker.io/"${ARCH}${SUFFIX}"/alpine:3.19
 mkdir -p "${SYSEXTNAME}"
 cat >"${SYSEXTNAME}"/build.sh <<EOF
+#!/bin/sh
+set -euo pipefail
 apk --no-cache add \
         binutils \
         file \
