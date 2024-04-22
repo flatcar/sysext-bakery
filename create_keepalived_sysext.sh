@@ -107,8 +107,7 @@ EOF
 mkdir -p "${SYSEXTNAME}"/usr/lib/systemd/system/keepalived.service.d
 cat > "${SYSEXTNAME}"/usr/lib/systemd/system/keepalived.service.d/10-keepalived.conf <<-'EOF'
 [Service]
-ExecStartPre=/usr/bin/mkdir -p /etc/keepalived/ 
-ExecStartPre=-/bin/bash -c '[ ! -f /etc/keepalived/keepalived.conf ] && touch /etc/keepalived/keepalived.conf' 
+ExecStartPre=/bin/bash -c 'set -e; mkdir -p /etc/keepalived/; if ! [ -e /etc/keepalived/keepalived.conf ]; then touch /etc/keepalived/keepalived.conf; fi' 
 ExecStart=
 ExecStart=/usr/sbin/keepalived --use-file /etc/keepalived/keepalived.conf $KEEPALIVED_OPTIONS
 EOF
