@@ -21,7 +21,14 @@ if ! which docker &>/dev/null; then
   exit 1
 fi
 
-export ARCH=x86-64
+SUFFIX=
+if  [ "${ARCH}" = "x86-64" ] || [ "${ARCH}" = "x86_64" ]; then
+  ARCH=amd64
+elif [ "${ARCH}" = "arm64" ]; then
+  ARCH="aarch64"
+  SUFFIX="v8"
+fi
+IMG=docker.io/"${ARCH}${SUFFIX}"/alpine:3.19
 mkdir -p "${SYSEXTNAME}"
 cat >"${SYSEXTNAME}"/build.sh <<EOF
 apk --no-cache add \
