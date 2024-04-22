@@ -16,7 +16,6 @@ fi
 VERSION="$1"
 SYSEXTNAME="$2"
 
-
 if ! which docker &>/dev/null; then
   echo Missing docker in path
   exit 1
@@ -24,12 +23,8 @@ fi
 
 export ARCH=x86-64
 mkdir -p "${SYSEXTNAME}"
-#docker build -t keepalived-build --build-arg  VERSION=$VERSION - <  Dockerfile-keepalived
-docker build -t keepalived-build --build-arg  VERSION=$VERSION - <<-'EOF'
-
-FROM alpine:3.19 as build
-ARG VERSION=not_set_force_fail
-RUN    apk --no-cache add \
+cat >"${SYSEXTNAME}"/build.sh <<EOF
+apk --no-cache add \
         binutils \
         file \
         file-dev \
@@ -55,9 +50,9 @@ RUN    apk --no-cache add \
         pcre2-dev \
         autoconf \
         automake zlib-static  alpine-sdk linux-headers libmnl-static git
-WORKDIR /opt
-RUN git clone https://github.com/acassen/keepalived.git
-RUN set -ex && \
+cd /opt
+git clone https://github.com/acassen/keepalived.git
+set -ex && \
     cd /opt/keepalived && git checkout $VERSION && \
     ./autogen.sh && \
     CFLAGS='-static -s' LDFLAGS=-static ./configure  --disable-dynamic-linking \
@@ -73,26 +68,17 @@ RUN set -ex && \
     --enable-nftables \
     --enable-regex \
     --enable-json  --with-init=systemd --enable-vrrp --enable-libnl-dynamic
-RUN set -ex && \
+set -ex && \
     cd /opt/keepalived && \
     make && \
     make DESTDIR=/install_root install && \
     find /install_root && \
-    rm -rf /install_root/usr/share /install_root/usr/etc/keepalived/samples
-
-FROM scratch AS bin
-COPY --from=build /install_root /
-
-
-
+    rm -rf /install_root/usr/share /install_root/usr/etc/keepalived/samples && chown $(id -u):$(id -g) /install_root -R
 EOF
-
-
-docker save keepalived-build | tar --no-anchored --strip-components 1  -C "${SYSEXTNAME}" -xvf - layer.tar 
-tar -C "${SYSEXTNAME}" -xvf "${SYSEXTNAME}"/layer.tar 
-rm -f "${SYSEXTNAME}"/layer.tar
-mkdir -p  "${SYSEXTNAME}/usr/lib/systemd/system/"
-cat > "${SYSEXTNAME}/usr/lib/systemd/system/keepalived.service" <<-'EOF'
+chmod +x "${SYSEXTNAME}"/build.sh
+docker run -v "${SCRIPTFOLDER}"/"${SYSEXTNAME}":/install_root/  --rm -it alpine:3.19 /bin/sh -c /install_root/build.sh
+mkdir -p  "${SYSEXTNAME}"/usr/lib/systemd/system/
+cat > "${SYSEXTNAME}"/usr/lib/systemd/system/keepalived.service <<-'EOF'
 [Unit]
 Description=LVS and VRRP High Availability Monitor
 After=network-online.target syslog.target
@@ -111,19 +97,18 @@ ExecReload=/bin/kill -HUP $MAINPID
 WantedBy=multi-user.target
 EOF
 
-mkdir -p "${SYSEXTNAME}/usr/lib/systemd/system/keepalived.service.d"
-cat > "${SYSEXTNAME}/usr/lib/systemd/system/keepalived.service.d/10-keepalived.conf" <<-'EOF'
+mkdir -p "${SYSEXTNAME}"/usr/lib/systemd/system/keepalived.service.d
+cat > "${SYSEXTNAME}"/usr/lib/systemd/system/keepalived.service.d/10-keepalived.conf <<-'EOF'
 [Service]
 ExecStartPre=/usr/bin/mkdir -p /etc/keepalived/ 
 ExecStartPre=-/bin/bash -c '[ ! -f /etc/keepalived/keepalived.conf ] && touch /etc/keepalived/keepalived.conf' 
-#ExecStartPre=-/usr/bin/rsync -u /usr/etc/keepalived/keepalived.conf.sample /etc/keepalived/keepalived.conf
 ExecStart=
 ExecStart=/usr/sbin/keepalived --use-file /etc/keepalived/keepalived.conf $KEEPALIVED_OPTIONS
 EOF
 
-mkdir -p "${SYSEXTNAME}/usr/lib/systemd/system/multi-user.target.d"
+mkdir -p "${SYSEXTNAME}"/usr/lib/systemd/system/multi-user.target.d
 { echo "[Unit]"; echo "Upholds=keepalived.service"; } > "${SYSEXTNAME}/usr/lib/systemd/system/multi-user.target.d/10-keepalived.conf"
-
+rm -f "${SYSEXTNAME}"/build.sh
 RELOAD=1 "${SCRIPTFOLDER}"/bake.sh "${SYSEXTNAME}"
 rm -rf "${SYSEXTNAME}"
-docker rmi keepalived-build
+
