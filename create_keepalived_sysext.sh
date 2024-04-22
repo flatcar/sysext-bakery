@@ -61,7 +61,6 @@ apk --no-cache add \
         automake zlib-static  alpine-sdk linux-headers libmnl-static git
 cd /opt
 git clone https://github.com/acassen/keepalived.git
-set -ex && \
     cd /opt/keepalived && git checkout $VERSION && \
     ./autogen.sh && \
     CFLAGS='-static -s' LDFLAGS=-static ./configure  --disable-dynamic-linking \
