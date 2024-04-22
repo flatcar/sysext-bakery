@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+export ARCH="${ARCH-x86-64}"
 SCRIPTFOLDER="$(dirname "$(readlink -f "$0")")"
 
 if [ $# -lt 2 ] || [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
