@@ -31,7 +31,7 @@ curl -o "cri-o.${ARCH}.v${VERSION}.tar.gz" -fsSL "https://storage.googleapis.com
 rm -rf "${SYSEXTNAME}"
 mkdir -p "${SYSEXTNAME}" "${SYSEXTNAME}/tmp"
 tar --force-local -xf "cri-o.${ARCH}.v${VERSION}.tar.gz" -C "${SYSEXTNAME}/tmp"
-cd ${SYSEXTNAME}/tmp/cri-o/
+cd "${SYSEXTNAME}/tmp/cri-o/"
 sed -i '/^sed -i.*DESTDIR/d' install # removes sed replacements from install script to keep the default location (/usr) in the base config file
 DESTDIR="${PWD}/../../../${SYSEXTNAME}" PREFIX=/usr ETCDIR=$PREFIX/share/crio/etc OCIDIR=$PREFIX/share/oci-umount/oci-umount.d \
   CNIDIR=$PREFIX/share/crio/cni/etc/net.d/ OPT_CNI_BIN_DIR=$PREFIX/share/crio/cni/bin/  BASHINSTALLDIR=/tmp FISHINSTALLDIR=/tmp ZSHINSTALLDIR=/tmp MANDIR=/tmp ./install 
