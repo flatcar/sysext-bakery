@@ -16,7 +16,7 @@ fi
 VERSION="$1"
 SYSEXTNAME="$2"
 
-if ! which docker &>/dev/null; then
+if ! command -v docker &>/dev/null; then
   echo Missing docker in path
   exit 1
 fi
