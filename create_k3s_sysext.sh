@@ -20,7 +20,6 @@ SYSEXTNAME="$2"
 # The github release uses different arch identifiers, we map them here
 # and rely on bake.sh to map them back to what systemd expects
 if [ "${ARCH}" = "amd64" ] || [ "${ARCH}" = "x86-64" ]; then
-  ARCH="x86_64"
   URL="https://github.com/k3s-io/k3s/releases/download/${VERSION}/k3s"
 elif [ "${ARCH}" = "arm64" ]; then
   ARCH="aarch64"
