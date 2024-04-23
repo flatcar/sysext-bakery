@@ -84,7 +84,7 @@ git clone https://github.com/acassen/keepalived.git
     rm -rf /install_root/usr/share /install_root/usr/etc/keepalived/samples && chown \$(stat -c %u:%g /install_root/build.sh) /install_root -R
 EOF
 chmod +x "${SYSEXTNAME}"/build.sh
-docker run -v "${PWD}/${SYSEXTNAME}":/install_root/  --rm -it "${IMG}" /bin/sh -c /install_root/build.sh
+docker run -v "${PWD}/${SYSEXTNAME}":/install_root/  --rm "${IMG}" /bin/sh -c /install_root/build.sh
 mkdir -p  "${SYSEXTNAME}"/usr/lib/systemd/system/
 cat > "${SYSEXTNAME}"/usr/lib/systemd/system/keepalived.service <<-'EOF'
 [Unit]
