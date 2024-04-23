@@ -22,7 +22,7 @@ SYSEXTNAME="$2"
 if [ "${ARCH}" = "amd64" ] || [ "${ARCH}" = "x86-64" ]; then
   URL="https://github.com/k3s-io/k3s/releases/download/${VERSION}/k3s"
 elif [ "${ARCH}" = "arm64" ] || [ "${ARCH}" = "aarch64" ]; then
-  URL="https://github.com/k3s-io/k3s/releases/download/${VERSION}%2Bk3s1/k3s-arm64"
+  URL="https://github.com/k3s-io/k3s/releases/download/${VERSION}/k3s-arm64"
 fi
 
 rm -rf "${SYSEXTNAME}"
