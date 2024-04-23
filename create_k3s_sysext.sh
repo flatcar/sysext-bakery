@@ -21,7 +21,7 @@ SYSEXTNAME="$2"
 # and rely on bake.sh to map them back to what systemd expects
 if [ "${ARCH}" = "amd64" ] || [ "${ARCH}" = "x86-64" ]; then
   URL="https://github.com/k3s-io/k3s/releases/download/${VERSION}/k3s"
-elif [ "${ARCH}" = "arm64" ]; then
+elif [ "${ARCH}" = "arm64" ] || [ "${ARCH}" = "aarch64" ]; then
   ARCH="aarch64"
   URL="https://github.com/k3s-io/k3s/releases/download/${VERSION}%2Bk3s1/k3s-arm64"
 fi
