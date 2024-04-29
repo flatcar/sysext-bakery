@@ -20,12 +20,12 @@ SYSEXTNAME="$2"
 # The github release uses different arch identifiers, we map them here
 # and rely on bake.sh to map them back to what systemd expects
 if [ "${ARCH}" = "amd64" ] || [ "${ARCH}" = "x86-64" ]; then
-  URL="https://github.com/rancher/rke2/releases/download/${VERSION}/rke2.linux-amd64.tar.gz"
-  SHA256SUMS="https://github.com/rancher/rke2/releases/download/${VERSION}/sha256sum-amd64.txt"
+        export ARCH="amd64"
 elif [ "${ARCH}" = "arm64" ] || [ "${ARCH}" = "aarch64" ]; then
-  URL="https://github.com/rancher/rke2/releases/download/${VERSION}/rke2.linux-arm64.tar.gz"
-  SHA256SUMS="https://github.com/rancher/rke2/releases/download/${VERSION}/sha256sum-arm64.txt"
+        export ARCH="arm64"
 fi
+URL="https://github.com/rancher/rke2/releases/download/${VERSION}/rke2.linux-${ARCH}.tar.gz"
+SHA256SUMS="https://github.com/rancher/rke2/releases/download/${VERSION}/sha256sum-${ARCH}.txt"
 
 rm -rf "${SYSEXTNAME}"
 mkdir -p "${SYSEXTNAME}/usr/local/"
