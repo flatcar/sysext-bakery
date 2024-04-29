@@ -95,5 +95,5 @@ ExecStartPre=-/sbin/modprobe overlay
 ExecStart=/usr/local/bin/k3s agent
 EOF
 
-"${SCRIPTFOLDER}"/bake.sh "${SYSEXTNAME}"
+RELOAD=1 "${SCRIPTFOLDER}"/bake.sh "${SYSEXTNAME}"
 rm -rf "${SYSEXTNAME}"
