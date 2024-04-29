@@ -44,7 +44,7 @@ rm "${SYSEXTNAME}/usr/local/bin/rke2-uninstall.sh"
 # remove TMP_DIR before building the sysext
 rm -rf "${TMP_DIR}"
 
-"${SCRIPTFOLDER}"/bake.sh "${SYSEXTNAME}"
+RELOAD=1 "${SCRIPTFOLDER}"/bake.sh "${SYSEXTNAME}"
 
 # cleanup
 rm -rf "${SYSEXTNAME}"
