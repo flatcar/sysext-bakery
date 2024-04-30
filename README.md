@@ -213,6 +213,35 @@ In the [Flatcar docs](https://www.flatcar.org/docs/latest/provisioning/sysext/) 
 
 The updates works by [`systemd-sysupdate`](https://www.freedesktop.org/software/systemd/man/sysupdate.d.html) fetching the `SHA256SUMS` file of the generated artifacts, which holds the list of built images with their respective SHA256 digest.
 
+The k3s sysext can be configured by using the following snippet, in case you
+want this to be a k3s server (controlplane):
+
+```yaml
+variant: flatcar
+version: 1.0.0
+storage:
+  links:
+    - path: /etc/systemd/system/multi-user.target.wants/k3s.service
+      target: /usr/local/lib/systemd/k3s.service
+      overwrite: true
+```
+
+For a k3s agent (worker node) you would use something like this snippet:
+
+```yaml
+variant: flatcar
+version: 1.0.0
+storage:
+  links:
+    - path: /etc/systemd/system/multi-user.target.wants/k3s-agent.service
+      target: /usr/local/lib/systemd/k3s-agent.service
+      overwrite: true
+```
+
+Of course, any configuration you need should be prepared before starting the
+services, like providing a token for an agent or server to join or creating a
+`config.yaml` file.
+
 ### Creating a custom Docker sysext image
 
 The Docker releases publish static binaries including containerd and the only missing piece are the systemd units.
