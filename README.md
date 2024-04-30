@@ -135,6 +135,8 @@ systemd:
 This also configures systemd-sysupdate for auto-updates. The `noop.conf` is a workaround for systemd-sysupdate to run without error messages.
 Since the configuration sets up a custom Docker version, it also disables Torcx and the future `docker-flatcar` and `containerd-flatcar` extensions to prevent conflicts.
 
+#### wasmcloud
+
 For another example of how you can further customize the recipes provided in this repository, the following recipe uses the image built with `create_wasmcloud_sysext.sh`:
 ```yaml
 variant: flatcar
@@ -213,6 +215,8 @@ In the [Flatcar docs](https://www.flatcar.org/docs/latest/provisioning/sysext/) 
 
 The updates works by [`systemd-sysupdate`](https://www.freedesktop.org/software/systemd/man/sysupdate.d.html) fetching the `SHA256SUMS` file of the generated artifacts, which holds the list of built images with their respective SHA256 digest.
 
+#### k3s
+
 The k3s sysext can be configured by using the following snippet, in case you
 want this to be a k3s server (controlplane):
 
@@ -235,6 +239,37 @@ storage:
   links:
     - path: /etc/systemd/system/multi-user.target.wants/k3s-agent.service
       target: /usr/local/lib/systemd/k3s-agent.service
+      overwrite: true
+```
+
+Of course, any configuration you need should be prepared before starting the
+services, like providing a token for an agent or server to join or creating a
+`config.yaml` file.
+
+#### rke2
+
+The rke2 sysext can be configured by using the following snippet, in case you
+want this to be a rke2 server (controlplane):
+
+```yaml
+variant: flatcar
+version: 1.0.0
+storage:
+  links:
+    - path: /etc/systemd/system/multi-user.target.wants/rke2-server.service
+      target: /usr/local/lib/systemd/rke2-server.service
+      overwrite: true
+```
+
+For a rke2 agent (worker node) you would use something like this snippet:
+
+```yaml
+variant: flatcar
+version: 1.0.0
+storage:
+  links:
+    - path: /etc/systemd/system/multi-user.target.wants/rke2-agent.service
+      target: /usr/local/lib/systemd/rke2-agent.service
       overwrite: true
 ```
 
