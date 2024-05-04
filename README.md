@@ -226,7 +226,7 @@ version: 1.0.0
 storage:
   links:
     - path: /etc/systemd/system/multi-user.target.wants/k3s.service
-      target: /usr/local/lib/systemd/k3s.service
+      target: /usr/local/lib/systemd/system/k3s.service
       overwrite: true
 ```
 
@@ -238,7 +238,7 @@ version: 1.0.0
 storage:
   links:
     - path: /etc/systemd/system/multi-user.target.wants/k3s-agent.service
-      target: /usr/local/lib/systemd/k3s-agent.service
+      target: /usr/local/lib/systemd/system/k3s-agent.service
       overwrite: true
 ```
 
@@ -257,7 +257,7 @@ version: 1.0.0
 storage:
   links:
     - path: /etc/systemd/system/multi-user.target.wants/rke2-server.service
-      target: /usr/local/lib/systemd/rke2-server.service
+      target: /usr/local/lib/systemd/system/rke2-server.service
       overwrite: true
 ```
 
@@ -269,13 +269,28 @@ version: 1.0.0
 storage:
   links:
     - path: /etc/systemd/system/multi-user.target.wants/rke2-agent.service
-      target: /usr/local/lib/systemd/rke2-agent.service
+      target: /usr/local/lib/systemd/system/rke2-agent.service
       overwrite: true
 ```
 
 Of course, any configuration you need should be prepared before starting the
 services, like providing a token for an agent or server to join or creating a
 `config.yaml` file.
+
+#### Tailscale
+
+The Tailscale sysext ships a service unit but doesn't pre-enable it.
+You can use this Butane snippet to enable it:
+
+```
+variant: flatcar
+version: 1.0.0
+storage:
+  links:
+    - path: /etc/systemd/system/multi-user.target.wants/tailscaled.service
+      target: /usr/local/lib/systemd/system/tailscaled.service
+      overwrite: true
+```
 
 ### Creating a custom Docker sysext image
 
