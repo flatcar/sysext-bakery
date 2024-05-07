@@ -32,13 +32,13 @@ mkdir -p "${SYSEXTNAME}/usr/local/"
 
 TMP_DIR="${SYSEXTNAME}/tmp/"
 mkdir -p "${TMP_DIR}"
-curl -o "${TMP_DIR}/rke2.linux-amd64.tar.gz"  -fsSL "${URL}"
+curl -o "${TMP_DIR}/rke2.linux-${ARCH}.tar.gz"  -fsSL "${URL}"
 curl -o "${TMP_DIR}/sha256sums"  -fsSL "${SHA256SUMS}"
 pushd "${TMP_DIR}" > /dev/null
-grep rke2.linux-amd64.tar.gz ./sha256sums | sha256sum -c -
+grep "rke2.linux-${ARCH}.tar.gz" ./sha256sums | sha256sum -c -
 popd  > /dev/null
 
-tar xf "${TMP_DIR}/rke2.linux-amd64.tar.gz" -C "${SYSEXTNAME}/usr/local/"
+tar xf "${TMP_DIR}/rke2.linux-${ARCH}.tar.gz" -C "${SYSEXTNAME}/usr/local/"
 rm "${SYSEXTNAME}/usr/local/bin/rke2-uninstall.sh"
 
 # remove TMP_DIR before building the sysext
