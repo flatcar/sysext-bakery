@@ -73,6 +73,26 @@ You can also set the architecture to be arm64 to fetch the right binaries and en
 
 The tools normally generate squashfs images not only because of the compression benefits but also because it doesn't need root permissions and loop device mounts.
 
+### Available Extensions
+
+The following table shows which build recipes exist and for which the GitHub Release publishes updatable images.
+While the goal is to automate the release pipeline to detect latest versions and have weekly releases, currently the release trigger is manual and all version updates except Kubernetes are also manual.
+For extensions that are not part of the GitHub Release or which you want to customize, you can build your own images and host them elsewhere - the easiest is to fork this repo and modify the `release_build_versions.txt` file and create a new `latest` tag.
+
+| Extension | Availability |
+| --- | --- |
+| `kubernetes` | released |
+| `docker` | released (includes containerd) |
+| `docker_compose` | released |
+| `wasmtime` | released |
+| `wasmcloud` | released |
+| `tailscale` | released |
+| `crio` | released |
+| `k3s` | released |
+| `rke2` | released |
+| `keepalived` | build script |
+
+
 ### Consuming the published images
 
 There is a Github Action to build current recipes and to publish the built images as release artifacts. It's possible to directly consume the latest release from a Butane/Ignition configuration, example:
@@ -134,6 +154,52 @@ systemd:
 
 This also configures systemd-sysupdate for auto-updates. The `noop.conf` is a workaround for systemd-sysupdate to run without error messages.
 Since the configuration sets up a custom Docker version, it also disables Torcx and the future `docker-flatcar` and `containerd-flatcar` extensions to prevent conflicts.
+
+Here a template for a single extension where you have to replace `NAME`, `VERSION`, and `ARCH`:
+
+```yaml
+# butane < config.yaml > config.json
+# ./flatcar_production_qemu.sh -i ./config.json
+variant: flatcar
+version: 1.0.0
+storage:
+  files:
+    - path: /opt/extensions/NAME/NAME-VERSION-ARCH.raw
+      contents:
+        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/NAME-VERSION-ARCH.raw
+    - path: /etc/sysupdate.d/noop.conf
+      contents:
+        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/noop.conf
+    - path: /etc/sysupdate.NAME.d/NAME.conf
+      contents:
+        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/NAME.conf
+  links:
+    - target: /opt/extensions/NAME/NAME-VERSION-ARCH.raw
+      path: /etc/extensions/NAME.raw
+      hard: false
+systemd:
+  units:
+    - name: systemd-sysupdate.timer
+      enabled: true
+    - name: systemd-sysupdate.service
+      dropins:
+        - name: NAME.conf
+          contents: |
+            [Service]
+            ExecStartPre=/usr/lib/systemd/systemd-sysupdate -C NAME update
+        - name: sysext.conf
+          contents: |
+            [Service]
+            ExecStartPost=systemctl restart systemd-sysext
+```
+
+In the [Flatcar docs](https://www.flatcar.org/docs/latest/provisioning/sysext/) you can find an Ignition configuration that explicitly sets the update configurations instead of downloading them.
+
+The updates works by [`systemd-sysupdate`](https://www.freedesktop.org/software/systemd/man/sysupdate.d.html) fetching the `SHA256SUMS` file of the generated artifacts, which holds the list of built images with their respective SHA256 digest.
+
+#### Kubernetes
+
+The [Flatcar Kubernetes docs](https://www.flatcar.org/docs/latest/container-runtimes/getting-started-with-kubernetes/) show how to use the extension provided here for controllers and workers.
 
 #### wasmcloud
 
@@ -210,10 +276,6 @@ This example uses Butane/Ignition configuration do the following customizations 
 2. Provide a set of credentials for the nats-server leaf node to connect with (`/etc/nats.creds`).
 3. Override the bundled `NATS_CONFIG` environment variable to point it to the newly created configuration (`NATS_CONFIG=/etc/nats-server.conf`).
 4. Override the lattice the wasmCloud host is configured to connect (`WASMCLOUD_LATTICE=<redacted>`).
-
-In the [Flatcar docs](https://www.flatcar.org/docs/latest/provisioning/sysext/) you can find an Ignition configuration that explicitly sets the update configurations instead of downloading them.
-
-The updates works by [`systemd-sysupdate`](https://www.freedesktop.org/software/systemd/man/sysupdate.d.html) fetching the `SHA256SUMS` file of the generated artifacts, which holds the list of built images with their respective SHA256 digest.
 
 #### k3s
 
@@ -360,7 +422,8 @@ Please make also sure that your don't have a `containerd.service` drop in file u
 
 CI can be kicked-off by overriding the `latest` tag. The `latest` release artifacts will be updated consequently here: https://github.com/flatcar/sysext-bakery/releases/tag/latest
 ```
-git rebase origin/main
+git checkout main
+git pull --ff-only
 git tag -d latest
 git tag -as latest
 git push origin --force latest
