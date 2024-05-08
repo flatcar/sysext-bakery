@@ -330,10 +330,17 @@ variant: flatcar
 version: 1.0.0
 storage:
   links:
+    # filename needs to be rke2.raw
+    - path: /etc/extensions/rke2.raw
+      contents:
+        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/rke2-v1.29.2+rke2r1-x86-64.raw
     - path: /etc/systemd/system/multi-user.target.wants/rke2-server.service
       target: /usr/local/lib/systemd/system/rke2-server.service
       overwrite: true
 ```
+
+Please note that this way you will not get automatic updates via
+`systemd-sysupdate`.
 
 For a rke2 agent (worker node) you would use something like this snippet:
 
@@ -342,6 +349,10 @@ variant: flatcar
 version: 1.0.0
 storage:
   links:
+    # filename needs to be rke2.raw
+    - path: /etc/extensions/rke2.raw
+      contents:
+        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/rke2-v1.29.2+rke2r1-x86-64.raw
     - path: /etc/systemd/system/multi-user.target.wants/rke2-agent.service
       target: /usr/local/lib/systemd/system/rke2-agent.service
       overwrite: true
