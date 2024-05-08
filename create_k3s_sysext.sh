@@ -29,6 +29,11 @@ rm -rf "${SYSEXTNAME}"
 mkdir -p "${SYSEXTNAME}"/usr/local/bin
 curl -o "${SYSEXTNAME}/usr/local/bin/k3s" -fsSL "${URL}"
 chmod +x "${SYSEXTNAME}"/usr/local/bin/k3s
+pushd "${SYSEXTNAME}"/usr/local/bin/
+ln -s ./k3s kubectl
+ln -s ./k3s ctr
+ln -s ./k3s crictl
+popd
 
 mkdir -p "${SYSEXTNAME}"/usr/local/lib/systemd/system/
 cat > "${SYSEXTNAME}"/usr/local/lib/systemd/system/k3s.service << EOF
