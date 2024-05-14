@@ -4,6 +4,7 @@
 Flatcar Container Linux as an OS without a package manager is a good fit for extension through systemd-sysext.
 The tools in this repository help you to create your own sysext images bundeling software to extend your base OS.
 The current focus is on Docker and containerd, contributions are welcome for other software.
+See the section at the end on how to bundle any software with the Flix and Flatwrap tools.
 
 ## Systemd-sysext
 
@@ -428,6 +429,73 @@ ls -1
 ```
 
 The script supports all vendors and clouds natively supported by Flatcar.
+
+### Flix and Flatwrap
+
+The Flix and Flatwrap tools both convert a given chroot folder into a systemd-sysext image.
+You have to specify which files should be made available to the host.
+
+The Flix tool rewrites specified binaries to use a custom library path.
+You also have to specify needed resource folders and you can specify systemd units, too.
+
+Here examples with Flix:
+
+```
+CMD="apk -U add b3sum" ./oci-rootfs.sh alpine:latest /var/tmp/alpine-b3sum
+./flix.sh /var/tmp/alpine-b3sum/ b3sum /usr/bin/b3sum /bin/busybox:/usr/bin/busybox
+# got b3sum.raw
+
+CMD="apt-get update && apt install -y nginx" ./oci-rootfs.sh debian /var/tmp/debian-nginx
+./flix.sh /var/tmp/debian-nginx/ nginx /usr/sbin/nginx /usr/sbin/start-stop-daemon /usr/lib/systemd/system/nginx.service
+# got nginx.raw
+
+# Note: Enablement of nginx.service with Butane would happen as in the k3s example
+# but you can also pre-enable the service inside the extension.
+# Here a non-production nginx test config if you want to try the above:
+$ cat /etc/nginx/nginx.conf
+user root;
+pid /run/nginx.pid;
+
+events {
+}
+
+http {
+  access_log /dev/null;
+  proxy_temp_path /tmp;
+  client_body_temp_path /tmp;
+  fastcgi_temp_path /tmp;
+  uwsgi_temp_path /tmp;
+  scgi_temp_path /tmp;
+  server {
+        server_name   localhost;
+        listen        127.0.0.1:80;
+  }
+}
+```
+
+The Flatwrap tool generates entry point wrappers for a chroot with `unshare` or `bwrap`.
+You can specify systemd units, too. By default `/etc`, `/var`, and `/home` are mapped from the host but that is configurable (see `--help`).
+
+Here examples with Flatwrap:
+
+```
+CMD="apk -U add b3sum" ./oci-rootfs.sh alpine:latest /var/tmp/alpine-b3sum
+./flatwrap.sh /var/tmp/alpine-b3sum b3sum /usr/bin/b3sum /bin/busybox:/usr/bin/busybox
+# got b3sum.raw
+
+CMD="apk -U add htop" ./oci-rootfs.sh alpine:latest /var/tmp/alpine-htop
+# Use ETCMAP=chroot because alpine's htop needs alpine's /etc/terminfo
+ETCMAP=chroot ./flatwrap.sh /var/tmp/alpine-htop htop /usr/bin/htop
+# got htop.raw
+
+CMD="apt-get update && apt install -y nginx" ./oci-rootfs.sh debian /var/tmp/debian-nginx
+./flatwrap.sh /var/tmp/debian-nginx/ nginx /usr/sbin/nginx /usr/sbin/start-stop-daemon /usr/lib/systemd/system/nginx.service
+# got nginx.raw
+
+# Note: Enablement of nginx.service with Butane would happen as in the k3s example
+# but you can also pre-enable the service inside the extension.
+# (The "non-production" nginx test config above can be used here, too, stored on the host's /etc.)
+```
 
 ### Converting a Torcx image
 
