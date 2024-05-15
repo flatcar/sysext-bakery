@@ -47,7 +47,7 @@ fi
 echo "Using temporary container ${ID}"
 trap "'${DOCKER}' rm --force --time 0 '${ID}'" EXIT INT
 if [ "${CMD}" != "" ]; then
-  docker run --name "${ID}" "${IMAGE}" sh -c "${CMD}"
+  "${DOCKER}" run --name "${ID}" "${IMAGE}" sh -c "${CMD}"
 fi
 rm -f "${FOLDER}.tar"
 "${DOCKER}" export "${ID}" -o "${FOLDER}.tar"
