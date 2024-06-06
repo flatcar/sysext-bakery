@@ -6,7 +6,7 @@ SCRIPTFOLDER="$(dirname "$(readlink -f "$0")")"
 
 if [ $# -lt 2 ] || [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
   echo "Usage: $0 VERSION SYSEXTNAME"
-  echo "The script will download the k3s binary (e.g., for v1.29.2+k3s1) and create a sysext squashfs image with the name SYSEXTNAME.raw in the current folder."
+  echo "The script will download the sysdig falco binary (e.g., for 0.38.0) and create a sysext squashfs image with the name falco.raw in the current folder."
   echo "A temporary directory named SYSEXTNAME in the current folder will be created and deleted again."
   echo "All files in the sysext image will be owned by root."
   echo "To use arm64 pass 'ARCH=arm64' as environment variable (current value is '${ARCH}')."
