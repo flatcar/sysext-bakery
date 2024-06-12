@@ -85,6 +85,7 @@ For extensions that are not part of the GitHub Release or which you want to cust
 | `kubernetes` | released |
 | `docker` | released (includes containerd) |
 | `docker_compose` | released |
+| `falco` | released |
 | `wasmtime` | released |
 | `wasmcloud` | released |
 | `tailscale` | released |
@@ -197,6 +198,86 @@ systemd:
 In the [Flatcar docs](https://www.flatcar.org/docs/latest/provisioning/sysext/) you can find an Ignition configuration that explicitly sets the update configurations instead of downloading them.
 
 The updates works by [`systemd-sysupdate`](https://www.freedesktop.org/software/systemd/man/sysupdate.d.html) fetching the `SHA256SUMS` file of the generated artifacts, which holds the list of built images with their respective SHA256 digest.
+
+#### Falco
+
+To setup [Falco](https://falco.org/docs/getting-started/) we need the sysext plus the configuration files and the systemd unit.
+
+The following example uses the sysdig falco workshop rules and the systemd files available on the github:
+
+```yaml
+systemd:
+  units:
+    #source: https://raw.githubusercontent.com/falcosecurity/falco/master/scripts/systemd/falco-bpf.service
+    - name: falco-modern-bpf.service
+      enabled: true
+      contents: |
+        [Unit]
+        Description=Falco: Container Native Runtime Security with modern ebpf
+        Documentation=https://falco.org/docs/
+        Before=falcoctl-artifact-follow.service
+        Wants=falcoctl-artifact-follow.service
+        
+        [Service]
+        Type=simple
+        User=root
+        ExecStart=/usr/bin/falco -o engine.kind=modern_ebpf
+        ExecReload=kill -1 $MAINPID
+        UMask=0077
+        TimeoutSec=30
+        RestartSec=15s
+        Restart=on-failure
+        PrivateTmp=true
+        NoNewPrivileges=yes
+        ProtectHome=read-only
+        ProtectSystem=full
+        ProtectKernelTunables=true
+        RestrictRealtime=true
+        RestrictAddressFamilies=~AF_PACKET
+        StandardOutput=null
+        
+        [Install]
+        WantedBy=multi-user.target
+
+    # source: https://raw.githubusercontent.com/falcosecurity/falco/master/scripts/systemd/falcoctl-artifact-follow.service
+    - name: falcoctl-artifact-follow.service
+      contents: |
+        [Unit]
+        Description=Falcoctl Artifact Follow: automatic artifacts update service
+        Documentation=https://falco.org/docs/
+        PartOf=falco-bpf.service falco-kmod.service falco-modern-bpf.service falco-custom.service
+        
+        [Service]
+        Type=simple
+        User=root
+        ExecStart=/usr/bin/falcoctl artifact follow --allowed-types=rulesfile
+        UMask=0077
+        TimeoutSec=30
+        RestartSec=15s
+        Restart=on-failure
+        PrivateTmp=true
+        NoNewPrivileges=yes
+        ProtectSystem=true
+        ReadWriteDirectories=/usr/share/falco
+        ProtectKernelTunables=true
+        RestrictRealtime=true
+        
+        [Install]
+        WantedBy=multi-user.target
+
+storage:
+  files:
+    - path: /etc/falco/falco.yaml
+      contents:
+        source: "https://raw.githubusercontent.com/sysdiglabs/falco-workshop/master/falco.yaml"
+    - path: /etc/falco/falco_rules.yaml
+      contents:
+        source: "https://raw.githubusercontent.com/sysdiglabs/falco-workshop/master/falco_rules.yaml"
+    - path: /etc/extensions/falco.raw
+      contents:
+        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/falco-0.38.0-x86-64.raw
+```
+
 
 #### Kubernetes
 
