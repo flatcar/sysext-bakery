@@ -203,7 +203,9 @@ The updates works by [`systemd-sysupdate`](https://www.freedesktop.org/software/
 
 To setup [Falco](https://falco.org/docs/getting-started/) we need the sysext plus the configuration files and the systemd unit.
 
-The following example uses the sysdig falco workshop rules and the systemd files available on the github:
+By default, the falcon daemon systemd unit shipped is the [Falco Modern EBPF](https://github.com/falcosecurity/falco/blob/master/scripts/systemd/falco-modern-bpf.service). Create systemd drop-ins or replace the service to suit your needs if necessary. 
+
+The default falco config and rules files are shipped, but you can overwrite it. The example bellow shows how to override the default files:
 
 ```yaml
 storage:
@@ -219,10 +221,8 @@ storage:
         source: https://github.com/flatcar/sysext-bakery/releases/download/latest/falco-0.38.0-x86-64.raw
 ```
 
-By default, the falcon daemon systemd unit shipped is the [Falco Modern EBPF](https://github.com/falcosecurity/falco/blob/master/scripts/systemd/falco-modern-bpf.service). Create systemd drop-ins or replace the service to suit your needs if necessary. 
-
-There are no configuration and no rules shipped by default, but its possible to configure directly like the example above or to use the
-[artifact-follower](https://falco.org/blog/falcoctl-install-manage-rules-plugins/#follow-artifacts) to do so.
+Of course its also possible to use the 
+[artifact-follower](https://falco.org/blog/falcoctl-install-manage-rules-plugins/#follow-artifacts) to download falco artifacts automatically.
 
 #### Kubernetes
 
