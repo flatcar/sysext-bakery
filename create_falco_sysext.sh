@@ -29,7 +29,7 @@ rm -rf "${SYSEXTNAME}"
 mkdir -p "${SYSEXTNAME}/usr/local/lib/systemd/system/"
 curl -o - -fsSL "${URL}" | tar --strip-components 1 -xzvf - -C "${SYSEXTNAME}/"
 
-cat > "${SYSEXTNAME}"/usr/local/lib/systemd/system/falco-modern-bpf.service << EOF
+cat > "${SYSEXTNAME}"/usr/local/lib/systemd/system/falco-modern-bpf.service <<'EOF'
 [Unit]
 Description=Falco: Container Native Runtime Security with modern ebpf
 Documentation=https://falco.org/docs/
