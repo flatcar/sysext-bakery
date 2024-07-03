@@ -26,8 +26,14 @@ elif [ "${ARCH}" = "arm64" ] || [ "${ARCH}" = "aarch64" ]; then
 fi
 
 rm -rf "${SYSEXTNAME}"
-mkdir -p "${SYSEXTNAME}/usr/local/lib/systemd/system/"
+mkdir -p "${SYSEXTNAME}"{/usr/share/falco/etc/,/usr/lib/tmpfiles.d,/usr/local/lib/systemd/system/}
+
+cat <<EOF >"${SYSEXTNAME}"/usr/lib/tmpfiles.d/10-falco.conf
+/etc/falco - - - - /usr/share/falco/etc/falco
+EOF
+
 curl -o - -fsSL "${URL}" | tar --strip-components 1 -xzvf - -C "${SYSEXTNAME}/"
+mv "${SYSEXTNAME}"{/etc/{falco,falcoctl},/usr/share/falco/etc/}
 
 cat > "${SYSEXTNAME}"/usr/local/lib/systemd/system/falco-modern-bpf.service <<'EOF'
 [Unit]
