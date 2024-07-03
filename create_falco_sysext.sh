@@ -29,7 +29,7 @@ rm -rf "${SYSEXTNAME}"
 mkdir -p "${SYSEXTNAME}"{/usr/share/falco/etc/,/usr/lib/tmpfiles.d,/usr/local/lib/systemd/system/}
 
 cat <<EOF >"${SYSEXTNAME}"/usr/lib/tmpfiles.d/10-falco.conf
-/etc/falco - - - - /usr/share/falco/etc/falco
+C /etc/falco - - - - /usr/share/falco/etc/falco
 EOF
 
 curl -o - -fsSL "${URL}" | tar --strip-components 1 -xzvf - -C "${SYSEXTNAME}/"
