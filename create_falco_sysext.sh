@@ -26,8 +26,62 @@ elif [ "${ARCH}" = "arm64" ] || [ "${ARCH}" = "aarch64" ]; then
 fi
 
 rm -rf "${SYSEXTNAME}"
-mkdir -p "${SYSEXTNAME}"/
+mkdir -p "${SYSEXTNAME}/usr/local/lib/systemd/system/"
 curl -o - -fsSL "${URL}" | tar --strip-components 1 -xzvf - -C "${SYSEXTNAME}/"
+
+cat > "${SYSEXTNAME}"/usr/local/lib/systemd/system/falco-modern-bpf.service << EOF
+[Unit]
+Description=Falco: Container Native Runtime Security with modern ebpf
+Documentation=https://falco.org/docs/
+Before=falcoctl-artifact-follow.service
+Wants=falcoctl-artifact-follow.service
+
+[Service]
+Type=simple
+User=root
+ExecStart=/usr/bin/falco -o engine.kind=modern_ebpf
+ExecReload=kill -1 $MAINPID
+UMask=0077
+TimeoutSec=30
+RestartSec=15s
+Restart=on-failure
+PrivateTmp=true
+NoNewPrivileges=yes
+ProtectHome=read-only
+ProtectSystem=full
+ProtectKernelTunables=true
+RestrictRealtime=true
+RestrictAddressFamilies=~AF_PACKET
+StandardOutput=null
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+cat > "${SYSEXTNAME}"/usr/local/lib/systemd/system/falcoctl-artifact-follow.service << EOF
+[Unit]
+Description=Falcoctl Artifact Follow: automatic artifacts update service
+Documentation=https://falco.org/docs/
+PartOf=falco-bpf.service falco-kmod.service falco-modern-bpf.service falco-custom.service
+
+[Service]
+Type=simple
+User=root
+ExecStart=/usr/bin/falcoctl artifact follow --allowed-types=rulesfile
+UMask=0077
+TimeoutSec=30
+RestartSec=15s
+Restart=on-failure
+PrivateTmp=true
+NoNewPrivileges=yes
+ProtectSystem=true
+ReadWriteDirectories=/usr/share/falco
+ProtectKernelTunables=true
+RestrictRealtime=true
+
+[Install]
+WantedBy=multi-user.target
+EOF
 
 RELOAD=1 "${SCRIPTFOLDER}"/bake.sh "${SYSEXTNAME}"
 rm -rf "${SYSEXTNAME}"
