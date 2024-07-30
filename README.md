@@ -287,12 +287,12 @@ want this to be a k3s server (controlplane):
 variant: flatcar
 version: 1.0.0
 storage:
-  links:
   files:
     # filename needs to be k3s.raw
     - path: /etc/extensions/k3s.raw
       contents:
         source: https://github.com/flatcar/sysext-bakery/releases/download/latest/k3s-v1.29.2+k3s1-x86-64.raw
+  links:
     - path: /etc/systemd/system/multi-user.target.wants/k3s.service
       target: /usr/local/lib/systemd/system/k3s.service
       overwrite: true
@@ -307,11 +307,12 @@ For a k3s agent (worker node) you would use something like this snippet:
 variant: flatcar
 version: 1.0.0
 storage:
-  links:
+  files:
     # filename needs to be k3s.raw
     - path: /etc/extensions/k3s.raw
       contents:
         source: https://github.com/flatcar/sysext-bakery/releases/download/latest/k3s-v1.29.2+k3s1-x86-64.raw
+  links:
     - path: /etc/systemd/system/multi-user.target.wants/k3s-agent.service
       target: /usr/local/lib/systemd/system/k3s-agent.service
       overwrite: true
