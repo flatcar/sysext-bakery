@@ -21,7 +21,7 @@ wasmtime-18.0.1
 wasmcloud-0.82.0
 wasmcloud-1.0.0
 
-tailscale-1.64.0
+tailscale-1.70.0
 
 crio-1.28.4
 
