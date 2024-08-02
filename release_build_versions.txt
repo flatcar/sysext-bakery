@@ -1,6 +1,6 @@
 # Versions to build.
 
-# For Kubernetes, we fetch the latest versions to be built.
+# For Kubernetes and CRI-O, we fetch the latest versions to be built.
 # The below lists _additional_ kubernetes versions to be built.
 
 kubernetes-v1.28.5 # required for CAPO CI
@@ -22,8 +22,6 @@ wasmcloud-0.82.0
 wasmcloud-1.0.0
 
 tailscale-1.70.0
-
-crio-1.28.4
 
 k3s-v1.29.2+k3s1
 
