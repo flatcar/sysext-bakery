@@ -23,7 +23,7 @@ SYSEXTNAME="$2"
 if [ "${ARCH}" = "amd64" ] || [ "${ARCH}" = "x86-64" ]; then
   ARCH="amd64"
 elif [ "${ARCH}" = "arm64" ]; then
-  ARCH="arch64"
+  ARCH="arm64"
 fi
 
 git clone -b ${VERSION} --depth 1 https://github.com/NVIDIA/libnvidia-container || true
