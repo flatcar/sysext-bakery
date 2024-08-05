@@ -68,6 +68,7 @@ EOF
 mkdir -p "${SYSEXTNAME}"/usr/lib/systemd/system/nvidia.service.d
 cat <<EOF >"${SYSEXTNAME}"/usr/lib/systemd/system/nvidia.service.d/10-persistenced.conf
 [Service]
+ExecStartPre=-/bin/sh -c "rm /run/extensions/nvidia-driver && systemctl restart systemd-sysext"
 ExecStartPost=-/opt/bin/nvidia-persistenced
 ExecStartPost=-/bin/sh -c "chcon -R -t container_file_t /dev/nvidia*"
 ExecStartPost=mkdir -p /run/extensions
