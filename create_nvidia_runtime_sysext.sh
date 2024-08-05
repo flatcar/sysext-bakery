@@ -71,8 +71,9 @@ cat <<EOF >"${SYSEXTNAME}"/usr/lib/systemd/system/nvidia.service.d/10-persistenc
 ExecStartPost=-/opt/bin/nvidia-persistenced
 ExecStartPost=-/bin/sh -c "chcon -R -t container_file_t /dev/nvidia*"
 ExecStartPost=mkdir -p /run/extensions
-ExecStartPost=ln -s /opt/nvidia/current /run/extensions/nvidia-driver
+ExecStartPost=ln -sf /opt/nvidia/current /run/extensions/nvidia-driver
 ExecStartPost=systemctl restart systemd-sysext
+ExecStopPost=rmmod nvidia_uvm nvidia_modeset nvidia
 EOF
 
 
