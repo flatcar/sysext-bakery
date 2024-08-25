@@ -93,6 +93,7 @@ For extensions that are not part of the GitHub Release or which you want to cust
 | `k3s` | released |
 | `rke2` | released |
 | `keepalived` | build script |
+| `ollama` | released |
 
 
 ### Consuming the published images
@@ -379,6 +380,42 @@ storage:
       target: /usr/local/lib/systemd/system/tailscaled.service
       overwrite: true
 ```
+
+#### Ollama
+
+The ollama sysext can be configured by using the following snippet:
+
+```
+variant: flatcar
+version: 1.0.0
+storage:
+  files:
+    - path: /opt/extensions/ollama/ollama-0.3.9-x86-64.raw
+      contents:
+        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/ollama-0.3.9-x86-64.raw
+    - path: /etc/sysupdate.ollama.d/ollama.conf
+      contents:
+        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/ollama.conf
+  links:
+    - target: /opt/extensions/ollama/ollama-0.3.9-x86-64.raw
+      path: /etc/extensions/ollama.raw
+      hard: false
+systemd:
+  units:
+    - name: ollama.service
+      enabled: true
+      dropins:
+        - name: 10-ollama-env-override.conf
+          contents: |
+            [Service]
+            Environment=HOME="/var/lib/ollama"
+            Environment=OLLAMA_MODELS="/var/lib/ollama/models"
+            Environment=OLLAMA_RUNNERS_DIR="/var/lib/ollama/runners"
+```
+
+Note that this configuration can be customized in terms of where Ollama is configured to store its models, configuration and runtime libraries by changing the `HOME`, `OLLAMA_MODELS` and `OLLAMA_RUNNERS_DIR`.
+
+Please refer to the [Ollama documentation for further details](https://github.com/ollama/ollama/tree/main/docs).
 
 ### Creating a custom Docker sysext image
 
