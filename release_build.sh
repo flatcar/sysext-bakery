@@ -35,6 +35,10 @@ git ls-remote --tags --sort=-v:refname https://github.com/cri-o/cri-o \
 
 CRIO=()
 for r in "${KBS_VERS_ARRAY[@]}"; do
+    if ! grep -q "v${r%.*}" crio.txt; then
+        echo "Skipping $r"
+        continue
+    fi
     version=$(cat crio.txt | grep "v${r%.*}" | head -n1)
     CRIO+=( "crio-${version:1}" )
 done
@@ -45,13 +49,13 @@ echo "=========================================="
 curl -fsSL --retry-delay 1 --retry 60 --retry-connrefused \
          --retry-max-time 60 --connect-timeout 20  \
          https://api.github.com/repos/flatcar/sysext-bakery/releases/latest \
-    | jq -r '.assets[].browser_download_url' | grep -E '\.raw$' | tee prev_release_sysexts.txt
+    | jq -r '.assets[] | "\(.name)\t\(.browser_download_url)"' | grep -E '\.raw$' | tee prev_release_sysexts.txt
 
-for asset in $(cat prev_release_sysexts.txt); do
+while IFS=$'\t' read -r name url; do
     echo
-    echo "  ## Fetching $(basename "${asset}") <-- ${asset}"
-    curl -O -fsSL --retry-delay 1 --retry 60 --retry-connrefused --retry-max-time 60 --connect-timeout 20  "${asset}"
-done
+    echo "  ## Fetching ${name} <-- ${url}"
+    curl -o "${name}" -fsSL --retry-delay 1 --retry 60 --retry-connrefused --retry-max-time 60 --connect-timeout 20  "${url}"
+done <prev_release_sysexts.txt
 
 streams=()
 
@@ -97,7 +101,7 @@ done
   
 echo "" >> Release.md
 echo "The release includes the following sysexts from previous releases:" >> Release.md
-sed 's/^/* /' prev_release_sysexts.txt >> Release.md
+awk '{ print "* ["$1"]("$2")" }' prev_release_sysexts.txt >>Release.md
 
 echo
 echo "Generating systemd-sysupdate configurations and SHA256SUM."
