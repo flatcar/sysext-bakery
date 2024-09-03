@@ -85,6 +85,7 @@ For extensions that are not part of the GitHub Release or which you want to cust
 | `kubernetes` | released |
 | `docker` | released (includes containerd) |
 | `docker_compose` | released |
+| `nvidia-runtime` | released |
 | `wasmtime` | released |
 | `wasmcloud` | released |
 | `tailscale` | released |

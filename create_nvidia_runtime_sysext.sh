@@ -6,7 +6,7 @@ SCRIPTFOLDER="$(dirname "$(readlink -f "$0")")"
 
 if [ $# -lt 2 ] || [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
   echo "Usage: $0 VERSION SYSEXTNAME"
-  echo "The script will build nvidia-container-toolkit on ubuntu 18 and package it into a syseext."
+  echo "The script will build nvidia-container-toolkit on ubuntu 20 and package it into a sysext."
   echo "A temporary directory named SYSEXTNAME in the current folder will be created and deleted again."
   echo "All files in the sysext image will be owned by root."
   echo "To use arm64 pass 'ARCH=arm64' as environment variable (current value is '${ARCH}')."
@@ -29,15 +29,15 @@ fi
 git clone -b ${VERSION} --depth 1 https://github.com/NVIDIA/libnvidia-container || true
 git clone -b ${VERSION} --depth 1 https://github.com/NVIDIA/nvidia-container-toolkit || true
 
-make -C libnvidia-container ubuntu18.04-${ARCH}
-make -C nvidia-container-toolkit ubuntu18.04-${ARCH}
+make -C libnvidia-container ubuntu20.04-${ARCH}
+make -C nvidia-container-toolkit ubuntu20.04-${ARCH}
 
 rm -rf "${SYSEXTNAME}"
 mkdir -p "${SYSEXTNAME}"
-for deb in libnvidia-container/dist/ubuntu18.04/${ARCH}/libnvidia-container{1_*,-tools_}*.deb; do
+for deb in libnvidia-container/dist/ubuntu20.04/${ARCH}/libnvidia-container{1_*,-tools_}*.deb; do
   dpkg-deb -x $deb "${SYSEXTNAME}"/
 done
-for deb in nvidia-container-toolkit/dist/ubuntu18.04/${ARCH}/nvidia-container-toolkit*.deb; do
+for deb in nvidia-container-toolkit/dist/ubuntu20.04/${ARCH}/nvidia-container-toolkit*.deb; do
   dpkg-deb -x $deb "${SYSEXTNAME}"/
 done
 rm -rf "${SYSEXTNAME}"/usr/share
