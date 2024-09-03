@@ -49,7 +49,7 @@ echo "=========================================="
 curl -fsSL --retry-delay 1 --retry 60 --retry-connrefused \
          --retry-max-time 60 --connect-timeout 20  \
          https://api.github.com/repos/flatcar/sysext-bakery/releases/latest \
-    | jq -r '.assets[] | "\(.name)\t\(.browser_download_url)"' | grep -E '\.raw$' | tee prev_release_sysexts.txt
+    | jq -r '.assets[] | "\(.name)\t\(.browser_download_url)"' | { grep -E '\.raw$' || true; } | tee prev_release_sysexts.txt
 
 while IFS=$'\t' read -r name url; do
     echo
