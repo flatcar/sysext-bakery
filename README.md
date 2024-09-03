@@ -210,9 +210,9 @@ variant: flatcar
 version: 1.0.0
 storage:
   files:
-    - path: /opt/extensions/wasmcloud/wasmcloud-1.0.0-x86-64.raw
+    - path: /opt/extensions/wasmcloud/wasmcloud-1.1.1-x86-64.raw
       contents:
-        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/wasmcloud-1.0.0-x86-64.raw
+        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/wasmcloud-1.1.1-x86-64.raw
     - path: /etc/sysupdate.d/noop.conf
       contents:
         source: https://github.com/flatcar/sysext-bakery/releases/download/latest/noop.conf
@@ -238,7 +238,7 @@ storage:
         inline: |
           <redacted>
   links:
-    - target: /opt/extensions/wasmcloud/wasmcloud-1.0.0-x86-64.raw
+    - target: /opt/extensions/wasmcloud/wasmcloud-1.1.1-x86-64.raw
       path: /etc/extensions/wasmcloud.raw
       hard: false
 systemd:
