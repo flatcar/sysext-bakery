@@ -27,3 +27,5 @@ tailscale-1.70.0
 k3s-v1.29.2+k3s1
 
 rke2-v1.29.2+rke2r1
+
+nvidia_runtime-v1.16.1
