@@ -35,6 +35,10 @@ git ls-remote --tags --sort=-v:refname https://github.com/cri-o/cri-o \
 
 CRIO=()
 for r in "${KBS_VERS_ARRAY[@]}"; do
+    if ! grep -q "v${r%.*}" crio.txt; then
+        echo "Skipping $r"
+        continue
+    fi
     version=$(cat crio.txt | grep "v${r%.*}" | head -n1)
     CRIO+=( "crio-${version:1}" )
 done
