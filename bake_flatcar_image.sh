@@ -16,7 +16,7 @@ install_to="root:/opt/extensions/"
 
 set -euo pipefail
 workdir="$(pwd)/flatcar-os-image"
-bakery_base_url="https://github.com/flatcar/sysext-bakery/releases/download/latest"
+bakery_base_url="https://github.com/flatcar/sysext-bakery/releases/latest/download"
 
 # ./run_sdk_container ./image_to_vm.sh --help 2>&1 | grep '\--format'
 supported_vendors=( "ami" "ami_vmdk" "azure" "cloudsigma" "cloudstack" "cloudstack_vhd" "digitalocean" "exoscale" "gce" "hyperv" "iso" "openstack" "openstack_mini" "packet" "parallels" "pxe" "qemu" "qemu_uefi" "qemu_uefi_secure" "rackspace" "rackspace_onmetal" "rackspace_vhd" "vagrant" "vagrant_parallels" "vagrant_virtualbox" "vagrant_vmware_fusion" "virtualbox" "vmware" "vmware_insecure" "vmware_ova" "vmware_raw" "xen" )
