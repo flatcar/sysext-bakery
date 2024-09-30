@@ -17,9 +17,9 @@ wasmtime-12.0.0
 wasmtime-13.0.0 # Used in Flatcar wasm OS demo
 wasmtime-24.0.0 # Used in README.md. Update readme when version changes.
 
-wasmcloud-0.82.0
 wasmcloud-1.0.0
 wasmcloud-1.1.1
+wasmcloud-1.2.1
 
 tailscale-1.70.0
 
