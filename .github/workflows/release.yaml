@@ -36,7 +36,7 @@ jobs:
       - name: build release artifacts
         run: |
           pushd bakery
-          ./release_build.sh
+          REPO=${{ github.repository }} ./release_build.sh
 
       - name: delete previous latest release
         env:
