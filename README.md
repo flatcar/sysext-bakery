@@ -293,7 +293,7 @@ storage:
     # filename needs to be k3s.raw
     - path: /etc/extensions/k3s.raw
       contents:
-        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/k3s-v1.29.2+k3s1-x86-64.raw
+        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/k3s-v1.31.1+k3s1-x86-64.raw
   links:
     - path: /etc/systemd/system/multi-user.target.wants/k3s.service
       target: /usr/local/lib/systemd/system/k3s.service
@@ -313,7 +313,7 @@ storage:
     # filename needs to be k3s.raw
     - path: /etc/extensions/k3s.raw
       contents:
-        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/k3s-v1.29.2+k3s1-x86-64.raw
+        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/k3s-v1.31.1+k3s1-x86-64.raw
   links:
     - path: /etc/systemd/system/multi-user.target.wants/k3s-agent.service
       target: /usr/local/lib/systemd/system/k3s-agent.service
@@ -337,7 +337,7 @@ storage:
     # filename needs to be rke2.raw
     - path: /etc/extensions/rke2.raw
       contents:
-        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/rke2-v1.29.2+rke2r1-x86-64.raw
+        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/rke2-v1.31.1+rke2r1-x86-64.raw
     - path: /etc/systemd/system/multi-user.target.wants/rke2-server.service
       target: /usr/local/lib/systemd/system/rke2-server.service
       overwrite: true
@@ -356,7 +356,7 @@ storage:
     # filename needs to be rke2.raw
     - path: /etc/extensions/rke2.raw
       contents:
-        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/rke2-v1.29.2+rke2r1-x86-64.raw
+        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/rke2-v1.31.1+rke2r1-x86-64.raw
     - path: /etc/systemd/system/multi-user.target.wants/rke2-agent.service
       target: /usr/local/lib/systemd/system/rke2-agent.service
       overwrite: true
