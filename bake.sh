@@ -67,7 +67,7 @@ else
   VERMAJ=$(echo "${VER}" | cut -d . -f 1)
   VERMIN=$(echo "${VER}" | cut -d . -f 2)
   ARG=(-all-root -noappend)
-  if [ "${VERMAJ}" -gt 4 ] && [ "${VERMIN}" -gt 6 ]; then
+  if [[ "${VERMAJ}" -gt 4 || ( "${VERMAJ}" -eq 4 && "${VERMIN}" -gt 5 ) ]]; then
     ARG+=('-xattrs-exclude' '^btrfs.')
   fi
   mksquashfs "${SYSEXTNAME}" "${SYSEXTNAME}".raw "${ARG[@]}"
