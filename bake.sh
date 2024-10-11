@@ -38,6 +38,10 @@ elif [ "${ARCH}" = "aarch64" ]; then
   ARCH="arm64"
 fi
 
+function version_ge() {
+    test "$(printf '%s\n' "$@" | sort -rV | head -n 1)" == "$1";
+}
+
 mkdir -p "${SYSEXTNAME}/usr/lib/extension-release.d"
 {
   echo "ID=${OS}"
@@ -64,10 +68,9 @@ elif [ "${FORMAT}" = "ext4" ] || [ "${FORMAT}" = "ext2" ]; then
   resize2fs -M "${SYSEXTNAME}".raw
 else
   VER=$({ mksquashfs -version || true ; } | head -n1 | cut -d " " -f 3)
-  VERMAJ=$(echo "${VER}" | cut -d . -f 1)
-  VERMIN=$(echo "${VER}" | cut -d . -f 2)
   ARG=(-all-root -noappend)
-  if [[ "${VERMAJ}" -gt 4 || ( "${VERMAJ}" -eq 4 && "${VERMIN}" -gt 5 ) ]]; then
+  # use sort semver to check if current version is >= 4.6.1
+  if version_ge "$VER" "4.6.1"; then
     ARG+=('-xattrs-exclude' '^btrfs.')
   fi
   mksquashfs "${SYSEXTNAME}" "${SYSEXTNAME}".raw "${ARG[@]}"
