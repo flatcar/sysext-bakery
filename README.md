@@ -417,6 +417,42 @@ Note that this configuration can be customized in terms of where Ollama is confi
 
 Please refer to the [Ollama documentation for further details](https://github.com/ollama/ollama/tree/main/docs).
 
+### Building sysext images
+
+To use the build scripts in this repository, the following packages are required:
+
+- `curl`
+- `jq`
+- `squashfs-tools`
+- `xz-utils`
+- `gawk`
+- [`yq`](https://github.com/mikefarah/yq/releases/latest/)
+
+
+#### Build individual sysext image
+
+To build the Kubernetes sysext for example, use:
+
+```sh
+./create_kubernetes_sysext.sh v1.29.8 kubernetes
+```
+
+Afterwards, you can test the sysext image with:
+
+```sh
+sudo cp kubernetes.raw /etc/extensions/kubernetes.raw
+sudo systemd-sysext refresh
+kubeadm version
+```
+
+#### Build all sysext images in this repository
+
+This builds `x86-64` and `arm64` versions of **all** sysext images listed in `release_build_versions.txt`. This takes some time.
+
+```sh
+./release_build.sh
+```
+
 ### Creating a custom Docker sysext image
 
 The Docker releases publish static binaries including containerd and the only missing piece are the systemd units.
