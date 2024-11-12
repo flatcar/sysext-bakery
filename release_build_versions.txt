@@ -34,3 +34,5 @@ rke2-v1.31.1+rke2r1
 nvidia_runtime-v1.16.2
 
 ollama-0.3.9
+
+containerd-2.0.0
