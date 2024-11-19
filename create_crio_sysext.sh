@@ -6,7 +6,7 @@ SCRIPTFOLDER="$(dirname "$(readlink -f "$0")")"
 
 if [ $# -lt 2 ] || [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
   echo "Usage: $0 VERSION SYSEXTNAME"
-  echo "The script will download the cri-o release binaries (e.g., for 1.28.4) and create a sysext squashfs image with the name SYSEXTNAME.raw in the current folder."
+  echo "The script will download the cri-o release binaries (e.g., for v1.28.4) and create a sysext squashfs image with the name SYSEXTNAME.raw in the current folder."
   echo "A temporary directory named SYSEXTNAME in the current folder will be created and deleted again."
   echo "All files in the sysext image will be owned by root."
   echo "To use arm64 pass 'ARCH=arm64' as environment variable (current value is '${ARCH}')."
@@ -18,6 +18,9 @@ fi
 VERSION="$1"
 SYSEXTNAME="$2"
 
+# For compatibility with existing automation.
+[[ "${VERSION}" == v* ]] || VERSION="v${VERSION}"
+
 # The github release uses different arch identifiers (not the same as in the other scripts here),
 # we map them here and rely on bake.sh to map them back to what systemd expects
 if [ "${ARCH}" = "x86_64" ] || [ "${ARCH}" = "x86-64" ]; then
@@ -26,11 +29,11 @@ elif [ "${ARCH}" = "aarch64" ]; then
   ARCH="arm64"
 fi
 
-rm -f "cri-o.${ARCH}.v${VERSION}.tar.gz"
-curl -o "cri-o.${ARCH}.v${VERSION}.tar.gz" -fsSL "https://storage.googleapis.com/cri-o/artifacts/cri-o.${ARCH}.v${VERSION}.tar.gz" 
+rm -f "cri-o.${ARCH}.${VERSION}.tar.gz"
+curl -o "cri-o.${ARCH}.${VERSION}.tar.gz" -fsSL "https://storage.googleapis.com/cri-o/artifacts/cri-o.${ARCH}.${VERSION}.tar.gz"
 rm -rf "${SYSEXTNAME}"
 mkdir -p "${SYSEXTNAME}" "${SYSEXTNAME}/tmp"
-tar --force-local -xf "cri-o.${ARCH}.v${VERSION}.tar.gz" -C "${SYSEXTNAME}/tmp"
+tar --force-local -xf "cri-o.${ARCH}.${VERSION}.tar.gz" -C "${SYSEXTNAME}/tmp"
 cd "${SYSEXTNAME}/tmp/cri-o/"
 sed -i '/^sed -i.*DESTDIR/d' install # removes sed replacements from install script to keep the default location (/usr) in the base config file
 DESTDIR="${PWD}/../../../${SYSEXTNAME}" PREFIX=/usr ETCDIR=$PREFIX/share/crio/etc OCIDIR=$PREFIX/share/oci-umount/oci-umount.d \
