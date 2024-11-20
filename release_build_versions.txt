@@ -1,0 +1,38 @@
+# Versions to build.
+
+# For Kubernetes and CRI-O, we fetch the latest versions to be built.
+# The below lists _additional_ kubernetes versions to be built.
+
+kubernetes-v1.28.5 # required for CAPO CI
+
+
+
+docker-24.0.9 # Used in README.md. Update readme when version changes.
+docker-25.0.3
+
+docker_compose-2.22.0
+docker_compose-2.24.5
+
+wasmtime-12.0.0
+wasmtime-13.0.0 # Used in Flatcar wasm OS demo
+wasmtime-24.0.0 # Used in README.md. Update readme when version changes.
+
+wasmcloud-1.0.0
+wasmcloud-1.1.1
+wasmcloud-1.2.1
+
+tailscale-1.70.0
+
+k3s-v1.29.9+k3s1
+k3s-v1.30.5+k3s1
+k3s-v1.31.1+k3s1
+
+rke2-v1.29.9+rke2r1
+rke2-v1.30.5+rke2r1
+rke2-v1.31.1+rke2r1
+
+nvidia_runtime-v1.16.2
+
+ollama-0.3.9
+
+containerd-2.0.0

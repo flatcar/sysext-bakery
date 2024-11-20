@@ -1,9 +1,12 @@
-#!/bin/bash
+#!/usr/bin/env bash
 set -euo pipefail
 
-OS="${OS-flatcar}"
+OS="${OS-_any}"
 FORMAT="${FORMAT:-squashfs}"
 ARCH="${ARCH-}"
+RELOAD="${RELOAD-}"
+SOURCE_DATE_EPOCH="${SOURCE_DATE_EPOCH-0}"
+export SOURCE_DATE_EPOCH
 
 # This script is to be called as helper by other scripts but can also be used standalone
 if [ $# -lt 1 ]; then
@@ -12,9 +15,11 @@ if [ $# -lt 1 ]; then
   exit 1
 elif [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
   echo "If ARCH is specified as environment variable the sysext image will be required to run on the given architecture."
-  echo "To build for another OS than Flatcar, pass 'OS=myosid' as environment variable (current value is '${OS}'), e.g., 'fedora' as found in 'ID' under '/etc/os-release', or pass 'OS=_any' for any OS."
+  echo "To build for a specific OS, pass 'OS=myosid' as environment variable (current value is '${OS}'), e.g., 'fedora' as found in 'ID' under '/etc/os-release', or pass 'OS=_any' for any OS."
   echo "The '/etc/os-release' file of your OS has to include 'SYSEXT_LEVEL=1.0' as done in Flatcar (not needed for 'OS=_any')."
+  echo "To specify that systemd should do a daemon reload for the system when the extension is loaded/unloaded, set RELOAD=1 (current value is '${RELOAD}')."
   echo "If the mksquashfs tool is missing you can pass FORMAT=btrfs, FORMAT=ext4, or FORMAT=ext2 as environment variable (current value is '${FORMAT}') but the script won't change the ownership of the files in the SYSEXTNAME directory, so make sure that they are owned by root before creating the sysext image to avoid any problems."
+  echo "To make builds reproducible the SOURCE_DATE_EPOCH environment variable will be set to 0 if not defined."
   echo
   exit 1
 fi
@@ -33,6 +38,10 @@ elif [ "${ARCH}" = "aarch64" ]; then
   ARCH="arm64"
 fi
 
+function version_ge() {
+    test "$(printf '%s\n' "$@" | sort -rV | head -n 1)" == "$1";
+}
+
 mkdir -p "${SYSEXTNAME}/usr/lib/extension-release.d"
 {
   echo "ID=${OS}"
@@ -41,6 +50,9 @@ mkdir -p "${SYSEXTNAME}/usr/lib/extension-release.d"
   fi
   if [ "${ARCH}" != "" ]; then
     echo "ARCHITECTURE=${ARCH}"
+  fi
+  if [ "${RELOAD}" = 1 ]; then
+    echo "EXTENSION_RELOAD_MANAGER=1"
   fi
 } > "${SYSEXTNAME}/usr/lib/extension-release.d/extension-release.${SYSEXTNAME}"
 rm -f "${SYSEXTNAME}".raw
@@ -55,6 +67,12 @@ elif [ "${FORMAT}" = "ext4" ] || [ "${FORMAT}" = "ext2" ]; then
   mkfs."${FORMAT}" -E root_owner=0:0 -d "${SYSEXTNAME}" "${SYSEXTNAME}".raw
   resize2fs -M "${SYSEXTNAME}".raw
 else
-  mksquashfs "${SYSEXTNAME}" "${SYSEXTNAME}".raw -all-root
+  VER=$({ mksquashfs -version || true ; } | head -n1 | cut -d " " -f 3)
+  ARG=(-all-root -noappend)
+  # use sort semver to check if current version is >= 4.6.1
+  if version_ge "$VER" "4.6.1"; then
+    ARG+=('-xattrs-exclude' '^btrfs.')
+  fi
+  mksquashfs "${SYSEXTNAME}" "${SYSEXTNAME}".raw "${ARG[@]}"
 fi
 echo "Created ${SYSEXTNAME}.raw"

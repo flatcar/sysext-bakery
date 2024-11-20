@@ -2,7 +2,8 @@ name: Build and release Systemd sysext images
 on:
   push:
     tags:
-      - '*'
+      - 'latest'
+      - '[0-9]+'
 jobs:
   build:
     runs-on: ubuntu-22.04
@@ -11,37 +12,63 @@ jobs:
       contents: write
     steps:
       # checkout the sources
-      - uses: actions/checkout@v3
-      # build the images and generate a manifest
-      - name: build
+      - uses: actions/checkout@v4
+        with:
+          path: bakery
+
+      # prepare build host
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: install prerequisites
         run: |
-          set -euo pipefail
+          set -euxo pipefail
 
           sudo apt update -qq && sudo apt install -yqq \
             curl \
             jq \
             squashfs-tools \
-            xz-utils
+            xz-utils \
+            gawk
 
-          images=(
-              "kubernetes-v1.27.4"
-              "docker-24.0.5"
-              "docker_compose-2.17.2"
-              "wasmtime-12.0.1"
-          )
+      - name: build release artifacts
+        run: |
+          pushd bakery
+          REPO=${{ github.repository }} ./release_build.sh
 
-          for image in ${images[@]}; do
-              component="${image%-*}"
-              version="${image#*-}"
-              "./create_${component}_sysext.sh" "${version}" "${component}"
-              mv "${component}.raw" "${image}.raw"
-          done
+      - name: create a new latest release with some artifacts
+        uses: softprops/action-gh-release@v2
+        with:
+          make_latest: true
+          body_path: bakery/Release.md
+          files: |
+            bakery/SHA256SUMS
+            bakery/!(kubernetes|crio|ollama)*.raw
+            bakery/*.conf
 
-          sha256sum *.raw > SHA256SUMS
-      # create a Github release with the generated artifacts
-      - name: release
-        uses: softprops/action-gh-release@v1
+      - name: upload kubernetes x86-64 artifacts
+        uses: softprops/action-gh-release@v2
         with:
           files: |
-            SHA256SUMS
-            *.raw
+            bakery/kubernetes*-x86-64.raw
+
+      - name: upload kubernetes arm64 artifacts
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            bakery/kubernetes*-arm64.raw
+
+      - name: upload crio artifacts
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            bakery/crio*.raw
+
+      - name: upload ollama artifacts
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            bakery/ollama*.raw
