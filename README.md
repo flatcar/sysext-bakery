@@ -85,6 +85,7 @@ For extensions that are not part of the GitHub Release or which you want to cust
 | `kubernetes` | released |
 | `docker` | released (includes containerd) |
 | `docker_compose` | released |
+| `falco`          | released |
 | `nvidia-runtime` | released |
 | `wasmtime` | released |
 | `wasmcloud` | released |
@@ -199,6 +200,28 @@ systemd:
 In the [Flatcar docs](https://www.flatcar.org/docs/latest/provisioning/sysext/) you can find an Ignition configuration that explicitly sets the update configurations instead of downloading them.
 
 The updates works by [`systemd-sysupdate`](https://www.freedesktop.org/software/systemd/man/sysupdate.d.html) fetching the `SHA256SUMS` file of the generated artifacts, which holds the list of built images with their respective SHA256 digest.
+
+#### Falco
+
+To setup [Falco](https://falco.org/docs/getting-started/) we need the sysext plus the configuration files and the systemd unit.
+
+By default, the falcon daemon systemd unit shipped is the [Falco Modern EBPF](https://github.com/falcosecurity/falco/blob/master/scripts/systemd/falco-modern-bpf.service). Create systemd drop-ins or replace the service to suit your needs if necessary. 
+
+The default falco config and rules files are shipped, but you can overwrite it. The example bellow shows how to override the default files:
+
+```yaml
+storage:
+  files:
+    - path: /etc/falco/falco_rules.local.yaml
+      contents:
+        source: "https://raw.githubusercontent.com/sysdiglabs/falco-workshop/refs/heads/master/falco_rules.local.yaml"
+    - path: /etc/extensions/falco.raw
+      contents:
+        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/falco-0.39.1-x86-64.raw
+```
+
+Of course its also possible to use the 
+[artifact-follower](https://falco.org/blog/falcoctl-install-manage-rules-plugins/#follow-artifacts) to download falco artifacts automatically.
 
 #### Kubernetes
 
