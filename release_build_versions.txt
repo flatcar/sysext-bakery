@@ -13,6 +13,8 @@ docker-25.0.3
 docker_compose-2.22.0
 docker_compose-2.24.5
 
+falco-0.39.1
+
 wasmtime-12.0.0
 wasmtime-13.0.0 # Used in Flatcar wasm OS demo
 wasmtime-24.0.0 # Used in README.md. Update readme when version changes.
