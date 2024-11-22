@@ -25,14 +25,6 @@ wasmcloud-1.2.1
 
 tailscale-1.70.0
 
-k3s-v1.29.9+k3s1
-k3s-v1.30.5+k3s1
-k3s-v1.31.1+k3s1
-
-rke2-v1.29.9+rke2r1
-rke2-v1.30.5+rke2r1
-rke2-v1.31.1+rke2r1
-
 nvidia_runtime-v1.16.2
 
 ollama-0.3.9

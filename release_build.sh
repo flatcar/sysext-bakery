@@ -25,24 +25,37 @@ fi
 KBS_VERS_ARRAY=(${KBS_VERS})
 printf "%s\n" "${KBS_VERS_ARRAY[@]}"
 
-echo "Fetching list of latest CRI-O patch releases"
-echo "================================================="
+# fetch_releases returns available for a given software
+# based on Kubernetes major versions.
+function fetch_releases {
+	local software="${1}"
+	local file; file=$(mktemp)
+	local versions=()
 
-git ls-remote --tags --sort=-v:refname https://github.com/cri-o/cri-o \
-    | grep -v "{}" \
-    | awk '{ print $2}' \
-    | cut --delimiter='/' --fields=3 \
-    > crio.txt
+	git ls-remote --tags --sort=-v:refname "https://github.com/${software}" \
+	    | grep -v "{}" \
+	    | awk '{ print $2}' \
+	    | cut --delimiter='/' --fields=3 \
+	    > "${file}"
 
-CRIO=()
-for r in "${KBS_VERS_ARRAY[@]}"; do
-    if ! grep -q "v${r%.*}" crio.txt; then
-        echo "Skipping $r"
-        continue
-    fi
-    version=$(cat crio.txt | grep "v${r%.*}" | head -n1)
-    CRIO+=( "crio-${version:1}" )
-done
+	local version component r
+	for r in "${KBS_VERS_ARRAY[@]}"; do
+	    if ! grep -q "v${r%.*}" "${file}"; then
+		echo "Skipping $r"
+		continue
+	    fi
+	    version=$(cat "${file}" | grep "v${r%.*}" | grep -v "rc"| head -n1)
+	    component="${software#*/}"
+
+	    # remove extra '-' from component name (e.g cri-o -> crio)
+	    component="${component//-/}"
+	    versions+=( "${component}-${version}" )
+	done
+
+	rm -f "${file}"
+
+	echo "${versions[@]}"
+}
 
 echo
 echo "Fetching previous 'latest' release sysexts"
@@ -71,7 +84,9 @@ KUBERNETES=()
 for v in "${KBS_VERS_ARRAY[@]}"; do
     KUBERNETES+=( "kubernetes-v${v}" )
 done
-images+=( "${CRIO[@]}" )
+images+=( $(fetch_releases "k3s-io/k3s") )
+images+=( $(fetch_releases "cri-o/cri-o") )
+images+=( $(fetch_releases "rancher/rke2") )
 images+=( "${KUBERNETES[@]}" )
 
 echo "building: ${images[@]}"
@@ -94,10 +109,11 @@ for image in "${images[@]}"; do
     echo "* ${target}" >> Release.md
   done
   streams+=("${component}:-@v")
-  if [ "${component}" = "kubernetes" ] || [ "${component}" = "crio" ]; then
-    streams+=("${component}-${version%.*}:.@v")
-    # Should give, e.g., v1.28 for v1.28.2 (use ${version#*.*.} to get 2)
-  fi
+  case "${component}" in
+    kubernetes|crio|rke2|k3s)
+      # Should give, e.g., v1.28 for v1.28.2 (use ${version#*.*.} to get 2)
+      streams+=("${component}-${version%.*}:.@v")
+  esac
 done
   
 echo "" >> Release.md
