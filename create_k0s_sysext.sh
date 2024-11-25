@@ -20,10 +20,13 @@ SYSEXTNAME="$2"
 # The github release uses different arch identifiers, we map them here
 # and rely on bake.sh to map them back to what systemd expects
 if [ "${ARCH}" = "amd64" ] || [ "${ARCH}" = "x86-64" ]; then
-  URL="https://github.com/k0sproject/k0s/releases/download/${VERSION}/k0s-${VERSION}-amd64"
-elif [ "${ARCH}" = "arm64" ] || [ "${ARCH}" = "aarch64" ]; then
-  URL="https://github.com/k0sproject/k0s/releases/download/${VERSION}/k0s-${VERSION}-arm64"
+    ARCH="amd64"
 fi
+if [ "${ARCH}" = "arm64" ] || [ "${ARCH}" = "aarch64" ]; then
+    ARCH="arm64"
+fi
+
+URL="https://github.com/k0sproject/k0s/releases/download/${VERSION}/k0s-${VERSION}-${ARCH}"
 
 rm -rf "${SYSEXTNAME}"
 mkdir -p "${SYSEXTNAME}"/usr/local/bin
@@ -35,7 +38,7 @@ ln -s ./k0s ctr
 popd
 
 mkdir -p "${SYSEXTNAME}"/usr/local/lib/systemd/system/
-cat > "${SYSEXTNAME}"/etc/systemd/system/k0s.service << EOF
+cat > "${SYSEXTNAME}"/usr/local/lib/systemd/system/k0s.service << EOF
 [Unit]
 Description=k0s - Init Controller / External ETCD Controller
 Documentation=https://docs.k0sproject.io
@@ -64,7 +67,7 @@ Restart=always
 WantedBy=multi-user.target
 EOF
 
-cat > "${SYSEXTNAME}"/etc/systemd/system/k0scontroller.service << EOF
+cat > "${SYSEXTNAME}"/usr/local/lib/systemd/system/k0scontroller.service << EOF
 [Unit]
 Description=k0s - Controller
 Documentation=https://docs.k0sproject.io
@@ -93,7 +96,7 @@ Restart=always
 WantedBy=multi-user.target
 EOF
 
-cat > "${SYSEXTNAME}"/etc/systemd/system/k0sworker.service << EOF
+cat > "${SYSEXTNAME}"/usr/local/lib/systemd/system/k0sworker.service << EOF
 [Unit]
 Description=k0s - Worker
 Documentation=https://docs.k0sproject.io
