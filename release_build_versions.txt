@@ -4,6 +4,7 @@
 # The below lists _additional_ kubernetes versions to be built.
 
 kubernetes-v1.28.5 # required for CAPO CI
+kubernetes-v1.27.3 # required for CAPG CI
 
 
 
