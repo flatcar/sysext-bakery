@@ -91,6 +91,7 @@ For extensions that are not part of the GitHub Release or which you want to cust
 | `wasmcloud` | released |
 | `tailscale` | released |
 | `crio` | released |
+| `k0s` | released |
 | `k3s` | released |
 | `rke2` | released |
 | `keepalived` | build script |
@@ -222,6 +223,114 @@ storage:
 
 Of course its also possible to use the 
 [artifact-follower](https://falco.org/blog/falcoctl-install-manage-rules-plugins/#follow-artifacts) to download falco artifacts automatically.
+
+#### k0s
+
+To setup [k0s](https://docs.k0sproject.io/stable/) we need:
+
+1. the sysext plus the configuration files /etc/k0s/k0s.yaml and/or /etc/default/k0s
+2. the systemd units
+
+After you enable k0s syext following the guide deacribed on Consuming the published images, follow the next steps:
+
+1. 
+  a) Customize /etc/k0s/k0s.yaml for either controller/worker ([More info](https://docs.k0sproject.io/stable/configuration/#configuration-file-reference)). Below is the default configuration for k0s implemented via Ignition which you should change it according to your needs:
+
+```yaml
+storage:
+  files:
+    - path: /etc/k0s/k0s.yaml
+      overwrite: true
+      mode: 0644
+      contents:
+        inline: |
+                    apiVersion: k0s.k0sproject.io/v1beta1
+                    kind: ClusterConfig
+                    metadata:
+                      name: k0s
+                    spec:
+                      api:
+                        address: 192.168.68.104
+                        k0sApiPort: 9443
+                        port: 6443
+                        sans:
+                        - 192.168.68.104
+                      controllerManager: {}
+                      extensions:
+                        helm:
+                          concurrencyLevel: 5
+                      installConfig:
+                        users:
+                          etcdUser: etcd
+                          kineUser: kube-apiserver
+                          konnectivityUser: konnectivity-server
+                          kubeAPIserverUser: kube-apiserver
+                          kubeSchedulerUser: kube-scheduler
+                      konnectivity:
+                        adminPort: 8133
+                        agentPort: 8132
+                      network:
+                        clusterDomain: cluster.local
+                        dualStack:
+                          enabled: false
+                        kubeProxy:
+                          iptables:
+                            minSyncPeriod: 0s
+                            syncPeriod: 0s
+                          ipvs:
+                            minSyncPeriod: 0s
+                            syncPeriod: 0s
+                            tcpFinTimeout: 0s
+                            tcpTimeout: 0s
+                            udpTimeout: 0s
+                          metricsBindAddress: 0.0.0.0:10249
+                          mode: iptables
+                        kuberouter:
+                          autoMTU: true
+                          hairpin: Enabled
+                          metricsPort: 8080
+                        nodeLocalLoadBalancing:
+                          enabled: false
+                          envoyProxy:
+                            apiServerBindPort: 7443
+                            konnectivityServerBindPort: 7132
+                          type: EnvoyProxy
+                        podCIDR: 10.244.0.0/16
+                        provider: kuberouter
+                        serviceCIDR: 10.96.0.0/12
+                      scheduler: {}
+                      storage:
+                        etcd:
+                          peerAddress: 192.168.68.104
+                        type: etcd
+                      telemetry:
+                        enabled: true
+```
+
+  b) If you want use another CRI other than k0s embedded one define it here: /etc/default/k0s 
+
+```yaml
+storage:
+  files:
+    - path: /etc/default/k0s
+      overwrite: true
+      mode: 0644
+      contents:
+        inline: |
+                    CRI_SOCKET="remote:unix:///var/run/custom_CRI.sock"
+```
+
+2. Defined systemd units are: k0s.service, k0scontroller.service and k0sworker.service
+  a) If you go with the embedded k0s components you have to enable k0scontroller.service or k0sworker.service according to the `ROLE`(controller/worker) of the node and the /etc/k0s/k0s.yaml you have defined at step 1
+
+```yaml
+systemd:
+  units:
+    - name: k0s`ROLE`.service
+      enabled: true
+```
+
+  b) If you decide to go with custom components for k0s (different CRI, external ETCD cluster, ...) you have to enable k0s.service for controller or k0sworker.service for worker and, of course, configure /etc/k0s/k0s.yaml accordingly.
 
 #### Kubernetes
 
