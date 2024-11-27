@@ -30,3 +30,5 @@ nvidia_runtime-v1.16.2
 ollama-0.3.9
 
 containerd-2.0.0
+
+wasmedge-0.14.1

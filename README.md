@@ -95,6 +95,7 @@ For extensions that are not part of the GitHub Release or which you want to cust
 | `rke2` | released |
 | `keepalived` | build script |
 | `ollama` | released |
+| `wasmedge` | released |
 
 
 ### Consuming the published images
@@ -439,6 +440,25 @@ systemd:
 Note that this configuration can be customized in terms of where Ollama is configured to store its models, configuration and runtime libraries by changing the `HOME`, `OLLAMA_MODELS` and `OLLAMA_RUNNERS_DIR`.
 
 Please refer to the [Ollama documentation for further details](https://github.com/ollama/ollama/tree/main/docs).
+
+#### WasmEdge
+
+The wasmedge sysext can be configured by using the following snippet:
+
+```
+variant: flatcar
+version: 1.0.0
+storage:
+  files:
+    - path: /opt/extensions/wasmedge-0.14.1-x86-64.raw
+      mode: 0420
+      contents:
+        source: https://github.com/flatcar/sysext-bakery/releases/download/wasmedge-0.14.1-x86-64.raw
+  links:
+    - target: /opt/extensions/wasmedge-0.14.1-x86-64.raw
+      path: /etc/extensions/wasmedge.raw
+      hard: false
+```
 
 ### Building sysext images
 
