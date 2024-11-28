@@ -460,6 +460,32 @@ storage:
       hard: false
 ```
 
+#### LlamaEdge
+
+The llamaedge sysext can be configured by using the following snippet:
+
+```
+variant: flatcar
+version: 1.0.0
+storage:
+  files:
+    - path: /opt/extensions/wasmedge-0.14.1-x86-64.raw
+      mode: 0420
+      contents:
+        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/wasmaedge-0.14.1-x86-64.raw
+    - path: /opt/extensions/llamaedge-0.14.16-x86-64.raw
+      mode: 0420
+      contents:
+        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/llamaedge-0.14.16-x86-64.raw
+  links:
+    - target: /opt/extensions/llamaedge-0.14.16-x86-64.raw
+      path: /etc/extensions/llamaedge.raw
+      hard: false
+    - target: /opt/extensions/wasmedge-0.14.1-x86-64.raw
+      path: /etc/extensions/wasmedge.raw
+      hard: false
+```
+
 ### Building sysext images
 
 To use the build scripts in this repository, the following packages are required:
