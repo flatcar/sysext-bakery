@@ -18,8 +18,8 @@ set -euo pipefail
 workdir="$(pwd)/flatcar-os-image"
 bakery_base_url="https://github.com/flatcar/sysext-bakery/releases/latest/download"
 
-# ./run_sdk_container ./image_to_vm.sh --help 2>&1 | grep '\--format'
-supported_vendors=( "ami" "ami_vmdk" "azure" "cloudsigma" "cloudstack" "cloudstack_vhd" "digitalocean" "exoscale" "gce" "hyperv" "iso" "openstack" "openstack_mini" "packet" "parallels" "pxe" "qemu" "qemu_uefi" "qemu_uefi_secure" "rackspace" "rackspace_onmetal" "rackspace_vhd" "vagrant" "vagrant_parallels" "vagrant_virtualbox" "vagrant_vmware_fusion" "virtualbox" "vmware" "vmware_insecure" "vmware_ova" "vmware_raw" "xen" )
+# ./run_sdk_container ./image_to_vm.sh --help 2>&1 | grep '\--format' | sed -e 's/.*: /supported_vendors=(/' -e 's/ /" "/g' -e 's/=(/=( "' -e 's/$/" )/'
+supported_vendors=( "akamai" "ami" "ami_vmdk" "azure" "cloudsigma" "cloudstack" "cloudstack_vhd" "digitalocean" "exoscale" "gce" "hetzner" "hyperv" "hyperv_vhdx" "iso" "kubevirt" "openstack" "openstack_mini" "packet" "parallels" "pxe" "qemu_uefi" "rackspace" "rackspace_onmetal" "rackspace_vhd" "scaleway" "vagrant" "vagrant_parallels" "vagrant_virtualbox" "vagrant_vmware_fusion" "virtualbox" "vmware" "vmware_insecure" "vmware_ova" "vmware_raw" "xen" )
 
 function print_help() {
     echo
@@ -316,7 +316,11 @@ if [[ "${vendor}" != "generic" && ! ${supported_vendors[@]} =~ ${vendor} ]] ; th
     exit 1
 fi
 
-rm -rf "${workdir}"
+if [ -d "${workdir}" ] ; then
+    echo "Cleaning up old bits in '${workdir}'. This needs 'sudo'."
+    sudo rm -rf "${workdir}"
+fi
+
 mkdir "${workdir}"
 (
     cd "${workdir}"
