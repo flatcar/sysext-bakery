@@ -41,7 +41,6 @@ function fetch_releases {
 	local version component r
 	for r in "${KBS_VERS_ARRAY[@]}"; do
 	    if ! grep -q "v${r%.*}" "${file}"; then
-		echo "Skipping $r"
 		continue
 	    fi
 	    version=$(cat "${file}" | grep "v${r%.*}" | grep -v "rc"| head -n1)
