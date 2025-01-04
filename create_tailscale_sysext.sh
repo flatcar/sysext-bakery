@@ -34,13 +34,16 @@ curl -o "${TMP_DIR}/${TARBALL}" -fsSL "${URL}"
 
 tar xf "${TMP_DIR}/${TARBALL}" -C "${TMP_DIR}" --strip-components=1
 
-mkdir -p "${SYSEXTNAME}"/usr/local/{bin,sbin,lib/{systemd/system,extension-release.d}}
+mkdir -p "${SYSEXTNAME}"/usr/{bin,sbin,lib/{systemd/system,extension-release.d,tmpfiles.d},share/tailscale}
 
-mv "${TMP_DIR}/tailscale" "${SYSEXTNAME}/usr/local/bin/tailscale"
-mv "${TMP_DIR}/tailscaled" "${SYSEXTNAME}/usr/local/sbin/tailscaled"
-mv "${TMP_DIR}/systemd/tailscaled.service" "${SYSEXTNAME}/usr/local/lib/systemd/system/tailscaled.service"
+mv "${TMP_DIR}/tailscale" "${SYSEXTNAME}/usr/bin/tailscale"
+mv "${TMP_DIR}/tailscaled" "${SYSEXTNAME}/usr/sbin/tailscaled"
+mv "${TMP_DIR}/systemd/tailscaled.service" "${SYSEXTNAME}/usr/lib/systemd/system/tailscaled.service"
+mv "${TMP_DIR}/systemd/tailscaled.defaults" "${SYSEXTNAME}/usr/share/tailscale/tailscaled.defaults"
 
-sed -i 's/--port.*//g' "${SYSEXTNAME}/usr/local/lib/systemd/system/tailscaled.service"
+cat <<EOF >"${SYSEXTNAME}"/usr/lib/tmpfiles.d/10-tailscale.conf
+C /etc/default/tailscaled - - - - /usr/share/tailscale/tailscaled.defaults
+EOF
 
 rm -rf "${TMP_DIR}"
 
