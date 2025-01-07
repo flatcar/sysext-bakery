@@ -23,7 +23,7 @@ wasmcloud-1.0.0
 wasmcloud-1.1.1
 wasmcloud-1.2.1
 
-tailscale-1.76.6
+tailscale-1.78.1
 
 nvidia_runtime-v1.16.2
 
