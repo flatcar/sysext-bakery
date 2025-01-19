@@ -34,19 +34,12 @@ curl -o "${TMP_DIR}/${TARBALL}" -fsSL "${URL}"
 
 tar xf "${TMP_DIR}/${TARBALL}" -C "${TMP_DIR}" --strip-components=1
 
-mkdir -p "${SYSEXTNAME}"/usr/{bin,sbin,lib/{systemd/system/tailscaled.service.d,systemd/network,extension-release.d,tmpfiles.d},share/tailscale}
+mkdir -p "${SYSEXTNAME}"/usr/{bin,sbin,lib/{systemd/system,systemd/network,extension-release.d,tmpfiles.d},share/tailscale}
 
 mv "${TMP_DIR}/tailscale" "${SYSEXTNAME}/usr/bin/tailscale"
 mv "${TMP_DIR}/tailscaled" "${SYSEXTNAME}/usr/sbin/tailscaled"
 mv "${TMP_DIR}/systemd/tailscaled.service" "${SYSEXTNAME}/usr/lib/systemd/system/tailscaled.service"
 mv "${TMP_DIR}/systemd/tailscaled.defaults" "${SYSEXTNAME}/usr/share/tailscale/tailscaled.defaults"
-
-cat <<EOF >"${SYSEXTNAME}"/usr/lib/systemd/system/tailscaled.service.d/10-networkd-reload.conf
-# Reload systemd-networkd.service to pick up 50-tailscale.network
-
-[Service]
-ExecStartPre=systemctl reload systemd-networkd.service
-EOF
 
 cat <<EOF >"${SYSEXTNAME}"/usr/lib/tmpfiles.d/10-tailscale.conf
 C /etc/default/tailscaled - - - - /usr/share/tailscale/tailscaled.defaults
