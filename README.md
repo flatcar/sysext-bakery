@@ -1,494 +1,308 @@
-# sysext-bakery: Recipes for baking systemd-sysext images
+# Ready-to use System Extensions for Flatcar (and other distros)
 
-[Systemd-sysext images](https://www.freedesktop.org/software/systemd/man/systemd-sysext.html) are overlay images for `/usr`, allowing to extend the base OS with custom (static) binaries.
-Flatcar Container Linux as an OS without a package manager is a good fit for extension through systemd-sysext.
-The tools in this repository help you to create your own sysext images bundeling software to extend your base OS.
-The current focus is on Docker and containerd, contributions are welcome for other software.
-See the section at the end on how to bundle any software with the Flix and Flatwrap tools.
+The Sysext Bakery serves 3 main functions:
 
-## Systemd-sysext
-
-The `NAME.raw` sysext images (or `NAME` sysext directories) can be placed under `/etc/extensions/` or `/var/lib/extensions` to be activated on boot by `systemd-sysext.service`.
-Images can specify to require systemd to do a daemon reload (needs systemd 255, Flatcar ships `ensure-sysext.service` as workaround to automatically load the image's services).
-
-A current limitation of `systemd-sysext` is that you need to use `TARGET.upholds` symlinks (supported from systemd 254, similar to `.wants`) or `Upholds=` drop-ins for the target units to start your units.
-For current versions of Flatcar (systemd 252) you need to use `systemctl restart systemd-sysext ensure-sysext` to reload the sysext images and start the services and a manual `systemd-sysext refresh` is not recommended.
-
-The compatibility mechanism of sysext images requires a metadata file in the image under `usr/lib/extension-release.d/extension-release.NAME`.
-It needs to contain a matching OS `ID`, and either a matching `VERSION_ID` or `SYSEXT_LEVEL`. Here you can also set `EXTENSION_RELOAD_MANAGER=1` for a systemd daemon reload.
-Since the rapid release cycle and automatic updates of Flatcar Container Linux make it hard to rely on particular OS libraries by specifying a dependency of the sysext image to the OS version, it is not recommended to match by `VERSION_ID`.
-Instead, Flatcar defined the `SYSEXT_LEVEL` value `1.0` to match for.
-You can also use `ID=_any` and then neither `SYSEXT_LEVEL` nor `VERSION_ID` are needed.
-The sysext image should only include static binaries.
-
-Inside the image, binaries should be placed under `usr/bin/` and systemd units under `usr/lib/systemd/system/`.
-While placing symlinks in the image itself to enable the units in the same way as systemd would normally do (like `sockets.target.wants/my.socket` → `../my.socket`) is still currently supported, this is not a recommended practice.
-The recommended way is to ship drop-ins for the target units that start your unit.
-The drop-in file should use the `Upholds=` property in the `[Unit]` section.
-For example, for starting `docker.socket` we would use a drop-in for `sockets.target` placed in `usr/lib/systemd/system/sockets.target.d/10-docker-socket.conf` with the following contents:
-
-```
-[Unit]
-Upholds=docker.socket
-```
-
-This can be done also for services, so for `docker.service` started by `multi-user.target`, the drop-in would reside in `usr/lib/systemd/system/multi-user.target.d/10-docker-service.conf` and it would have a `Upholds=docker.service` line instead.
+1. Serve ready-to-use system extensions for consumption by users in their deployments via our [Releases](https://github.com/flatcar/sysext-bakery/releases/tag/latest).
+   - The extensions can be consumed directly from releases of this repository via a corresponding Butane/Ignition configuration.
+   - Sysupdate configurations are provided too, so extensions can be made to auto-update when new versions are released in the bakery repo.
+   - Check the "available extensions" section below for details and config snippets for individual extensions.
+2. Provide a go-to point for the community to add new extensions to Flatcar and make them available to everyone.
+   - Regular release builds of the Flatcar maintainers team ensure extensions remain up to date.
+   - A simple versioning mechanism ensures older releases remain available.
+3. Serve as an example to users for creating their own sysexts and operate sysext repositories (either from scratch or as a fork of this repo) to serve customised extensions.
+   - Using Github for building and releasing allows for git-ops style releases.
 
 
-The following Butane Config (YAML) can be be transpiled to Ignition JSON and will download a custom Docker+containerd sysext image on first boot.
-It also takes care of disabling Torcx and future inbuild Docker and containerd sysext images we plan to ship in Flatcar.
-If your sysext image doesn't replace Flatcar's inbuilt Docker/containerd, omit the two `links` entries and the `torcx-generator` entry.
+## What's a sysext and how does it extend Flatcar?
 
-```
+Systemd-sysext, introduced with systemd release 248 in 2021, allows extending the base OS filesystem to add new features and new functionality.
+These system extensions are shipped as self-contained immutable file system images.
+
+Extension images follow the UAPI group's [Extension Image specification](https://uapi-group.org/specifications/specs/extension_image/).
+Images ship directory trees under `/usr` and (optionally) `/opt` that only contain the binaries and config files required for the respective feature that's being added.
+The images also usually contain service unit definitions in `/usr/lib/systemd/system/` to start at boot as needed, and lightweight metadata
+
+Extension images are "merged" into the base OS file system at boot via an overlayfs mount.
+Contents of extension images appear right in the base OS file system.
+
+Extension images hosted here are _self-contained_, i.e. do not have any dependencies on the host operating system.
+All extensions can be operated and updated independently of the host OS version.
+
+Extensions can be consumed either at provisioning time using Ignition, or baked into the OS image.
+See _Baking sysexts into Flatcar OS images_ below for more information.
+
+
+## What extensions are available?
+
+The following table lists all extensions built and released in this repository.
+"build script" instead of "released" denotes extensions that can be built with this repo but aren't hosted here.
+Check out the README files of specific extensions for detailed usage instructions and configuration examples.
+
+|    Extension     | Availability | Documentation |
+| ---------------- | ------------ | ------------- |
+| `crio`           |  released    | [crio.md](docs/crio.md) |
+| `docker`         |  released    | [docker.md](docs/docker.md) |
+| `docker_compose` |  released    | [docker_compose.md](docs/docker_compose.md) |
+| `falco`          |  released    | [falco.md](docs/falco.md) |
+| `k3s`            |  released    | [k3s.md](docs/k3s.md) |
+| `keepalived`     | build script | [keepalived.md](docs/keepalived.md) |
+| `kubernetes`     |  released    | [kubernetes.md](docs/kubernetes.md) |
+| `nvidia-runtime` |  released    | [nvidia-runtime.md](docs/nvidia-runtime.md) |
+| `ollama`         |  released    | [ollama.md](docs/ollama.md) |
+| `rke2`           |  released    | [rke2.md](docs/rke2.md) |
+| `tailscale`      |  released    | [tailscale.md](docs/tailscale.md) |
+| `wasmcloud`      |  released    | [wasmcloud.md](docs/wasmcloud.md) |
+| `wasmedge`       |  released    | [wasmedge.md](docs/wasmedge.md) |
+| `wasmtime`       |  released    | [wasmtime.md](docs/wasmtime.md) |
+
+
+## How do I use sysexts?
+
+Simply consume the extensions you need via Ignition, or use [`bake_flatcar_image.sh`](bake_flatcar_image.sh) to create an OS image with the sysext(s) of your choice included.
+
+**BEFORE YOU CONTINUE:**
+If you already know what extension(s) you want to use please refer to the individual extensions' readme files referenced above for ready-to-use configuration snippets (including sysupdate configuration).
+The documentation below is a generic walk-through for sysext usage on Flatcar.
+The goal of this walk-through is to provide a comprehensive overview of all the steps and details involved.
+If you just want to use an extension, please check out the individual readmes above.
+
+The simplest way to consume a sysext `EXTNAME` is to configure Ignition to download and install it from this repo at provisioning time.
+```yaml
 variant: flatcar
 version: 1.0.0
+
 storage:
   files:
-    - path: /etc/extensions/mydocker.raw
+    - path: /etc/extensions/EXTNAME.raw
+      mode: 0644
       contents:
-        source: https://myserver.net/mydocker.raw
-    - path: /etc/systemd/system-generators/torcx-generator
+        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/EXTNAME.raw
+```
+That's it!
+
+### Try it locally
+
+A more flexible approach is to store extensions in a custom path in `/opt` and sym-link into `/etc/extensions`.
+This allows us to store versioned sysexts (via semver filenames) and manage sysexts via symlinks.
+With this approach, we can store multiple versions of an extension for in-place upgrades and for roll-backs.
+```yaml
+variant: flatcar
+version: 1.0.0
+
+storage:
+  files:
+    - path: /opt/extensions/EXTNAME/EXTNAME-3.13.5-x86-64.raw
+      mode: 0644
+      contents:
+        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/EXTNAME-3.13.5-x86-64.raw
   links:
-    - path: /etc/extensions/docker-flatcar.raw
-      target: /dev/null
-      overwrite: true
-    - path: /etc/extensions/containerd-flatcar.raw
-      target: /dev/null
-      overwrite: true
-```
-
-## Systemd-sysext on other distributions
-
-The tools here will by default build for any OS and create the metadata file `usr/lib/extension-release.d/extension-release.NAME` as follows:
-
-```
-ID=_any
-# Depending on the image, e.g., for Docker systemd units, there is also:
-# EXTENSION_RELOAD_MANAGER=1
-```
-
-Use the configuration parameters in the tools to build for your distribution (pass `OS=` to be the OS ID from `/etc/os-release`) or to build for any distribution (pass `OS=_any`).
-You can also set the architecture to be arm64 to fetch the right binaries and encode this information in the sysext image metadata.
-
-## Recipes in this repository
-
-The tools normally generate squashfs images not only because of the compression benefits but also because it doesn't need root permissions and loop device mounts.
-
-### Available Extensions
-
-The following table shows which build recipes exist and for which the GitHub Release publishes updatable images.
-While the goal is to automate the release pipeline to detect latest versions and have weekly releases, currently the release trigger is manual and all version updates except Kubernetes are also manual.
-For extensions that are not part of the GitHub Release or which you want to customize, you can build your own images and host them elsewhere - the easiest is to fork this repo and modify the `release_build_versions.txt` file and create a new `latest` tag.
-
-| Extension | Availability |
-| --- | --- |
-| `kubernetes` | released |
-| `docker` | released (includes containerd) |
-| `docker_compose` | released |
-| `falco`          | released |
-| `nvidia-runtime` | released |
-| `wasmtime` | released |
-| `wasmcloud` | released |
-| `tailscale` | released |
-| `crio` | released |
-| `k3s` | released |
-| `rke2` | released |
-| `keepalived` | build script |
-| `ollama` | released |
-| `wasmedge` | released |
-
-
-### Consuming the published images
-
-There is a Github Action to build current recipes and to publish the built images as release artifacts. It's possible to directly consume the latest release from a Butane/Ignition configuration, example:
-```yaml
-# butane < config.yaml > config.json
-# ./flatcar_production_qemu.sh -i ./config.json
-variant: flatcar
-version: 1.0.0
-storage:
-  files:
-    - path: /opt/extensions/wasmtime/wasmtime-24.0.0-x86-64.raw
-      contents:
-        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/wasmtime-24.0.0-x86-64.raw
-    - path: /opt/extensions/docker/docker-24.0.9-x86-64.raw
-      contents:
-        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/docker-24.0.9-x86-64.raw
-    - path: /etc/systemd/system-generators/torcx-generator
-    - path: /etc/sysupdate.d/noop.conf
-      contents:
-        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/noop.conf
-    - path: /etc/sysupdate.wasmtime.d/wasmtime.conf
-      contents:
-        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/wasmtime.conf
-    - path: /etc/sysupdate.docker.d/docker.conf
-      contents:
-        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/docker.conf
-  links:
-    - target: /opt/extensions/wasmtime/wasmtime-24.0.0-x86-64.raw
-      path: /etc/extensions/wasmtime.raw
+    - target: /opt/extensions/EXTNAME/EXTNAME-3.13.5-x86-64.raw
+      path: /etc/extensions/EXTNAME.raw
       hard: false
-    - target: /opt/extensions/docker/docker-24.0.9-x86-64.raw
-      path: /etc/extensions/docker.raw
-      hard: false
-    - path: /etc/extensions/docker-flatcar.raw
-      target: /dev/null
-      overwrite: true
-    - path: /etc/extensions/containerd-flatcar.raw
-      target: /dev/null
-      overwrite: true
-systemd:
-  units:
-    - name: systemd-sysupdate.timer
-      enabled: true
-    - name: systemd-sysupdate.service
-      dropins:
-        - name: wasmtime.conf
-          contents: |
-            [Service]
-            ExecStartPre=/usr/lib/systemd/systemd-sysupdate -C wasmtime update
-        - name: docker.conf
-          contents: |
-            [Service]
-            ExecStartPre=/usr/lib/systemd/systemd-sysupdate -C docker update
-        - name: sysext.conf
-          contents: |
-            [Service]
-            ExecStartPost=systemctl restart systemd-sysext
 ```
 
-This also configures systemd-sysupdate for auto-updates. The `noop.conf` is a workaround for systemd-sysupdate to run without error messages.
-Since the configuration sets up a custom Docker version, it also disables Torcx and the future `docker-flatcar` and `containerd-flatcar` extensions to prevent conflicts.
+## Extension auto-updates
 
-Here a template for a single extension where you have to replace `NAME`, `VERSION`, and `ARCH`:
+Using the flexible (symlink) approach above we can instruct `systemd-sysupdate` to poll the bakery for updates.
+This is done by running the sysupdate service on a schedule, triggered by a timer unit.
+The default cadence for sysupdate to run on Flatcar is set to one hour, and can be changed via drop-ins for the `systemd-sysupdate.timer` unit.
 
-```yaml
-# butane < config.yaml > config.json
-# ./flatcar_production_qemu.sh -i ./config.json
-variant: flatcar
-version: 1.0.0
-storage:
-  files:
-    - path: /opt/extensions/NAME/NAME-VERSION-ARCH.raw
-      contents:
-        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/NAME-VERSION-ARCH.raw
-    - path: /etc/sysupdate.d/noop.conf
-      contents:
-        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/noop.conf
-    - path: /etc/sysupdate.NAME.d/NAME.conf
-      contents:
-        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/NAME.conf
-  links:
-    - target: /opt/extensions/NAME/NAME-VERSION-ARCH.raw
-      path: /etc/extensions/NAME.raw
-      hard: false
-systemd:
-  units:
-    - name: systemd-sysupdate.timer
-      enabled: true
-    - name: systemd-sysupdate.service
-      dropins:
-        - name: NAME.conf
-          contents: |
-            [Service]
-            ExecStartPre=/usr/lib/systemd/systemd-sysupdate -C NAME update
-        - name: sysext.conf
-          contents: |
-            [Service]
-            ExecStartPost=systemctl restart systemd-sysext
+Sysupdate matches semantic versioning patterns in sysext filenames to learn whether an update is available.
+If a version newer than currently installed becomes available, sysupdate will download the update and store the extension image next to the one currently used.
+Sysupdate will then re-create the symlink to point to the new sysext.
+
+At this point, the update will have been _staged_ but not activated.
+
+`/etc/sysupdate.EXTNAME.d/EXTNAME.conf` sysupdate configuration.
+The pattern `@v-%a` signifies the semver part of the extension's file name.
+`InstancesMax=3` tells sysupdate to keep a maximum of 3 versions of the extension (for roll-back).
+```ini
+[Transfer]
+Verify=false
+
+[Source]
+Type=url-file
+Path=https://github.com/flatcar/sysext-bakery/releases/latest/download/
+MatchPattern=EXTNAME-@v-%a.raw
+
+[Target]
+InstancesMax=3
+Type=regular-file
+Path=/opt/extensions/EXTNAME/
+CurrentSymlink=/etc/extensions/EXTNAME.raw
+```
+The config file will be used in conjunction with `systemd-sysupdate -C EXTNAME update` to perform an update check.
+We'll automate the check and wire it up to a timer unit in the next step.
+
+**NOTE**: As mentioned, `systemd-sysupdate` will only _stage_ an update, not _activate_ it.
+To activate an update, we need to either run `systemd-sysext refresh` or reboot the instance.
+Either action might be more feasible depending on what is shipped with the extension.
+For simple extensions like docker, crio, or wasm, it might suffice to stop the corresponding service, apply the update, and restart the service.
+For complex workloads like Kubernetes it is probably more feasible to request a node reboot.
+
+We will now add a drop-in for the sysupdate service to have it check for `EXTNAME` updates on a schedule.
+The drop-in will run sysupdate and detect whether the symlink changed.
+This goes to `/etc/systemd/system/systemd-sysupdate.service.d/EXTNAME.conf`
+```ini
+[Service]
+ExecStartPre=/usr/bin/sh -c "readlink --canonicalize /etc/extensions/EXTNAME.raw > /tmp/EXTNAME"
+ExecStartPre=/usr/lib/systemd/systemd-sysupdate -C EXTNAME update
+ExecStartPost=/usr/bin/sh -c "readlink --canonicalize /etc/extensions/EXTNAME.raw > /tmp/EXTNAME-new"
+ExecStartPost=/usr/bin/sh -c "if ! cmp --silent /tmp/EXTNAME /tmp/EXTNAME-new; then <SERVICE REFRESH ACTION HERE>; fi"
 ```
 
-In the [Flatcar docs](https://www.flatcar.org/docs/latest/provisioning/sysext/) you can find an Ignition configuration that explicitly sets the update configurations instead of downloading them.
-
-The updates works by [`systemd-sysupdate`](https://www.freedesktop.org/software/systemd/man/sysupdate.d.html) fetching the `SHA256SUMS` file of the generated artifacts, which holds the list of built images with their respective SHA256 digest.
-
-#### Falco
-
-To setup [Falco](https://falco.org/docs/getting-started/) we need the sysext plus the configuration files and the systemd unit.
-
-By default, the falcon daemon systemd unit shipped is the [Falco Modern EBPF](https://github.com/falcosecurity/falco/blob/master/scripts/systemd/falco-modern-bpf.service). Create systemd drop-ins or replace the service to suit your needs if necessary. 
-
-The default falco config and rules files are shipped, but you can overwrite it. The example bellow shows how to override the default files:
-
-```yaml
-storage:
-  files:
-    - path: /etc/falco/falco_rules.local.yaml
-      contents:
-        source: "https://raw.githubusercontent.com/sysdiglabs/falco-workshop/refs/heads/master/falco_rules.local.yaml"
-    - path: /etc/extensions/falco.raw
-      contents:
-        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/falco-0.39.1-x86-64.raw
+For simple services, we might just activate the update directly and restart the service:
+```ini
+...
+ExecStartPost=/usr/bin/sh -c "if ! cmp --silent /tmp/EXTNAME /tmp/EXTNAME-new; then systemd-sysext refresh; systemctl restart EXTNAME.service; fi"
+...
 ```
 
-Of course its also possible to use the 
-[artifact-follower](https://falco.org/blog/falcoctl-install-manage-rules-plugins/#follow-artifacts) to download falco artifacts automatically.
+For more complex services like Kubernetes, we might tell a reboot manager like e.g. kured or FLUO to safely reboot the node:
+```ini
+...
+ExecStartPost=/usr/bin/sh -c "if ! cmp --silent /tmp/EXTNAME /tmp/EXTNAME-new; then touch /run/reboot-required; fi"
+...
+```
 
-#### Kubernetes
+## Putting it all together
 
-The [Flatcar Kubernetes docs](https://www.flatcar.org/docs/latest/container-runtimes/getting-started-with-kubernetes/) show how to use the extension provided here for controllers and workers.
+Here is a full-featured Butane configuration snippet for `EXTNAME` with sysupdate included.
 
-#### wasmcloud
-
-For another example of how you can further customize the recipes provided in this repository, the following recipe uses the image built with `create_wasmcloud_sysext.sh`:
 ```yaml
 variant: flatcar
 version: 1.0.0
+
 storage:
   files:
-    - path: /opt/extensions/wasmcloud/wasmcloud-1.2.1-x86-64.raw
+    - path: /opt/extensions/EXTNAME/EXTNAME-3.13.5-x86-64.raw
+      mode: 0644
       contents:
-        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/wasmcloud-1.2.1-x86-64.raw
-    - path: /etc/sysupdate.d/noop.conf
-      contents:
-        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/noop.conf
-    - path: /etc/sysupdate.wasmcloud.d/wasmcloud.conf
-      contents:
-        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/wasmcloud.conf
-    - path: /etc/nats-server.conf
+        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/EXTNAME-3.13.5-x86-64.raw
+    - path: /etc/sysupdate.EXTNAME.d/EXTNAME.conf
       contents:
         inline: |
-          jetstream {
-            domain: default
-          }
-          leafnodes {
-              remotes = [
-                  {
-                      url: "tls://connect.cosmonic.sh"
-                      credentials: "/etc/nats.creds"
-                  }
-              ]
-          }
-    - path: /etc/nats.creds
+          [Transfer]
+          Verify=false
+
+          [Source]
+          Type=url-file
+          Path=https://github.com/flatcar/sysext-bakery/releases/latest/download/
+          MatchPattern=EXTNAME-@v-%a.raw
+
+          [Target]
+          InstancesMax=3
+          Type=regular-file
+          Path=/opt/extensions/EXTNAME/
+          CurrentSymlink=/etc/extensions/EXTNAME.raw
+    - path: /etc/sysupdate.d/noop.conf
       contents:
         inline: |
-          <redacted>
+          [Source]
+          Type=regular-file
+          Path=/
+          MatchPattern=invalid@v.raw
+          [Target]
+          Type=regular-file
+          Path=/
   links:
-    - target: /opt/extensions/wasmcloud/wasmcloud-1.2.1-x86-64.raw
-      path: /etc/extensions/wasmcloud.raw
+    - target: /opt/extensions/EXTNAME/EXTNAME-3.13.5-x86-64.raw
+      path: /etc/extensions/EXTNAME.raw
       hard: false
 systemd:
   units:
-    - name: nats.service
-      enabled: true
-      dropins:
-        - name: 10-nats-env-override.conf
-          contents: |
-            [Service]
-            Environment=NATS_CONFIG=/etc/nats-server.conf
-    - name: wasmcloud.service
-      enabled: true
-      dropins:
-        - name: 10-wasmcloud-env-override.conf
-          contents: |
-            [Service]
-            Environment=WASMCLOUD_LATTICE=<redacted>
     - name: systemd-sysupdate.timer
       enabled: true
     - name: systemd-sysupdate.service
       dropins:
-        - name: wasmcloud.conf
+        - name: EXTNAME.conf
           contents: |
             [Service]
-            ExecStartPre=/usr/lib/systemd/systemd-sysupdate -C wasmcloud update
-        - name: sysext.conf
-          contents: |
-            [Service]
-            ExecStartPost=systemctl restart systemd-sysext
+            ExecStartPre=/usr/bin/sh -c "readlink --canonicalize /etc/extensions/EXTNAME.raw > /tmp/EXTNAME"
+            ExecStartPre=/usr/lib/systemd/systemd-sysupdate -C EXTNAME update
+            ExecStartPost=/usr/bin/sh -c "readlink --canonicalize /etc/extensions/EXTNAME.raw > /tmp/EXTNAME-new"
+            ExecStartPost=/usr/bin/sh -c "if ! cmp --silent /tmp/EXTNAME /tmp/EXTNAME-new; then <SERVICE REFRESH ACTION HERE>; fi"
 ```
 
-This example uses Butane/Ignition configuration do the following customizations beyond simply including the image:
+Note that this snippet inlines all of the sysupdate configuration for documentation purposes.
+Most extensions published in the Bakery ship sysupdate configuration as part of the releases, so these can be downloaded by Ignition instead of being inlined.
+(And consequently, that's what most of the configuration examples of individual extensions do).
+Check out the respective extensions' readme for details.
 
-1. Provide a different configuration to setup the nats-server to act as a leaf node to a pre-existing wasmCloud deployment (`/etc/nats-server.conf`).
-2. Provide a set of credentials for the nats-server leaf node to connect with (`/etc/nats.creds`).
-3. Override the bundled `NATS_CONFIG` environment variable to point it to the newly created configuration (`NATS_CONFIG=/etc/nats-server.conf`).
-4. Override the lattice the wasmCloud host is configured to connect (`WASMCLOUD_LATTICE=<redacted>`).
+Also, we include a dummy `noop.conf` for systemd-sysupdate to work around a spurious error message.
 
-#### k3s
+## Baking sysexts into Flatcar OS images
 
-The k3s sysext can be configured by using the following snippet, in case you
-want this to be a k3s server (controlplane):
+Using the `bake_flatcar_image.sh` script, custom Flatcar OS images can be created which include one or more sysexts.
+The script will download a Flatcar OS release image, insert the desired sysexts, and optionally create a vendor (public / private cloud or bare metal) image.
 
-```yaml
-variant: flatcar
-version: 1.0.0
-storage:
-  files:
-    # filename needs to be k3s.raw
-    - path: /etc/extensions/k3s.raw
-      contents:
-        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/k3s-v1.31.1+k3s1-x86-64.raw
-  links:
-    - path: /etc/systemd/system/multi-user.target.wants/k3s.service
-      target: /usr/local/lib/systemd/system/k3s.service
-      overwrite: true
+**NOTE:** The script requires sudo access at certain points to manage loopback mounts for the OS image partitions and will then prompt for a password.
+
+For example, if you have just built the Kubernetes sysext and want to embed it into the OS image, run
+```bash
+./bake_flatcar_image.sh kubernetes:kubernetes.raw
 ```
 
-Please note that this way you will not get automatic updates via
-`systemd-sysupdate`.
-
-For a k3s agent (worker node) you would use something like this snippet:
-
-```yaml
-variant: flatcar
-version: 1.0.0
-storage:
-  files:
-    # filename needs to be k3s.raw
-    - path: /etc/extensions/k3s.raw
-      contents:
-        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/k3s-v1.31.1+k3s1-x86-64.raw
-  links:
-    - path: /etc/systemd/system/multi-user.target.wants/k3s-agent.service
-      target: /usr/local/lib/systemd/system/k3s-agent.service
-      overwrite: true
+By default, the script operates with local sysexts (and optionally sysupdate configurations if present).
+However, the `--fetch` option may be specified to fetch the sysext `.raw` file and sysupdate config from the latest Bakery release.
+For our Kubernetes example we need to specify a version and architecture because Bakery releases include semver in the extension file name.
+```bash
+./bake_flatcar_image.sh --fetch kubernetes:kubernetes-v1.31.4-x86-64.raw
 ```
 
-Of course, any configuration you need should be prepared before starting the
-services, like providing a token for an agent or server to join or creating a
-`config.yaml` file.
+If you want to produce an image for a specific vendor (e.g. AWS or Azure), instruct `bake_flatcar_image.sh` to do so:
+```bash
+./bake_flatcar_image.sh --vendor azure kubernetes:kubernetes.raw
+```
+This build will take a little longer as `bake_flatcar_image.sh` will now use the Flatcar SDK container to build an image for that vendor.
+The script supports all vendors and clouds natively supported by Flatcar; you can get a full list via the `--help` flag.
 
-#### rke2
+Sysexts can be added to the root partition (the default) or the OEM partition of the OS image.
+Read more about Flatcar's OS image disk layout here: https://www.flatcar.org/docs/latest/reference/developer-guides/sdk-disk-partitions/
 
-The rke2 sysext can be configured by using the following snippet, in case you
-want this to be a rke2 server (controlplane):
+Refer to `./bake_flatcar_image.sh --help` for more information.
 
-```yaml
-variant: flatcar
-version: 1.0.0
-storage:
-  links:
-    # filename needs to be rke2.raw
-    - path: /etc/extensions/rke2.raw
-      contents:
-        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/rke2-v1.31.1+rke2r1-x86-64.raw
-    - path: /etc/systemd/system/multi-user.target.wants/rke2-server.service
-      target: /usr/local/lib/systemd/system/rke2-server.service
-      overwrite: true
+### Try it locally with the QEMU vendor
+
+Baking sysexts into the OS image provides an entirely self-contained way to test sysexts locally, in a live Flatcar VM.
+First, we use the `qemu_uefi` vendor to build an OS image that contains the sysext we want to test.
+We'll continue to use the kubernetes example from above.
+
+```bash
+./bake_flatcar_image.sh --vendor qemu_uefo kubernetes:kubernetes.raw
 ```
 
-Please note that this way you will not get automatic updates via
-`systemd-sysupdate`.
-
-For a rke2 agent (worker node) you would use something like this snippet:
-
-```yaml
-variant: flatcar
-version: 1.0.0
-storage:
-  links:
-    # filename needs to be rke2.raw
-    - path: /etc/extensions/rke2.raw
-      contents:
-        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/rke2-v1.31.1+rke2r1-x86-64.raw
-    - path: /etc/systemd/system/multi-user.target.wants/rke2-agent.service
-      target: /usr/local/lib/systemd/system/rke2-agent.service
-      overwrite: true
+This will produce the OS image, `flatcar_production_qemu_uefi_image.img.bz2`, with kubernetes baked in, as well as a few other artifacts.
+The OS image is compressed for efficiency reasons; we uncompress it so we can use it locally.
+```bash
+bunzip2 flatcar_production_qemu_uefi_image.img.bz2
 ```
 
-Of course, any configuration you need should be prepared before starting the
-services, like providing a token for an agent or server to join or creating a
-`config.yaml` file.
-
-#### Tailscale
-
-The Tailscale sysext ships a service unit but doesn't pre-enable it.
-You can use this Butane snippet to enable it:
-
-```
-variant: flatcar
-version: 1.0.0
-storage:
-  links:
-    - path: /etc/systemd/system/multi-user.target.wants/tailscaled.service
-      target: /usr/local/lib/systemd/system/tailscaled.service
-      overwrite: true
+Now we can boot the image locally and check for Kubernetes being present.
+We'll use qemu's the console output (`-nographic`) and we'll not modify the base image (`-snapshot`) so we can mess around without remorse:
+```bash
+./flatcar_production_qemu_uefi.sh -nographic -snapshot
+...
+... [Flatcar is booting] ...
+...
+core@localhost ~ $
 ```
 
-#### Ollama
-
-The ollama sysext can be configured by using the following snippet:
-
-```
-variant: flatcar
-version: 1.0.0
-storage:
-  files:
-    - path: /opt/extensions/ollama/ollama-0.3.9-x86-64.raw
-      contents:
-        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/ollama-0.3.9-x86-64.raw
-    - path: /etc/sysupdate.ollama.d/ollama.conf
-      contents:
-        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/ollama.conf
-  links:
-    - target: /opt/extensions/ollama/ollama-0.3.9-x86-64.raw
-      path: /etc/extensions/ollama.raw
-      hard: false
-systemd:
-  units:
-    - name: ollama.service
-      enabled: true
-      dropins:
-        - name: 10-ollama-env-override.conf
-          contents: |
-            [Service]
-            Environment=HOME="/var/lib/ollama"
-            Environment=OLLAMA_MODELS="/var/lib/ollama/models"
-            Environment=OLLAMA_RUNNERS_DIR="/var/lib/ollama/runners"
+We can now check for Kubernetes e.g. via
+```bash
+core@localhost ~ $ kubelet --version
+Kubernetes v1.31.4
+core@localhost ~ $
 ```
 
-Note that this configuration can be customized in terms of where Ollama is configured to store its models, configuration and runtime libraries by changing the `HOME`, `OLLAMA_MODELS` and `OLLAMA_RUNNERS_DIR`.
+Further testing can now be done directly, on a live instance.
 
-Please refer to the [Ollama documentation for further details](https://github.com/ollama/ollama/tree/main/docs).
 
-#### WasmEdge
+## Building sysext images
 
-The wasmedge sysext can be configured by using the following snippet:
-
-```
-variant: flatcar
-version: 1.0.0
-storage:
-  files:
-    - path: /opt/extensions/wasmedge-0.14.1-x86-64.raw
-      mode: 0420
-      contents:
-        source: https://github.com/flatcar/sysext-bakery/releases/download/wasmedge-0.14.1-x86-64.raw
-  links:
-    - target: /opt/extensions/wasmedge-0.14.1-x86-64.raw
-      path: /etc/extensions/wasmedge.raw
-      hard: false
-```
-
-#### LlamaEdge
-
-The llamaedge sysext can be configured by using the following snippet:
-
-```
-variant: flatcar
-version: 1.0.0
-storage:
-  files:
-    - path: /opt/extensions/wasmedge-0.14.1-x86-64.raw
-      mode: 0420
-      contents:
-        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/wasmaedge-0.14.1-x86-64.raw
-    - path: /opt/extensions/llamaedge-0.14.16-x86-64.raw
-      mode: 0420
-      contents:
-        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/llamaedge-0.14.16-x86-64.raw
-  links:
-    - target: /opt/extensions/llamaedge-0.14.16-x86-64.raw
-      path: /etc/extensions/llamaedge.raw
-      hard: false
-    - target: /opt/extensions/wasmedge-0.14.1-x86-64.raw
-      path: /etc/extensions/wasmedge.raw
-      hard: false
-```
-
-### Building sysext images
-
-To use the build scripts in this repository, the following packages are required:
+There is no strict need for building extensions yourself; most extensions are hosted in this repo as a Github release.
+The release is generated via a [Github action](.github/workflows/release.yaml) each time a new version tag is pushed.
+If you still want to build yourself, the following packages are required:
 
 - `curl`
 - `jq`
@@ -498,7 +312,7 @@ To use the build scripts in this repository, the following packages are required
 - [`yq`](https://github.com/mikefarah/yq/releases/latest/)
 
 
-#### Build individual sysext image
+### Build individual sysext image
 
 To build the Kubernetes sysext for example, use:
 
@@ -514,75 +328,56 @@ sudo systemd-sysext refresh
 kubeadm version
 ```
 
-#### Build all sysext images in this repository
+### Build all sysext images in this repository
 
-This builds `x86-64` and `arm64` versions of **all** sysext images listed in `release_build_versions.txt`. This takes some time.
+This builds `x86-64` and `arm64` versions of **all** sysext images listed in `release_build_versions.txt`.
+This takes some time.
 
 ```sh
 ./release_build.sh
 ```
 
-### Creating a custom Docker sysext image
+# Adding new Extensions
 
-The Docker releases publish static binaries including containerd and the only missing piece are the systemd units.
-To ease the process, the `create_docker_sysext.sh` helper script takes care of downloading the release binaries and adding the systemd unit files, and creates a combined Docker+containerd sysext image:
+We're always interested in adding more extensions here, and to serve them to all Flatcar users.
+Check out existing build scripts for inspiration.
+E.g. [create_ollama_sysext.sh](https://github.com/flatcar/sysext-bakery/blob/main/create_ollama_sysext.sh) is a pretty simple though full-featured one.
 
-```
-./create_docker_sysext.sh 24.0.9 mydocker
-[… writes mydocker.raw into current directory …]
-```
+Create a new script `create_EXTNAME_sysext.sh` which
+1. Creates a subdirectory `EXTNAME` which will later be used to generate the sysext file system from.
+2. Download a release of the application you want to ship and store them in suitable subdirectories below `EXTNAME/`.
+   Make sure the application is self-contained **and** doesn't ship any system libraries like glibc etc. If you need such a library in a sysext, please consult the Flix/Flatwrap instructions below.
+   - binaries go to `EXTNAME/usr/bin`
+   - libraries go to `EXTNAME/usr/lib`
+   - other files go to any path below `EXTNAME/usr/` as appropriate.
+3. If applicable, create service unit(s) for the application in `EXTNAME/usr/lib/systemd/system/`.
+4. Call `bake.sh EXTNAME` to generate `EXTNAME.raw` from the subdirectory we populated in steps 1. to 3.
+   A number of environment variables control metadata generated by `bake.sh`
+   - `ARCH` - CPU architecture. Either `arm64` or `x86-64`.
+   - `RELOAD` - set this to "1" if your sysext includes service units (step 3. above).
+     This will instruct the service manager to reload its configuration after merge, so the new service files will be picked up.
 
-Pass the `OS` or `ARCH` environment variables to build for another target than Flatcar amd64, e.g., for any distro with arm64:
+- Add the extension build script to the repo , add a corresponding markdown file with usage instructions and config snippets to `docs/`.
+- Optionally add the new extension name to [release_build_versions.txt](https://github.com/flatcar/sysext-bakery/blob/main/release_build_versions.txt) to automatically build sysexts with new bakery releases.
+- Add the sysext to the list of available extensions in this README.
+- File a PR.
+Done!
 
-```
-OS=_any ARCH=arm64 ./create_docker_sysext.sh 24.0.9 mydocker
-[… writes mydocker.raw into current directory …]
-```
 
-See the above intro section on how to use the resulting sysext image.
+## Flix and Flatwrap
 
-You can also limit the sysext image to only Docker (without containerd and runc) or only containerd (no Docker but runc) by passing the environment variables `ONLY_DOCKER=1` or `ONLY_CONTAINERD=1`.
-If you build both sysext images that way, you can load both combined and, e.g., only load the Docker sysext image for debugging while using the containerd sysext image by default for Kubernetes.
-
-### Baking sysexts into Flatcar OS images
-
-Using the `bake_flatcar_image.sh` script, custom Flatcar OS images can be created which include one or more sysexts.
-The script will download a Flatcar OS release image, insert the desired sysexts, and optionally create a vendor (public / private cloud or bare metal) image.
-
-By default, the script operates with local sysexts (and optionally sysupdate configurations if present).
-However, the `--fetch` option may be specified to fetch the sysext `.raw` file and sysupdate config from the latest Bakery release.
-
-Sysexts can be added to the root partition or the OEM partition of the OS image (root is preferred).
-Read more about Flatcar's OS image disk layout here: https://www.flatcar.org/docs/latest/reference/developer-guides/sdk-disk-partitions/
-
-The script requires sudo access at certain points to manage loopback mounts for the OS image partitions and will then prompt for a password.
-
-Refer to `./bake_flatcar_image.sh --help` for more information.
-
-Example usage:
-```
-./bake_flatcar_image.sh --fetch --vendor qemu_uefi wasmtime:wasmtime-24.0.0-x86-64.raw
-```
-
-Example usage with local sysext:
-```
-ls -1
-  myext-1.0.1-x86-64.raw
-  myext.conf
-./bake_flatcar_image.sh --fetch --vendor qemu_uefi myext:myext-1.0.1-x86-64.raw
-```
-
-The script supports all vendors and clouds natively supported by Flatcar.
-
-### Flix and Flatwrap
-
-The Flix and Flatwrap tools both convert a given chroot folder into a systemd-sysext image.
+The Flix and Flatwrap tools both convert a root folder into a systemd-sysext image.
 You have to specify which files should be made available to the host.
 
 The Flix tool rewrites specified binaries to use a custom library path.
 You also have to specify needed resource folders and you can specify systemd units, too.
 
-Here examples with Flix:
+Flatwrap, on the other hand, uses lightweight namespace isolation to create a private root for the sysext contents.
+
+These tools can be used to safely ship library dependencies of OS libraries (like e.g. glibc) in a custom path.
+The custom path ("sysroot") avoids clashes with Flatcar's native OS libraries.
+
+Flix example:
 
 ```
 CMD="apk -U add b3sum" ./oci-rootfs.sh alpine:latest /var/tmp/alpine-b3sum
@@ -641,19 +436,7 @@ CMD="apt-get update && apt install -y nginx" ./oci-rootfs.sh debian /var/tmp/deb
 # (The "non-production" nginx test config above can be used here, too, stored on the host's /etc.)
 ```
 
-### Converting a Torcx image
-
-Torcx was a solution for switching between different Docker versions on Flatcar.
-In case you have an existing Torcx image you can convert it with the `convert_torcx_image.sh` helper script (Currently only Torcx tar balls are supported and the conversion is done on best effort):
-
-```
-./convert_torcx_image.sh TORCXTAR SYSEXTNAME
-[… writes SYSEXTNAME.raw into the current directory …]
-```
-
-Please make also sure that your don't have a `containerd.service` drop in file under `/etc` that uses Torcx paths.
-
-## For maintainers: how to release?
+# For maintainers: how do I trigger a new release?
 
 CI can be kicked-off by overriding the `latest` tag. The `latest` release artifacts will be updated consequently here: https://github.com/flatcar/sysext-bakery/releases/tag/latest
 ```
