@@ -47,6 +47,7 @@ Check out the README files of specific extensions for detailed usage instruction
 | `k3s`            |  released    | [k3s.md](docs/k3s.md) |
 | `keepalived`     | build script | [keepalived.md](docs/keepalived.md) |
 | `kubernetes`     |  released    | [kubernetes.md](docs/kubernetes.md) |
+| `nebula`         |  released    | [nebula.md](docs/nebula.md) |
 | `nvidia-runtime` |  released    | [nvidia-runtime.md](docs/nvidia-runtime.md) |
 | `ollama`         |  released    | [ollama.md](docs/ollama.md) |
 | `rke2`           |  released    | [rke2.md](docs/rke2.md) |
