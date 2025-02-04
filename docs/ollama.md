@@ -63,4 +63,3 @@ systemd:
             ExecStartPost=/usr/bin/sh -c "readlink --canonicalize /etc/extensions/ollama.raw > /tmp/ollama-new"
             ExecStartPost=/usr/bin/sh -c "if ! cmp --silent /tmp/ollama /tmp/ollama-new; then touch /run/reboot-required; fi"
 ```
-```
