@@ -26,6 +26,8 @@ wasmcloud-1.2.1
 
 tailscale-1.76.6
 
+nebula-1.9.5
+
 nvidia_runtime-v1.16.2
 
 ollama-0.3.9
