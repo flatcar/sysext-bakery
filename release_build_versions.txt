@@ -37,3 +37,5 @@ containerd-2.0.0
 wasmedge-0.14.1
 
 llamaedge-0.14.16
+
+cilium-v0.16.24 

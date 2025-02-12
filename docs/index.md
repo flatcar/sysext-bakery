@@ -45,6 +45,7 @@ Check out the README files of specific extensions for detailed usage instruction
 |    Extension     | Availability | Documentation |
 | ---------------- | ------------ | ------------- |
 | `crio`           |  released    | [crio.md](docs/crio.md) |
+| `cilium`         |  released    | [cilium.md](docs/cilium.md) |
 | `docker`         |  released    | [docker.md](docs/docker.md) |
 | `docker_compose` |  released    | [docker_compose.md](docs/docker_compose.md) |
 | `falco`          |  released    | [falco.md](docs/falco.md) |
