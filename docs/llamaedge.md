@@ -1,24 +1,29 @@
 #  Llamaedge sysext
 
-This sysext ships [llamaedge](https://github.com/LlamaEdge/LlamaEdge).
-It requires wasmedge to run, so we include the wamsedge sysext in the configuration snippets below.
+This sysext ships [LlamaEdge](https://github.com/LlamaEdge/LlamaEdge).
+It requires WasmEdge to run, so we include the WasmEdge sysext in the configuration snippets below.
+
+Note that the version of WasmEdge used must match the version passed to the LlamaEdge sysext build.
+LlamaEdge ships a WasmEdge plug-in which is Wasm version specific.
+
+At the time of writing, the 0.14 series of the LlamaEdge sysext uses the WasmEdge 0.14.1 plugin.
 
 # Usage
 
-Note that the snippet merely provisions llamaedge.
+Note that the snippet merely provisions LlamaEdge.
 It does not start automatically.
 
-After provisioning you can interact with llamaedge on the instance:
+After provisioning you can interact with LlamaEdge on the instance:
 ```bash
 wasmedge run /usr/lib/wasmedge/wasm/llama-api-server.wasm
 ```
 
-The llamaedge sysext can be configured by using the following snippet.
+The LlamaEdge sysext can be configured by using the following snippet.
 The snippet includes automated updates via systemd-sysupdate.
 Sysupdate will stage updates and request a reboot by creating a flag file at `/run/reboot-required`.
 You can deactivate updates by changing `enabled: true` to `enabled: false` in `systemd-sysupdate.timer`.
 
-Note that the snippet is for the x86-64 version of wasmedge 0.14.1 and llamaedge 0.14.16.
+Note that the snippet is for the x86-64 version of WasmEdge 0.14.1 and LlamaEdge 0.14.16.
 
 ```yaml
 variant: flatcar

@@ -22,10 +22,10 @@ version: 1.0.0
 
 storage:
   files:
-    - path: /opt/extensions/tailscale/tailscale-1.76.6-x86-64.raw
+    - path: /opt/extensions/tailscale/tailscale-v1.76.6-x86-64.raw
       mode: 0644
       contents:
-        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/tailscale-1.76.6-x86-64.raw
+        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/tailscale-v1.76.6-x86-64.raw
     - path: /etc/sysupdate.tailscale.d/tailscale.conf
       contents:
         source: https://github.com/flatcar/sysext-bakery/releases/download/latest/tailscale.conf
@@ -36,7 +36,7 @@ storage:
     - path: /etc/systemd/system/multi-user.target.wants/tailscaled.service
       target: /usr/local/lib/systemd/system/tailscaled.service
       overwrite: true
-    - target: /opt/extensions/tailscale/tailscale-1.76.6-x86-64.raw
+    - target: /opt/extensions/tailscale/tailscale-v1.76.6-x86-64.raw
       path: /etc/extensions/tailscale.raw
       hard: false
 systemd:

@@ -6,16 +6,30 @@ We recommend to build, and either self-host the extension or to bake it right in
 
 The build process will build a statically compiled keepalived in a transient Alpine docker image, export the resulting binary, and build a sysext.
 
+**NOTE:** When building for a target architecture different from the host (build system) architecture,
+    the target architecture will be emulated (in software).
+    This may cause the build to run very slow.
+
 # Usage
 
-Review the keepalived releases and pick a release version: https://github.com/acassen/keepalived
-The example below uses keepalived v2.3.1.
-
-Clone the bakery repo and build the sysext.
+Clone the bakery repo:
 ```bash
 git clone https://github.com/flatcar/sysext-bakery.git
 cd sysext-bakery
-./create_keepalived_sysext.sh v2.3.1 keepalived
+```
+
+Pick a release version:
+```bash
+./bakery list keepalived
+```
+
+Build the sysext:
+```bash
+./bakery create keepalived <version>
+```
+e.g. for v2.3.1, use
+```bash
+./bakery create keepalived v2.3.1
 ```
 
 This will produce `keepalived.raw` in the local directory.

@@ -25,9 +25,9 @@ version: 1.0.0
 
 storage:
   files:
-    - path: /opt/extensions/ollama/ollama-0.3.9-x86-64.raw
+    - path: /opt/extensions/ollama/ollama-v0.3.9-x86-64.raw
       contents:
-        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/ollama-0.3.9-x86-64.raw
+        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/ollama-v0.3.9-x86-64.raw
     - path: /etc/sysupdate.ollama.d/ollama.conf
       contents:
         source: https://github.com/flatcar/sysext-bakery/releases/download/latest/ollama.conf
@@ -35,7 +35,7 @@ storage:
       contents:
         source: https://github.com/flatcar/sysext-bakery/releases/download/latest/noop.conf
   links:
-    - target: /opt/extensions/ollama/ollama-0.3.9-x86-64.raw
+    - target: /opt/extensions/ollama/ollama-v0.3.9-x86-64.raw
       path: /etc/extensions/ollama.raw
       hard: false
 

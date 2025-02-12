@@ -1,0 +1,5 @@
+version = 3
+# set containerd's OOM score
+oom_score = -999
+[plugins.'io.containerd.cri.v1.runtime'.containerd.runtimes.runc.options]
+  SystemdCgroup = false

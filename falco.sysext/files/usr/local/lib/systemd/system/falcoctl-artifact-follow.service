@@ -1,0 +1,22 @@
+[Unit]
+Description=Falcoctl Artifact Follow: automatic artifacts update service
+Documentation=https://falco.org/docs/
+PartOf=falco-bpf.service falco-kmod.service falco-modern-bpf.service falco-custom.service
+
+[Service]
+Type=simple
+User=root
+ExecStart=/usr/bin/falcoctl artifact follow --allowed-types=rulesfile
+UMask=0077
+TimeoutSec=30
+RestartSec=15s
+Restart=on-failure
+PrivateTmp=true
+NoNewPrivileges=yes
+ProtectSystem=true
+ReadWriteDirectories=/usr/share/falco
+ProtectKernelTunables=true
+RestrictRealtime=true
+
+[Install]
+WantedBy=multi-user.target

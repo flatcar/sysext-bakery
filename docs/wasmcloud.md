@@ -29,13 +29,13 @@ version: 1.0.0
 
 storage:
   links:
-    - target: /opt/extensions/wasmcloud/wasmcloud-1.2.1-x86-64.raw
+    - target: /opt/extensions/wasmcloud/wasmcloud-v1.2.1-x86-64.raw
       path: /etc/extensions/wasmcloud.raw
       hard: false
   files:
-    - path: /opt/extensions/wasmcloud/wasmcloud-1.2.1-x86-64.raw
+    - path: /opt/extensions/wasmcloud/wasmcloud-v1.2.1-x86-64.raw
       contents:
-        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/wasmcloud-1.2.1-x86-64.raw
+        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/wasmcloud-v1.2.1-x86-64.raw
     - path: /etc/sysupdate.wasmcloud.d/wasmcloud.conf
       contents:
         source: https://github.com/flatcar/sysext-bakery/releases/download/latest/wasmcloud.conf

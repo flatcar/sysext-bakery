@@ -21,13 +21,13 @@ version: 1.0.0
 
 storage:
   links:
-    - target: /opt/extensions/wasmtime/wasmtime-24.0.0-x86-64.raw
+    - target: /opt/extensions/wasmtime/wasmtime-v24.0.0-x86-64.raw
       path: /etc/extensions/wasmtime.raw
       hard: false
   files:
-    - path: /opt/extensions/wasmtime/wasmtime-24.0.0-x86-64.raw
+    - path: /opt/extensions/wasmtime/wasmtime-v24.0.0-x86-64.raw
       contents:
-        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/wasmtime-24.0.0-x86-64.raw
+        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/wasmtime-v24.0.0-x86-64.raw
     - path: /etc/sysupdate.wasmtime.d/wasmtime.conf
       contents:
         source: https://github.com/flatcar/sysext-bakery/releases/download/latest/wasmtime.conf

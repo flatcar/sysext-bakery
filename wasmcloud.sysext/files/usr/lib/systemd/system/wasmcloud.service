@@ -1,0 +1,13 @@
+[Unit]
+Description=wasmCloud Host
+Documentation=https://wasmcloud.com/docs/
+After=nats.service network-online.target
+Wants=network-online.target
+Requires=nats.service
+[Service]
+ExecStart=/usr/bin/wasmcloud
+Restart=always
+StartLimitInterval=0
+RestartSec=5
+[Install]
+WantedBy=multi-user.target
