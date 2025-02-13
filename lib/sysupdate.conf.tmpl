@@ -4,10 +4,10 @@ Verify=false
 [Source]
 Type=url-file
 Path=https://github.com/flatcar/sysext-bakery/releases/latest/download/
-MatchPattern=${EXTNAME}-@v-%a.raw
+MatchPattern={MATCH_PATTERN}
 
 [Target]
 InstancesMax=3
 Type=regular-file
-Path=/opt/extensions/${EXTNAME}
-CurrentSymlink=/etc/extensions/${EXTNAME}.raw
+Path={TARGET_PATH}
+CurrentSymlink=/etc/extensions/{EXTNAME}.raw

@@ -2,8 +2,11 @@
 
 This sysext ships [Tailscale](https://tailscale.com/).
 
+Starting with version v1.78.1 the Tailscale sysext includes a mechanism to automatically start the service at boot.
+It uses the service's [default configuration](https://github.com/tailscale/tailscale/blob/main/cmd/tailscaled/tailscaled.defaults)
+which can be customised or replaced via a custom Butane config.
 
-The Tailscale sysext includes a service unit but doesn't pre-enable it.
+Older releases of the sysext (1.76 and earlier) did not pre-enable the service.
 The unit can be enabled via Butane in order to start tailscale at boot.
 
 ## Usage

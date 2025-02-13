@@ -9,7 +9,7 @@
 function get_optional_param() {
   local param="$1"
   local default="$2"
-  shift; shift
+  shift 2
 
   while [[ $# -gt 0 ]] ; do
     case "$1" in
@@ -36,7 +36,7 @@ function get_positional_param() {
            echo "$1"
            return
          fi
-         ((curr++))
+         : $((curr++))
          ;;
     esac
     shift

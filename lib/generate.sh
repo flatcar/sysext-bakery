@@ -82,9 +82,13 @@ function _create_metadata() {
 
 function _create_sysupdate() {
   local extname="$1"
+  local match_pattern="${2:-${extname}-@v-%a.raw}"
+  local target_path="${3:-/opt/extensions/${extname}}"
 
-  EXTNAME="${extname}" \
-    envsubst '$EXTNAME' < "${libroot}/sysupdate.conf.tmpl" \
+  sed -e "s/{EXTNAME}/${extname}/g" \
+      -e "s/{MATCH_PATTERN}/${match_pattern}/g" \
+      -e "s,{TARGET_PATH},${target_path},g" \
+      "${libroot}/sysupdate.conf.tmpl" \
     >"${extname}.conf"
 
   echo "Generated sysupdate configuration '${extname}.conf'"
@@ -95,6 +99,7 @@ function _generate_sysext() {
   local extname="$1"
   local basedir="$2"
   local format="$3"
+  local ext_fs_size="$4"
 
   local filename="${extname}.raw"
   announce "Creating extension image '${filename}' and generating SHA256SUM"
@@ -103,7 +108,7 @@ function _generate_sysext() {
       mkfs.btrfs --mixed -m single -d single --shrink --rootdir "${basedir}" "${filename}"
       ;;
     ext2|ext4)
-      truncate -s 1G "${filename}"
+      truncate -s "${ext_fs_size}" "${filename}"
       mkfs."${format}" -E root_owner=0:0 -d "${basedir}" "${filename}"
       resize2fs -M "${filename}"
       ;;
@@ -184,7 +189,7 @@ function generate_sysext() {
   export SOURCE_DATE_EPOCH
 
   _create_metadata "$name" "$basedir" "$os" "$arch" "$reload_services"
-  _generate_sysext "$name" "$basedir" "$format"
+  _generate_sysext "$name" "$basedir" "$format" "$ext_fs_size"
 
   local sysupdate="$(get_optional_param "sysupdate" "false" "${@}")"
   if [[ ${sysupdate} == true ]] ; then

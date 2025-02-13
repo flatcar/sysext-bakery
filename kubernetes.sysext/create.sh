@@ -72,9 +72,9 @@ function populate_sysext_root() {
   # Generate 2nd sysupdate config for only patchlevel upgrades.
   local sysupdate="$(get_optional_param "sysupdate" "false" "${@}")"
   if [[ ${sysupdate} == true ]] ; then
-    local ver="$(echo "${version}" | sed 's/^\(v[0-9]\+\.[0-9]\+\).*/\1/')"
-    _create_sysupdate "${extname}-${ver}"
-    mv "${extname}-${ver}.conf" "${rundir}"
+    local majorver="$(echo "${version}" | sed 's/^\(v[0-9]\+\.[0-9]\+\).*/\1/')"
+    _create_sysupdate "${extname}-${majorver}" "${extname}-${majorver}.@v-%a.raw" "/opt/extensions/${extname}"
+    mv "${extname}-${majorver}.conf" "${rundir}"
   fi
 }
 # --
