@@ -1,0 +1,15 @@
+[Unit]
+Description=NATS Server
+After=network-online.target systemd-timesyncd.service
+[Service]
+PrivateTmp=true
+Type=simple
+Environment=NATS_CONFIG=/usr/share/nats/nats.conf
+ExecStart=/usr/bin/nats-server --jetstream --config ${NATS_CONFIG}
+ExecReload=/bin/kill -s HUP $MAINPID
+ExecStop=/bin/kill -s SIGINT $MAINPID
+# The nats-server uses SIGUSR2 to trigger using Lame Duck Mode (LDM) shutdown
+KillSignal=SIGUSR2
+# You might want to adjust TimeoutStopSec too.
+[Install]
+WantedBy=multi-user.target

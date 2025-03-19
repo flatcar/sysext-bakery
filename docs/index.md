@@ -16,6 +16,7 @@ The Sysext Bakery serves 3 main functions:
 3. Serve as an example to users for creating their own sysexts and operate sysext repositories (either from scratch or as a fork of this repo) to serve customised extensions.
    - Using Github for building and releasing allows for git-ops style releases.
 
+For our user documentation please check out https://flatcar.github.io/sysext-bakery/.
 
 ## What's a sysext and how does it extend Flatcar?
 
@@ -35,6 +36,7 @@ All extensions can be operated and updated independently of the host OS version.
 Extensions can be consumed either at provisioning time using Ignition, or baked into the OS image.
 See _Baking sysexts into Flatcar OS images_ below for more information.
 
+If you want to build extensions in this repository yourself and/or want to add an extension, see _"Working with the Bakery_ further below.
 
 ## What extensions are available?
 
@@ -44,20 +46,20 @@ Check out the README files of specific extensions for detailed usage instruction
 
 |    Extension     | Availability | Documentation |
 | ---------------- | ------------ | ------------- |
-| `crio`           |  released    | [crio.md](docs/crio.md) |
-| `docker`         |  released    | [docker.md](docs/docker.md) |
-| `docker_compose` |  released    | [docker_compose.md](docs/docker_compose.md) |
-| `falco`          |  released    | [falco.md](docs/falco.md) |
-| `k3s`            |  released    | [k3s.md](docs/k3s.md) |
-| `keepalived`     | build script | [keepalived.md](docs/keepalived.md) |
-| `kubernetes`     |  released    | [kubernetes.md](docs/kubernetes.md) |
-| `nvidia-runtime` |  released    | [nvidia-runtime.md](docs/nvidia-runtime.md) |
-| `ollama`         |  released    | [ollama.md](docs/ollama.md) |
-| `rke2`           |  released    | [rke2.md](docs/rke2.md) |
-| `tailscale`      |  released    | [tailscale.md](docs/tailscale.md) |
-| `wasmcloud`      |  released    | [wasmcloud.md](docs/wasmcloud.md) |
-| `wasmedge`       |  released    | [wasmedge.md](docs/wasmedge.md) |
-| `wasmtime`       |  released    | [wasmtime.md](docs/wasmtime.md) |
+| `crio`           |  released    | [crio.md](/docs/crio.md) |
+| `docker`         |  released    | [docker.md](/docs/docker.md) |
+| `docker_compose` |  released    | [docker_compose.md](/docs/docker_compose.md) |
+| `falco`          |  released    | [falco.md](/docs/falco.md) |
+| `k3s`            |  released    | [k3s.md](/docs/k3s.md) |
+| `keepalived`     | build script | [keepalived.md](/docs/keepalived.md) |
+| `kubernetes`     |  released    | [kubernetes.md](/docs/kubernetes.md) |
+| `nvidia-runtime` |  released    | [nvidia-runtime.md](/docs/nvidia-runtime.md) |
+| `ollama`         |  released    | [ollama.md](/docs/ollama.md) |
+| `rke2`           |  released    | [rke2.md](/docs/rke2.md) |
+| `tailscale`      |  released    | [tailscale.md](/docs/tailscale.md) |
+| `wasmcloud`      |  released    | [wasmcloud.md](/docs/wasmcloud.md) |
+| `wasmedge`       |  released    | [wasmedge.md](/docs/wasmedge.md) |
+| `wasmtime`       |  released    | [wasmtime.md](/docs/wasmtime.md) |
 
 
 ## How do I use sysexts?
@@ -237,26 +239,26 @@ Also, we include a dummy `noop.conf` for systemd-sysupdate to work around a spur
 
 ## Baking sysexts into Flatcar OS images
 
-Using the `bake_flatcar_image.sh` script, custom Flatcar OS images can be created which include one or more sysexts.
+Using the `tools/bake_flatcar_image.sh` script, custom Flatcar OS images can be created which include one or more sysexts.
 The script will download a Flatcar OS release image, insert the desired sysexts, and optionally create a vendor (public / private cloud or bare metal) image.
 
 **NOTE:** The script requires sudo access at certain points to manage loopback mounts for the OS image partitions and will then prompt for a password.
 
 For example, if you have just built the Kubernetes sysext and want to embed it into the OS image, run
 ```bash
-./bake_flatcar_image.sh kubernetes:kubernetes.raw
+./tools/bake_flatcar_image.sh kubernetes:kubernetes.raw
 ```
 
 By default, the script operates with local sysexts (and optionally sysupdate configurations if present).
 However, the `--fetch` option may be specified to fetch the sysext `.raw` file and sysupdate config from the latest Bakery release.
 For our Kubernetes example we need to specify a version and architecture because Bakery releases include semver in the extension file name.
 ```bash
-./bake_flatcar_image.sh --fetch kubernetes:kubernetes-v1.31.4-x86-64.raw
+./tools/bake_flatcar_image.sh --fetch kubernetes:kubernetes-v1.31.4-x86-64.raw
 ```
 
 If you want to produce an image for a specific vendor (e.g. AWS or Azure), instruct `bake_flatcar_image.sh` to do so:
 ```bash
-./bake_flatcar_image.sh --vendor azure kubernetes:kubernetes.raw
+./tools/bake_flatcar_image.sh --vendor azure kubernetes:kubernetes.raw
 ```
 This build will take a little longer as `bake_flatcar_image.sh` will now use the Flatcar SDK container to build an image for that vendor.
 The script supports all vendors and clouds natively supported by Flatcar; you can get a full list via the `--help` flag.
@@ -264,7 +266,7 @@ The script supports all vendors and clouds natively supported by Flatcar; you ca
 Sysexts can be added to the root partition (the default) or the OEM partition of the OS image.
 Read more about Flatcar's OS image disk layout here: https://www.flatcar.org/docs/latest/reference/developer-guides/sdk-disk-partitions/
 
-Refer to `./bake_flatcar_image.sh --help` for more information.
+Refer to `./tools/bake_flatcar_image.sh --help` for more information.
 
 ### Try it locally with the QEMU vendor
 
@@ -302,34 +304,73 @@ core@localhost ~ $
 Further testing can now be done directly, on a live instance.
 
 
-## Building sysext images
+## Working with the Bakery
 
 There is no strict need for building extensions yourself; most extensions are hosted in this repo as a Github release.
-The release is generated via a [Github action](.github/workflows/release.yaml) each time a new version tag is pushed.
-If you still want to build yourself, the following packages are required:
+Check out https://flatcar.github.io/sysext-bakery/ for guides on how to use these extensions.
+
+### Build sysexts
+
+If you want to build yourself, the following packages are required:
 
 - `curl`
+- `docker`
+- `git`
 - `jq`
 - `squashfs-tools`
 - `xz-utils`
 - `gawk`
 - [`yq`](https://github.com/mikefarah/yq/releases/latest/)
 
-
-### Build individual sysext image
-
-To build the Kubernetes sysext for example, use:
-
+First, clone the repository.
+The `bakery.sh` script is used to interact with individual extension build scripts.
+Try
 ```sh
-./create_kubernetes_sysext.sh v1.29.8 kubernetes
+./bakery.sh help
+```
+to get command line help.
+
+List all extensions available to build:
+```sh
+./bakery.sh list
 ```
 
-Afterwards, you can test the sysext image with:
+To list all versions that can be built for a specific extension, run:
+```sh
+./bakery.sh list <extension>
+```
+, e.g.
+```sh
+./bakery.sh list kubernetes
+```
+This fetches version information directly from the corresponding release server.
+
+To build the Kubernetes sysext containing Kubernetes release v1.29.8, run:
 
 ```sh
-sudo cp kubernetes.raw /etc/extensions/kubernetes.raw
-sudo systemd-sysext refresh
-kubeadm version
+./bakery.sh create kubernetes v1.29.8
+```
+
+This creates `kubernetes.raw` for x86-64 targets.
+For arm64 targets, use
+```sh
+./bakery.sh create kubernetes v1.29.8 --arch arm64
+```
+
+Check out
+```sh
+./bakery.sh create help
+```
+to see all options available for building extensions.
+
+Some extensions, e.g. Docker, supply additional command line parameters.
+Use
+```sh
+./bakery.sh create <extension> help
+```
+to display these; e.g.
+```sh
+./bakery.sh create docker help
 ```
 
 ### Build all sysext images in this repository
@@ -344,33 +385,44 @@ This takes some time.
 # Adding new Extensions
 
 We're always interested in adding more extensions here, and to serve them to all Flatcar users.
-Check out existing build scripts for inspiration.
-E.g. [create_ollama_sysext.sh](https://github.com/flatcar/sysext-bakery/blob/main/create_ollama_sysext.sh) is a pretty simple though full-featured one.
+Adding extensions should be fairly easy.
+The bakery offers library functions for most boilerplate tasks.
+Extension builds just need to implement core logic functions to populate a directory tree with files to be shipped.
 
-Create a new script `create_EXTNAME_sysext.sh` which
-1. Creates a subdirectory `EXTNAME` which will later be used to generate the sysext file system from.
-2. Download a release of the application you want to ship and store them in suitable subdirectories below `EXTNAME/`.
-   Make sure the application is self-contained **and** doesn't ship any system libraries like glibc etc. If you need such a library in a sysext, please consult the Flix/Flatwrap instructions below.
-   - binaries go to `EXTNAME/usr/bin`
-   - libraries go to `EXTNAME/usr/lib`
-   - other files go to any path below `EXTNAME/usr/` as appropriate.
-3. If applicable, create service unit(s) for the application in `EXTNAME/usr/lib/systemd/system/`.
-4. Call `bake.sh EXTNAME` to generate `EXTNAME.raw` from the subdirectory we populated in steps 1. to 3.
-   A number of environment variables control metadata generated by `bake.sh`
-   - `ARCH` - CPU architecture. Either `arm64` or `x86-64`.
-   - `RELOAD` - set this to "1" if your sysext includes service units (step 3. above).
-     This will instruct the service manager to reload its configuration after merge, so the new service files will be picked up.
+To add an extension:
+1. Copy the extension skeleton directory
+  ```sh
+  cp -R _skel.sysext <my-extension-name>.sysext
+  ```
+2.  Put static files like configurations, systemd units etc. in the `files/` sub-directory.
+   The files will end up in the extension image at the same paths they were placed below `files`, e.g..
+   `files/usr/lib/systemd/system/myservice.service` will be `/usr/lib/systemd/system/myservice.service`
+   in the extension image.
+3. Implement the `populate_sysext_root` and `list_available_versions` function stubs in `create.sh`.
+   - `list_available_versions` prints a list of (upstream) available versions to build.
+      Check out e.g. the `list_github_releases` function in `lib/helpers.sh` for inspiration.
+      (this function, and all other functions in `lib/`, are available when `create.sh` runs).
+   - `populate_sysext_root` populates the system extension root directory (available via `$sysextroot`).
+      This function runs in a temporary directory; stuff can be downloaded / built in `./` and then moved to `$sysextroot`.
+      The temporary directory will be removed when the extension build is complete (or when it errors out); no need to clean up manually.
 
-- Add the extension build script to the repo , add a corresponding markdown file with usage instructions and config snippets to `docs/`.
-- Optionally add the new extension name to [release_build_versions.txt](https://github.com/flatcar/sysext-bakery/blob/main/release_build_versions.txt) to automatically build sysexts with new bakery releases.
-- Add the sysext to the list of available extensions in this README.
-- File a PR.
+4. Add `docs/<my-extension-name>.md` with documentation and example configuration for the new extension, and reference the new file from the list of extensions in `docs/_index.md`.
+5. Optionally add the new extension name to [release_build_versions.txt](https://github.com/flatcar/sysext-bakery/blob/main/release_build_versions.txt) to automatically build sysexts with new bakery releases.
+6. File a PR.
 Done!
 
+Have a look at other extension builds for inspiration;
+* [k3s](/k3s.sysext/create.sh) and [falco](/falco.sysext/create.sh) are fairly simple and straightforward ones.
+* [docker](/docker.sysext/create.sh) is quite complex and even features its own command line build option.
+* [keepalived](/keepalived.sysext/create.sh) is rather unusual in that it spawns an ephemeral Alpine docker container
+  to statically compule keepalived (via a [build script](/keepalived.sysext/build.sh) mounted into the container).
 
 ## Flix and Flatwrap
 
-The Flix and Flatwrap tools both convert a root folder into a systemd-sysext image.
+The Flix and Flatwrap tools can be used to ship dynamically linked binaries w/o interfering with the host system.
+Both should be called from `populate_sysext_root()` via `${scriptroot}/tools/flix.sh` and `${scriptroot}/tools/flatwrap.sh`, respectively.
+
+Both convert a root folder into a systemd-sysext image.
 You have to specify which files should be made available to the host.
 
 The Flix tool rewrites specified binaries to use a custom library path.

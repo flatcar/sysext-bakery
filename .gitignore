@@ -1,3 +1,9 @@
 *.raw
 *.tgz
 *.tar.gz
+*.conf
+SHA256SUMS*
+mnt*
+Release.md
+prev_release_sysexts.txt
+tags

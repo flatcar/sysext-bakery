@@ -1,0 +1,15 @@
+[Unit]
+Description=Ollama
+Documentation=https://github.com/ollama/ollama/tree/main/docs
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Environment="HOME=/var/lib/ollama"
+Environment="OLLAMA_MODELS=/var/lib/ollama/models"
+Environment="OLLAMA_RUNNERS_DIR=/var/lib/ollama/runners"
+ExecStart=/usr/local/bin/ollama serve
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

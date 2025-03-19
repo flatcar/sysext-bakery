@@ -2,8 +2,11 @@
 
 This sysext ships [Tailscale](https://tailscale.com/).
 
+Starting with version v1.78.1 the Tailscale sysext includes a mechanism to automatically start the service at boot.
+It uses the service's [default configuration](https://github.com/tailscale/tailscale/blob/main/cmd/tailscaled/tailscaled.defaults)
+which can be customised or replaced via a custom Butane config.
 
-The Tailscale sysext includes a service unit but doesn't pre-enable it.
+Older releases of the sysext (1.76 and earlier) did not pre-enable the service.
 The unit can be enabled via Butane in order to start tailscale at boot.
 
 ## Usage
@@ -22,10 +25,10 @@ version: 1.0.0
 
 storage:
   files:
-    - path: /opt/extensions/tailscale/tailscale-1.76.6-x86-64.raw
+    - path: /opt/extensions/tailscale/tailscale-v1.76.6-x86-64.raw
       mode: 0644
       contents:
-        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/tailscale-1.76.6-x86-64.raw
+        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/tailscale-v1.76.6-x86-64.raw
     - path: /etc/sysupdate.tailscale.d/tailscale.conf
       contents:
         source: https://github.com/flatcar/sysext-bakery/releases/download/latest/tailscale.conf
@@ -36,7 +39,7 @@ storage:
     - path: /etc/systemd/system/multi-user.target.wants/tailscaled.service
       target: /usr/local/lib/systemd/system/tailscaled.service
       overwrite: true
-    - target: /opt/extensions/tailscale/tailscale-1.76.6-x86-64.raw
+    - target: /opt/extensions/tailscale/tailscale-v1.76.6-x86-64.raw
       path: /etc/extensions/tailscale.raw
       hard: false
 systemd:

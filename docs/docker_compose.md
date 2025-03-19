@@ -18,19 +18,19 @@ version: 1.0.0
 
 storage:
   files:
-    - path: /opt/extensions/docker_compose/docker_compose-2.24.5-x86-64.raw
+    - path: /opt/extensions/docker-compose/docker-compose-2.24.5-x86-64.raw
       mode: 0644
       contents:
-        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/docker_compose-2.24.5-x86-64.raw
-    - path: /etc/sysupdate.docker_compose.d/docker_compose.conf
+        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/docker-compose-2.24.5-x86-64.raw
+    - path: /etc/sysupdate.docker-compose.d/docker-compose.conf
       contents:
-        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/docker_compose.conf
+        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/docker-compose.conf
     - path: /etc/sysupdate.d/noop.conf
       contents:
         source: https://github.com/flatcar/sysext-bakery/releases/download/latest/noop.conf
   links:
-    - target: /opt/extensions/docker_compose/docker_compose-2.24.5-x86-64.raw
-      path: /etc/extensions/docker_compose.raw
+    - target: /opt/extensions/docker-compose/docker-compose-2.24.5-x86-64.raw
+      path: /etc/extensions/docker-compose.raw
       hard: false
 systemd:
   units:
@@ -38,12 +38,12 @@ systemd:
       enabled: true
     - name: systemd-sysupdate.service
       dropins:
-        - name: docker_compose.conf
+        - name: docker-compose.conf
           contents: |
             [Service]
-            ExecStartPre=/usr/bin/sh -c "readlink --canonicalize /etc/extensions/docker_compose.raw > /tmp/docker_compose"
-            ExecStartPre=/usr/lib/systemd/systemd-sysupdate -C docker_compose update
-            ExecStartPost=/usr/bin/sh -c "readlink --canonicalize /etc/extensions/docker_compose.raw > /tmp/docker_compose-new"
-            ExecStartPost=/usr/bin/sh -c "if ! cmp --silent /tmp/docker_compose /tmp/docker_compose-new; then touch /run/reboot-required; fi"
+            ExecStartPre=/usr/bin/sh -c "readlink --canonicalize /etc/extensions/docker-compose.raw > /tmp/docker-compose"
+            ExecStartPre=/usr/lib/systemd/systemd-sysupdate -C docker-compose update
+            ExecStartPost=/usr/bin/sh -c "readlink --canonicalize /etc/extensions/docker-compose.raw > /tmp/docker-compose-new"
+            ExecStartPost=/usr/bin/sh -c "if ! cmp --silent /tmp/docker-compose /tmp/docker-compose-new; then touch /run/reboot-required; fi"
 ```
 
