@@ -17,36 +17,36 @@
 # to build the latest (i.e. highest version number) release(s).
 #
 
-kubernetes v1.28.5 # required for CAPO CI
-kubernetes v1.27.3 # required for CAPG CI
-kubernetes latest
+containerd 2.0.0
+containerd latest
 
-docker 24.0.9 # Used in README.md. Update readme when version changes.
-docker 25.0.3
-docker latest
+crio latest
 
 docker-compose 2.22.0
 docker-compose 2.24.5
 docker-compose latest
 
+docker 24.0.9
+docker 25.0.3
+docker latest
+
 falco 0.39.1
 falco latest
 
-wasmtime 12.0.0
-wasmtime 13.0.0 # Used in Flatcar wasm OS demo
-wasmtime 24.0.0 # Used in README.md. Update readme when version changes.
-wasmtime latest
+k3s latest
 
-wasmcloud 1.0.0
-wasmcloud 1.1.1
-wasmcloud 1.2.1
-wasmcloud latest
+keepalived latest
 
-tailscale 1.76.6
-tailscale latest
+kubernetes v1.28.5 # required for CAPO CI
+kubernetes v1.27.3 # required for CAPG CI
+kubernetes latest
+
+# TODO: llamaedge sysext depends on wasmedge sysext version, so we can't automatically build it :-/
 
 nebula 1.9.5
 nebula latest
+
+nerdctl latest
 
 nvidia-runtime v1.16.2
 nvidia-runtime latest
@@ -54,10 +54,20 @@ nvidia-runtime latest
 ollama 0.3.9
 ollama latest
 
-containerd 2.0.0
-containerd latest
+rke2 latest
+
+tailscale 1.76.6
+tailscale latest
+
+wasmcloud 1.0.0
+wasmcloud 1.1.1
+wasmcloud 1.2.1
+wasmcloud latest
 
 wasmedge 0.14.1
 wasmedge latest
 
-# TODO: llamaedge sysext depends on wasmedge sysext version, so we can't automatically build it :-/
+wasmtime 12.0.0
+wasmtime 13.0.0 # Used in Flatcar wasm OS demo
+wasmtime 24.0.0 # Used in README.md. Update readme when version changes.
+wasmtime latest

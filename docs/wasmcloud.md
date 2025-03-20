@@ -35,13 +35,13 @@ storage:
   files:
     - path: /opt/extensions/wasmcloud/wasmcloud-v1.2.1-x86-64.raw
       contents:
-        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/wasmcloud-v1.2.1-x86-64.raw
+        source: https://extensions.flatcar.org/extensions/wasmcloud-v1.2.1-x86-64.raw
     - path: /etc/sysupdate.wasmcloud.d/wasmcloud.conf
       contents:
-        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/wasmcloud.conf
+        source: https://extensions.flatcar.org/extensions/wasmcloud.conf
     - path: /etc/sysupdate.d/noop.conf
       contents:
-      source: https://github.com/flatcar/sysext-bakery/releases/download/latest/noop.conf
+      source: https://extensions.flatcar.org/extensions/noop.conf
   #
   # Custom WasmCloud Config
   #

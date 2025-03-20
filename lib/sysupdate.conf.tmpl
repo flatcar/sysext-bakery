@@ -3,11 +3,11 @@ Verify=false
 
 [Source]
 Type=url-file
-Path=https://github.com/flatcar/sysext-bakery/releases/latest/download/
+Path=https://extensions.flatcar.org/extensions/{SOURCE_REL}/
 MatchPattern={MATCH_PATTERN}
 
 [Target]
 InstancesMax=3
 Type=regular-file
-Path={TARGET_PATH}
+Path=/opt/extensions/{TARGET_FILE}
 CurrentSymlink=/etc/extensions/{EXTNAME}.raw

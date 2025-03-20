@@ -28,13 +28,13 @@ storage:
     - path: /opt/extensions/tailscale/tailscale-v1.76.6-x86-64.raw
       mode: 0644
       contents:
-        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/tailscale-v1.76.6-x86-64.raw
+        source: https://extensions.flatcar.org/extensions/tailscale-v1.76.6-x86-64.raw
     - path: /etc/sysupdate.tailscale.d/tailscale.conf
       contents:
-        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/tailscale.conf
+        source: https://extensions.flatcar.org/extensions/tailscale.conf
     - path: /etc/sysupdate.d/noop.conf
       contents:
-        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/noop.conf
+        source: https://extensions.flatcar.org/extensions/noop.conf
   links:
     - path: /etc/systemd/system/multi-user.target.wants/tailscaled.service
       target: /usr/local/lib/systemd/system/tailscaled.service

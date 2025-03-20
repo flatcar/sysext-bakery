@@ -37,7 +37,7 @@ function populate_sysext_root() {
   announce "Extracting NVIDIA user space tools from DEB packages."
 
   local export_user_group="$(id -u):$(id -g)"
-  docker run -ti --rm \
+  docker run -i --rm \
              -v "$(pwd)/in":/in \
              -v "$(pwd)/out":/out \
               alpine \

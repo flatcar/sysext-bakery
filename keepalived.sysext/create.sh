@@ -27,7 +27,7 @@ function populate_sysext_root() {
 
   cp "${scriptroot}/keepalived.sysext/build.sh" .
   docker run --rm \
-              -ti \
+              -i \
               -v "$(pwd)":/install_root \
               --platform "linux/${img_arch}" \
               alpine \

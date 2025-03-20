@@ -27,13 +27,13 @@ storage:
   files:
     - path: /opt/extensions/ollama/ollama-v0.3.9-x86-64.raw
       contents:
-        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/ollama-v0.3.9-x86-64.raw
+        source: https://extensions.flatcar.org/extensions/ollama-v0.3.9-x86-64.raw
     - path: /etc/sysupdate.ollama.d/ollama.conf
       contents:
-        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/ollama.conf
+        source: https://extensions.flatcar.org/extensions/ollama.conf
     - path: /etc/sysupdate.d/noop.conf
       contents:
-        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/noop.conf
+        source: https://extensions.flatcar.org/extensions/noop.conf
   links:
     - target: /opt/extensions/ollama/ollama-v0.3.9-x86-64.raw
       path: /etc/extensions/ollama.raw

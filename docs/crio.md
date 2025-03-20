@@ -28,13 +28,13 @@ storage:
     - path: /opt/extensions/crio/crio-v1.31.3-x86-64.raw
       mode: 0644
       contents:
-        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/crio-v1.31.3-x86-64.raw
+        source: https://extensions.flatcar.org/extensions/crio-v1.31.3-x86-64.raw
     - path: /etc/sysupdate.crio.d/crio.conf
       contents:
-        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/crio.conf
+        source: https://extensions.flatcar.org/extensions/crio.conf
     - path: /etc/sysupdate.d/noop.conf
       contents:
-        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/noop.conf
+        source: https://extensions.flatcar.org/extensions/noop.conf
   links:
     - target: /opt/extensions/crio/crio-v1.31.3-x86-64.raw
       path: /etc/extensions/crio.raw

@@ -1,4 +1,4 @@
-# rke2 sysext
+# Rke2 sysext
 
 This sysext ships [RKE2](https://docs.rke2.io/),
 Rancher's next-generation Kubernetes distribution.
@@ -29,13 +29,13 @@ storage:
   files:
     - path: /etc/extensions/rke2.raw
       contents:
-        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/rke2-v1.31.1+rke2r1-x86-64.raw
+        source: https://extensions.flatcar.org/extensions/rke2-v1.31.1+rke2r1-x86-64.raw
     - path: /etc/sysupdate.rke2.d/rke2-v1.31.conf
       contents:
-        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/rke2.conf
+        source: https://extensions.flatcar.org/extensions/rke2.conf
     - path: /etc/sysupdate.d/noop.conf
       contents:
-        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/noop.conf
+        source: https://extensions.flatcar.org/extensions/noop.conf
   links:
     - target: /opt/extensions/rke2/rke2-v1.31.3+k3s1-x86-64.raw
       path: /etc/extensions/k3s.raw

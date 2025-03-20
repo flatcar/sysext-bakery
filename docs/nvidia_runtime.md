@@ -24,13 +24,13 @@ storage:
     - path: /opt/extensions/nvidia_runtime/nvidia_runtime-v1.16.2-x86-64.raw
       mode: 0644
       contents:
-        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/nvidia_runtime-v1.16.2-x86-64.raw
+        source: https://extensions.flatcar.org/extensions/nvidia_runtime-v1.16.2-x86-64.raw
     - path: /etc/sysupdate.nvidia_runtime.d/nvidia_runtime.conf
       contents:
-        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/nvidia_runtime.conf
+        source: https://extensions.flatcar.org/extensions/nvidia_runtime.conf
     - path: /etc/sysupdate.d/noop.conf
       contents:
-        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/noop.conf
+        source: https://extensions.flatcar.org/extensions/noop.conf
   links:
     - target: /opt/extensions/nvidia_runtime/nvidia_runtime-v1.16.2-x86-64.raw
       path: /etc/extensions/nvidia_runtime.raw

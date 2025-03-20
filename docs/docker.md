@@ -26,13 +26,13 @@ storage:
     - path: /opt/extensions/docker/docker-25.0.3-x86-64.raw
       mode: 0644
       contents:
-        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/docker-25.0.3-x86-64.raw
+        source: https://extensions.flatcar.org/extensions/docker-25.0.3-x86-64.raw
     - path: /etc/sysupdate.docker.d/docker.conf
       contents:
-        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/docker.conf
+        source: https://extensions.flatcar.org/extensions/docker.conf
     - path: /etc/sysupdate.d/noop.conf
       contents:
-        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/noop.conf
+        source: https://extensions.flatcar.org/extensions/noop.conf
   links:
     - target: /opt/extensions/docker/docker-25.0.3-x86-64.raw
       path: /etc/extensions/docker.raw

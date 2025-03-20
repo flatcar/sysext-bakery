@@ -25,13 +25,13 @@ storage:
     - path: /opt/extensions/containerd/containerd-2.0.0-x86-64.raw
       mode: 0644
       contents:
-        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/containerd-2.0.0-x86-64.raw
+        source: https://extensions.flatcar.org/extensions/containerd-2.0.0-x86-64.raw
     - path: /etc/sysupdate.containerd.d/containerd.conf
       contents:
-        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/containerd.conf
+        source: https://extensions.flatcar.org/extensions/containerd.conf
     - path: /etc/sysupdate.d/noop.conf
       contents:
-        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/noop.conf
+        source: https://extensions.flatcar.org/extensions/noop.conf
   links:
     - target: /opt/extensions/containerd/containerd-2.0.0-x86-64.raw
       path: /etc/extensions/containerd.raw
