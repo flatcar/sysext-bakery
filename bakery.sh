@@ -17,10 +17,11 @@ function usage() {
   echo "$0 <command> - run <command> on the sysext bakery."
   echo
   echo "Command is one of:"
-  echo "  list                          - List all sysexts available to build."
-  echo "  list <sysext> [--latest true] - List available versions for <sysext>."
-  echo "                                  If --latest is true, list only the"
-  echo "                                   extension's latest release(s)."
+  echo "  list [--plain true]           - Print a table of all sysexts available to build."
+  echo "                                  If --plain is true, just print the extensions w/o table formatting."
+  echo "  list <sysext> [--latest true] - List available releases of the project shipped by <sysext>."
+  echo "                                  If --latest is true, list only the project's latest release(s)."
+  echo "  list-bakery <sysext>          - List all Bakery release versions of <sysext>."
   echo "  create <sysext>               - Create the specified system extension."
   echo "  create <sysext> help          - List sysext specific parameters. Rarely used."
   echo
@@ -141,7 +142,7 @@ function create_sysext() {
 # --
 
 case "${1:-}" in
-  list|create|test)
+  list|list-bakery|create|test)
     cmd="${1}"
     shift
     "${cmd}"_sysext "${@}"

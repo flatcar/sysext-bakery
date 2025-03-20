@@ -1,0 +1,57 @@
+variant: flatcar
+version: 1.0.0
+
+passwd:
+  groups:
+    - name: caddy
+      gid: 1001
+  users:
+    - name: core
+      ssh_authorized_keys:
+        - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQC9x79n5iDHKdJuTyreMJD5q5L0JmxjNtf+P88zYbOx5QtB14UFDQurNbVyxQ/6G3zW4lUuGaHqANwYGYjsrjyftXBuCJIKN4ZvTwZXKSFqXXgkGw9wW/upF/5psqQesBi23opPmP3DOWZK1aKLi2V8k4i+PNZh5cny3QA8lgsfdW1phcbmURcLifu3BjGuBwSeENoMQShmWj5QuPQh24y0xx4d0xsgT1nq4WG7+EZzBwb+jwCvIdxbv7nMdAUibW7p9FjAMWrgr2ln7oWqNqR/yg2dbx3tXgA8gaC3jl3rztFwGSakXeiYb1DT2XTBBx3yHs9ckO2XWJLMGAwFWai/pT7seF6sj5cUOZbHRuSyYwF0OURXmbQcysCeUbVWQ2ITE2T/Sv2T/3npiY7Qqhxohmy4n9J0Gu0ybEL0rPyJpcSoLC2OZunhvBcl93dKCatUzOICuDN4zfm+mhtbnrhfEcrsjMUFfJ7r29D2vcgiJw9zTtQt3seoeruz13E2fpACGd1qnR8ac+aQljYAcsuRKZ/67n9Vlx7989r5M0bKxHsF8fciBbWZ8bquis89cTCu9bdm3tHQ2Za5qiES1CeIo7RT2DRLdjeK4vRmPBs4c+7S8sDvboI4a5f8c9U2VoZYofohbYuO6whadwwyE0ejjQb+niYffGJnimOK5Cvrfw== thilo@kinvolk.io
+    - name: caddy
+      uid: 1001
+      primary_group: caddy
+      groups:
+        - docker
+      no_create_home: true
+      home_dir: /opt/caddy
+
+storage:
+  directories:
+    - path: /opt/caddy/config
+      user:
+        name: caddy
+      group:
+        name: caddy
+    - path: /opt/caddy/data
+      user:
+        name: caddy
+      group:
+        name: caddy
+    - path: /opt/caddy/etc
+      user:
+        name: caddy
+      group:
+        name: caddy
+    - path: /opt/caddy/logs
+      user:
+        name: caddy
+      group:
+        name: caddy
+  files:
+    - path: /etc/systemd/system/caddy.service
+      contents:
+        local: caddy.service
+    - path: /opt/caddy/etc/Caddyfile
+      user:
+        name: caddy
+      group:
+        name: caddy
+      contents:
+        local: Caddyfile
+
+systemd:
+  units:
+    - name: caddy.service
+      enabled: true
