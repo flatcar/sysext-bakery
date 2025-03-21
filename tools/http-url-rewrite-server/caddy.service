@@ -1,0 +1,26 @@
+[Unit]
+Description=Caddy web server
+
+[Service]
+WorkingDirectory=/opt/caddy
+User=caddy
+
+ExecStart=/usr/bin/docker run --rm -i \
+            --user 1001:1001 \
+            --volume=/opt/caddy/etc:/etc/caddy \
+            --volume=/opt/caddy/logs:/logs \
+            --volume=/opt/caddy/data:/data \
+            --volume=/opt/caddy/config:/config \
+            --hostname=extensions.flatcar.org \
+            --name=caddy-webserver \
+            -p 80:80 \
+            -p 443:443 \
+            caddy
+
+ExecStop=/usr/bin/docker stop caddy-webserver
+Restart=on-failure
+RestartSec=5s
+
+
+[Install]
+WantedBy=multi-user.target

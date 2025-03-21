@@ -36,13 +36,13 @@ storage:
     - path: /opt/extensions/falco/falco-0.39.1-x86-64.raw
       mode: 0644
       contents:
-        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/falco-0.39.1-x86-64.raw
+        source: https://extensions.flatcar.org/extensions/falco-0.39.1-x86-64.raw
     - path: /etc/sysupdate.falco.d/falco.conf
       contents:
-        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/falco.conf
+        source: https://extensions.flatcar.org/extensions/falco.conf
     - path: /etc/sysupdate.d/noop.conf
       contents:
-        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/noop.conf
+        source: https://extensions.flatcar.org/extensions/noop.conf
   links:
     - target: /opt/extensions/falco/falco-0.39.1-x86-64.raw
       path: /etc/extensions/falco.raw

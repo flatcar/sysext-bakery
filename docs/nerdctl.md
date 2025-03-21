@@ -20,13 +20,13 @@ storage:
     - path: /opt/extensions/nerdctl-v2.0.3.raw
       mode: 0420
       contents:
-        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/nerdctl-v2.0.3.raw
+        source: https://extensions.flatcar.org/extensions/nerdctl-v2.0.3.raw
     - path: /etc/sysupdate.nerdctl.d/nerdctl.conf
       contents:
-        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/nerdctl.conf
+        source: https://extensions.flatcar.org/extensions/nerdctl.conf
     - path: /etc/sysupdate.d/noop.conf
       contents:
-        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/noop.conf
+        source: https://extensions.flatcar.org/extensions/noop.conf
   links:
     - target: /opt/extensions/nerdctl-v2.0.3.raw
       path: /etc/extensions/nerdctl.raw

@@ -28,16 +28,25 @@ function _has_function() {
 # --
 
 function _list_all_sysexts() {
-  announce "The following extension build scripts are available"
-  echo
-  _print_line "Extension name" "Static" "Build" "Test"
-  _print_line "" "Files" ""
-  _print_line "------------------------------" "-------" "-----" "----"
+  local plain="$(get_optional_param "plain" "false" "${@}")"
+
+  if [[ $plain != true  ]]; then
+    announce "The following extension build scripts are available"
+    echo
+    _print_line "Extension name" "Static" "Build" "Test"
+    _print_line "" "Files" ""
+    _print_line "------------------------------" "-------" "-----" "----"
+  fi
 
   local dir=""
   find "${scriptroot}" -regex '.*\.sysext$' | sort | while read dir ; do
     local extname="$(basename "${dir}")"
     if [[ ! -d "${dir}" ]] || [[ $extname == _skel* ]]; then
+      continue
+    fi
+
+    if [[ $plain == true  ]]; then
+      echo "${extname%.sysext}"
       continue
     fi
 
@@ -79,11 +88,31 @@ function _list_sysext_versions() {
 }
 # --
 
+function _list_bakery_releases() {
+  local extname="$(extension_name "$(get_positional_param 1 "${@}")")"
+
+  list_github_releases "${bakery%/*}" "${bakery#*/}" \
+    | sed --quiet "s/^${extname}-\\([^-]\\+\\)/\\1/p" \
+    | uniq
+}
+# --
+
 function list_sysext() {
-  if [[ -n "${@}" ]] ; then
+  local extname="$(extension_name "$(get_positional_param 1 "${@}")")"
+  
+  if [[ -n "${extname}" ]] ; then
     _list_sysext_versions "${@}"
   else
-    _list_all_sysexts
+    _list_all_sysexts "${@}"
+  fi
+}
+# --
+
+function list-bakery_sysext() {
+  if [[ -n "${@}" ]] ; then
+    _list_bakery_releases "${@}"
+  else
+    echo "ERROR: missing mandatory <sysext> argument" 
   fi
 }
 # --

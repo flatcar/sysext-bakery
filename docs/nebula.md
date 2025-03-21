@@ -17,13 +17,13 @@ storage:
     - path: /opt/extensions/nebula/nebula-v1.9.5-x86-64.raw
       mode: 0644
       contents:
-        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/nebula-v1.9.5-x86-64.raw
+        source: https://extensions.flatcar.org/extensions/nebula-v1.9.5-x86-64.raw
     - path: /etc/sysupdate.nebula.d/nebula.conf
       contents:
-        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/nebula.conf
+        source: https://extensions.flatcar.org/extensions/nebula.conf
     - path: /etc/sysupdate.d/noop.conf
       contents:
-        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/noop.conf
+        source: https://extensions.flatcar.org/extensions/noop.conf
   links:
     - path: /etc/systemd/system/multi-user.target.wants/nebula.service
       target: /usr/lib/systemd/system/nebula.service

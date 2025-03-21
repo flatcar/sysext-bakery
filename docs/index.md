@@ -25,7 +25,8 @@ These system extensions are shipped as self-contained immutable file system imag
 
 Extension images follow the UAPI group's [Extension Image specification](https://uapi-group.org/specifications/specs/extension_image/).
 Images ship directory trees under `/usr` and (optionally) `/opt` that only contain the binaries and config files required for the respective feature that's being added.
-The images also usually contain service unit definitions in `/usr/lib/systemd/system/` to start at boot as needed, and lightweight metadata
+The images also usually contain service unit definitions in `/usr/lib/systemd/system/` to start at boot as needed.
+Images also contain lightweight metadata with compatibility information for e.g. CPU architecture and distribution release requirements.
 
 Extension images are "merged" into the base OS file system at boot via an overlayfs mount.
 Contents of extension images appear right in the base OS file system.
@@ -44,22 +45,23 @@ The following table lists all extensions built and released in this repository.
 "build script" instead of "released" denotes extensions that can be built with this repo but aren't hosted here.
 Check out the README files of specific extensions for detailed usage instructions and configuration examples.
 
-|    Extension     | Availability | Documentation |
+|    Extension     | Availability | Versions available |
 | ---------------- | ------------ | ------------- |
-| `crio`           |  released    | [crio.md](/docs/crio.md) |
-| `docker`         |  released    | [docker.md](/docs/docker.md) |
-| `docker_compose` |  released    | [docker_compose.md](/docs/docker_compose.md) |
-| `falco`          |  released    | [falco.md](/docs/falco.md) |
-| `k3s`            |  released    | [k3s.md](/docs/k3s.md) |
-| `keepalived`     | build script | [keepalived.md](/docs/keepalived.md) |
-| `kubernetes`     |  released    | [kubernetes.md](/docs/kubernetes.md) |
-| `nvidia-runtime` |  released    | [nvidia-runtime.md](/docs/nvidia-runtime.md) |
-| `ollama`         |  released    | [ollama.md](/docs/ollama.md) |
-| `rke2`           |  released    | [rke2.md](/docs/rke2.md) |
-| `tailscale`      |  released    | [tailscale.md](/docs/tailscale.md) |
-| `wasmcloud`      |  released    | [wasmcloud.md](/docs/wasmcloud.md) |
-| `wasmedge`       |  released    | [wasmedge.md](/docs/wasmedge.md) |
-| `wasmtime`       |  released    | [wasmtime.md](/docs/wasmtime.md) |
+| `crio`           |  released    | [crio versions](https://github.com/flatcar/sysext-bakery/releases/tag/crio) |
+| `docker`         |  released    | [docker versions](https://github.com/flatcar/sysext-bakery/releases/tag/docker) |
+| `docker-compose` |  released    | [docker-compose versions](https://github.com/flatcar/sysext-bakery/releases/tag/docker-compose) |
+| `falco`          |  released    | [falco versions](https://github.com/flatcar/sysext-bakery/releases/tag/falco) |
+| `k3s`            |  released    | [k3s versions](https://github.com/flatcar/sysext-bakery/releases/tag/k3s) |
+| `keepalived`     |  released    | [keepalived versions](https://github.com/flatcar/sysext-bakery/releases/tag/keepalived) |
+| `kubernetes`     |  released    | [kubernetes versions](https://github.com/flatcar/sysext-bakery/releases/tag/kubernetes) |
+| `nerdctl`        |  released    | [nerdctl versions](https://github.com/flatcar/sysext-bakery/releases/tag/nerdctl) |
+| `nvidia-runtime` |  released    | [nvidia-runtime versions](https://github.com/flatcar/sysext-bakery/releases/tag/nvidia-runtime) |
+| `ollama`         |  released    | [ollama versions](https://github.com/flatcar/sysext-bakery/releases/tag/ollama) |
+| `rke2`           |  released    | [rke2 versions](https://github.com/flatcar/sysext-bakery/releases/tag/rke2) |
+| `tailscale`      |  released    | [tailscale versions](https://github.com/flatcar/sysext-bakery/releases/tag/tailscale) |
+| `wasmcloud`      |  released    | [wasmcloud versions](https://github.com/flatcar/sysext-bakery/releases/tag/wasmcloud) |
+| `wasmedge`       |  released    | [wasmedge versions](https://github.com/flatcar/sysext-bakery/releases/tag/wasmedge) |
+| `wasmtime`       |  released    | [wasmtime versions](https://github.com/flatcar/sysext-bakery/releases/tag/wasmtime) |
 
 
 ## How do I use sysexts?
@@ -82,7 +84,7 @@ storage:
     - path: /etc/extensions/EXTNAME.raw
       mode: 0644
       contents:
-        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/EXTNAME.raw
+        source: https://extensions.flatcar.org/extensions/EXTNAME.raw
 ```
 That's it!
 
@@ -100,7 +102,7 @@ storage:
     - path: /opt/extensions/EXTNAME/EXTNAME-3.13.5-x86-64.raw
       mode: 0644
       contents:
-        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/EXTNAME-3.13.5-x86-64.raw
+        source: https://extensions.flatcar.org/extensions/EXTNAME-3.13.5-x86-64.raw
   links:
     - target: /opt/extensions/EXTNAME/EXTNAME-3.13.5-x86-64.raw
       path: /etc/extensions/EXTNAME.raw
@@ -184,7 +186,7 @@ storage:
     - path: /opt/extensions/EXTNAME/EXTNAME-3.13.5-x86-64.raw
       mode: 0644
       contents:
-        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/EXTNAME-3.13.5-x86-64.raw
+        source: https://extensions.flatcar.org/extensions/EXTNAME-3.13.5-x86-64.raw
     - path: /etc/sysupdate.EXTNAME.d/EXTNAME.conf
       contents:
         inline: |
@@ -236,6 +238,14 @@ Most extensions published in the Bakery ship sysupdate configuration as part of 
 Check out the respective extensions' readme for details.
 
 Also, we include a dummy `noop.conf` for systemd-sysupdate to work around a spurious error message.
+
+### Where are bakery extension images hosted?
+
+Bakery extension images are hosted directly on the GitHub repository.
+We provide https://extensions.flatcar.org as a convenience wrapper - it will redirect to the respective extension release on GitHub.
+For a deep dive, please refer to the [Bakery developer documentation](https://github.com/flatcar/sysext-bakery/tree/t-lo/extensions-hosting-overhaul?tab=readme-ov-file#making-systemd-sysupdate-work-with-github-releases)
+for details on the redirect wrappper's interaction with systemd-sysupdate.
+While understanding the redirect wrapper might be interesting for curious developers, it's not a requirement for using extension images.
 
 ## Baking sysexts into Flatcar OS images
 
@@ -302,203 +312,3 @@ core@localhost ~ $
 ```
 
 Further testing can now be done directly, on a live instance.
-
-
-## Working with the Bakery
-
-There is no strict need for building extensions yourself; most extensions are hosted in this repo as a Github release.
-Check out https://flatcar.github.io/sysext-bakery/ for guides on how to use these extensions.
-
-### Build sysexts
-
-If you want to build yourself, the following packages are required:
-
-- `curl`
-- `docker`
-- `git`
-- `jq`
-- `squashfs-tools`
-- `xz-utils`
-- `gawk`
-- [`yq`](https://github.com/mikefarah/yq/releases/latest/)
-
-First, clone the repository.
-The `bakery.sh` script is used to interact with individual extension build scripts.
-Try
-```sh
-./bakery.sh help
-```
-to get command line help.
-
-List all extensions available to build:
-```sh
-./bakery.sh list
-```
-
-To list all versions that can be built for a specific extension, run:
-```sh
-./bakery.sh list <extension>
-```
-, e.g.
-```sh
-./bakery.sh list kubernetes
-```
-This fetches version information directly from the corresponding release server.
-
-To build the Kubernetes sysext containing Kubernetes release v1.29.8, run:
-
-```sh
-./bakery.sh create kubernetes v1.29.8
-```
-
-This creates `kubernetes.raw` for x86-64 targets.
-For arm64 targets, use
-```sh
-./bakery.sh create kubernetes v1.29.8 --arch arm64
-```
-
-Check out
-```sh
-./bakery.sh create help
-```
-to see all options available for building extensions.
-
-Some extensions, e.g. Docker, supply additional command line parameters.
-Use
-```sh
-./bakery.sh create <extension> help
-```
-to display these; e.g.
-```sh
-./bakery.sh create docker help
-```
-
-### Build all sysext images in this repository
-
-This builds `x86-64` and `arm64` versions of **all** sysext images listed in `release_build_versions.txt`.
-This takes some time.
-
-```sh
-./release_build.sh
-```
-
-# Adding new Extensions
-
-We're always interested in adding more extensions here, and to serve them to all Flatcar users.
-Adding extensions should be fairly easy.
-The bakery offers library functions for most boilerplate tasks.
-Extension builds just need to implement core logic functions to populate a directory tree with files to be shipped.
-
-To add an extension:
-1. Copy the extension skeleton directory
-  ```sh
-  cp -R _skel.sysext <my-extension-name>.sysext
-  ```
-2.  Put static files like configurations, systemd units etc. in the `files/` sub-directory.
-   The files will end up in the extension image at the same paths they were placed below `files`, e.g..
-   `files/usr/lib/systemd/system/myservice.service` will be `/usr/lib/systemd/system/myservice.service`
-   in the extension image.
-3. Implement the `populate_sysext_root` and `list_available_versions` function stubs in `create.sh`.
-   - `list_available_versions` prints a list of (upstream) available versions to build.
-      Check out e.g. the `list_github_releases` function in `lib/helpers.sh` for inspiration.
-      (this function, and all other functions in `lib/`, are available when `create.sh` runs).
-   - `populate_sysext_root` populates the system extension root directory (available via `$sysextroot`).
-      This function runs in a temporary directory; stuff can be downloaded / built in `./` and then moved to `$sysextroot`.
-      The temporary directory will be removed when the extension build is complete (or when it errors out); no need to clean up manually.
-
-4. Add `docs/<my-extension-name>.md` with documentation and example configuration for the new extension, and reference the new file from the list of extensions in `docs/_index.md`.
-5. Optionally add the new extension name to [release_build_versions.txt](https://github.com/flatcar/sysext-bakery/blob/main/release_build_versions.txt) to automatically build sysexts with new bakery releases.
-6. File a PR.
-Done!
-
-Have a look at other extension builds for inspiration;
-* [k3s](/k3s.sysext/create.sh) and [falco](/falco.sysext/create.sh) are fairly simple and straightforward ones.
-* [docker](/docker.sysext/create.sh) is quite complex and even features its own command line build option.
-* [keepalived](/keepalived.sysext/create.sh) is rather unusual in that it spawns an ephemeral Alpine docker container
-  to statically compule keepalived (via a [build script](/keepalived.sysext/build.sh) mounted into the container).
-
-## Flix and Flatwrap
-
-The Flix and Flatwrap tools can be used to ship dynamically linked binaries w/o interfering with the host system.
-Both should be called from `populate_sysext_root()` via `${scriptroot}/tools/flix.sh` and `${scriptroot}/tools/flatwrap.sh`, respectively.
-
-Both convert a root folder into a systemd-sysext image.
-You have to specify which files should be made available to the host.
-
-The Flix tool rewrites specified binaries to use a custom library path.
-You also have to specify needed resource folders and you can specify systemd units, too.
-
-Flatwrap, on the other hand, uses lightweight namespace isolation to create a private root for the sysext contents.
-
-These tools can be used to safely ship library dependencies of OS libraries (like e.g. glibc) in a custom path.
-The custom path ("sysroot") avoids clashes with Flatcar's native OS libraries.
-
-Flix example:
-
-```
-CMD="apk -U add b3sum" ./oci-rootfs.sh alpine:latest /var/tmp/alpine-b3sum
-./flix.sh /var/tmp/alpine-b3sum/ b3sum /usr/bin/b3sum /bin/busybox:/usr/bin/busybox
-# got b3sum.raw
-
-CMD="apt-get update && apt install -y nginx" ./oci-rootfs.sh debian /var/tmp/debian-nginx
-./flix.sh /var/tmp/debian-nginx/ nginx /usr/sbin/nginx /usr/sbin/start-stop-daemon /usr/lib/systemd/system/nginx.service
-# got nginx.raw
-
-# Note: Enablement of nginx.service with Butane would happen as in the k3s example
-# but you can also pre-enable the service inside the extension.
-# Here a non-production nginx test config if you want to try the above:
-$ cat /etc/nginx/nginx.conf
-user root;
-pid /run/nginx.pid;
-
-events {
-}
-
-http {
-  access_log /dev/null;
-  proxy_temp_path /tmp;
-  client_body_temp_path /tmp;
-  fastcgi_temp_path /tmp;
-  uwsgi_temp_path /tmp;
-  scgi_temp_path /tmp;
-  server {
-        server_name   localhost;
-        listen        127.0.0.1:80;
-  }
-}
-```
-
-The Flatwrap tool generates entry point wrappers for a chroot with `unshare` or `bwrap`.
-You can specify systemd units, too. By default `/etc`, `/var`, and `/home` are mapped from the host but that is configurable (see `--help`).
-
-Here examples with Flatwrap:
-
-```
-CMD="apk -U add b3sum" ./oci-rootfs.sh alpine:latest /var/tmp/alpine-b3sum
-./flatwrap.sh /var/tmp/alpine-b3sum b3sum /usr/bin/b3sum /bin/busybox:/usr/bin/busybox
-# got b3sum.raw
-
-CMD="apk -U add htop" ./oci-rootfs.sh alpine:latest /var/tmp/alpine-htop
-# Use ETCMAP=chroot because alpine's htop needs alpine's /etc/terminfo
-ETCMAP=chroot ./flatwrap.sh /var/tmp/alpine-htop htop /usr/bin/htop
-# got htop.raw
-
-CMD="apt-get update && apt install -y nginx" ./oci-rootfs.sh debian /var/tmp/debian-nginx
-./flatwrap.sh /var/tmp/debian-nginx/ nginx /usr/sbin/nginx /usr/sbin/start-stop-daemon /usr/lib/systemd/system/nginx.service
-# got nginx.raw
-
-# Note: Enablement of nginx.service with Butane would happen as in the k3s example
-# but you can also pre-enable the service inside the extension.
-# (The "non-production" nginx test config above can be used here, too, stored on the host's /etc.)
-```
-
-# For maintainers: how do I trigger a new release?
-
-CI can be kicked-off by overriding the `latest` tag. The `latest` release artifacts will be updated consequently here: https://github.com/flatcar/sysext-bakery/releases/tag/latest
-```
-git checkout main
-git pull --ff-only
-git tag -d latest
-git tag -as latest
-git push origin --force latest
-```

@@ -27,13 +27,13 @@ storage:
   files:
     - path: /opt/extensions/wasmtime/wasmtime-v24.0.0-x86-64.raw
       contents:
-        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/wasmtime-v24.0.0-x86-64.raw
+        source: https://extensions.flatcar.org/extensions/wasmtime-v24.0.0-x86-64.raw
     - path: /etc/sysupdate.wasmtime.d/wasmtime.conf
       contents:
-        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/wasmtime.conf
+        source: https://extensions.flatcar.org/extensions/wasmtime.conf
     - path: /etc/sysupdate.d/noop.conf
       contents:
-      source: https://github.com/flatcar/sysext-bakery/releases/download/latest/noop.conf
+      source: https://extensions.flatcar.org/extensions/noop.conf
  
 systemd:
   units:

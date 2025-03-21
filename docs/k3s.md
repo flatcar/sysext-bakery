@@ -31,13 +31,13 @@ storage:
     - path: /opt/extensions/k3s/k3s-v1.31.3+k3s1-x86-64.raw
       mode: 0644
       contents:
-        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/k3s-v1.31.3+k3s1-x86-64.raw
+        source: https://extensions.flatcar.org/extensions/k3s-v1.31.3+k3s1-x86-64.raw
     - path: /etc/sysupdate.k3s.d/k3s-v1.31.conf
       contents:
-        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/k3s.conf
+        source: https://extensions.flatcar.org/extensions/k3s.conf
     - path: /etc/sysupdate.d/noop.conf
       contents:
-        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/noop.conf
+        source: https://extensions.flatcar.org/extensions/noop.conf
   links:
     - target: /opt/extensions/k3s/k3s-v1.31.3+k3s1-x86-64.raw
       path: /etc/extensions/k3s.raw

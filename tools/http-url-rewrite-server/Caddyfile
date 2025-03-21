@@ -1,0 +1,53 @@
+# Redirect caddyfile for processing systemd-sysupdate requests.
+#
+# This Caddyfile will redirect incoming requests to GitHub releases, making it appear to clients like systemd-sysupdate
+#  as if all sysexts #  released on the Bakery are in the same directory.
+# For clients, the directory layout looks like e.g.:
+#
+# SHA256SUMS
+# kubernetes-v1.28.2-amd64.raw
+# kubernetes-v1.28.2-arm64.raw
+# kubernetes-v1.28.4-amd64.raw
+# kubernetes-v1.28.4-arm64.raw
+# kubernetes-v1.29.1-amd64.raw
+# kubernetes-v1.29.1-arm64.raw
+# ...
+#
+# while in fact requests are being redirected to GitHub releases depending on which pattern matches the request.
+
+# For testing locally, uncomment the below and comment 'extensions.flatcar.org {',
+#  then run
+# docker run --rm -ti -v ${PWD}/Caddyfile:/etc/caddy/Caddyfile -p 8080:80 caddy
+#:80 {
+extensions.flatcar.org {
+	vars base_dest_url "https://github.com/flatcar/sysext-bakery/releases/download"
+
+	# Extension image.
+	#     <extension>-<version>-<arch>.raw
+	#       ==>  https://[...]/releases/download/<extension>-<version>/<extension>-<version>-<arch>.raw
+	# Match groups: 1 - extension, 2 - version, 3 - arch
+	@raw path_regexp raw ^.*/extensions/*.*/([^/]+)-([^/]+)-(x86-64|arm64).raw$
+	redir @raw {vars.base_dest_url}/{re.raw.1}-{re.raw.2}/{re.raw.1}-{re.raw.2}-{re.raw.3}.raw
+
+	# Sysupdate conf. This is only used by Ignition.
+	#     <extension>-<version>.conf
+	#       ==>  https://[...]/releases/download/<extension>-<version>/<extension>-<version>.conf
+	# Match groups: 1 - extension, 2 - version, 3 - arch
+	@conf path_regexp conf ^.*/extensions/*.*/([^/]+).conf$
+	redir @conf {vars.base_dest_url}/{re.conf.1}/{re.conf.1}.conf
+
+	# Extension specific SHA file with extension name in path (group 1)
+	#     <extension>/SHA256SUMS
+	#       ==>  https://[...]/releases/download/<extension>/SHA256SUMS
+	@esha path_regexp esha ^/extensions/([^/]+)/SHA256SUMS$
+	redir @esha {vars.base_dest_url}/{re.esha.1}/SHA256SUMS
+
+	# Global SHA file with all extensions in it.
+	#     /SHA256SUMS
+	#       ==>  https://[...]/releases/download/SHA256SUMS/SHA256SUMS
+	@sha path_regexp sha ^/extensions/SHA256SUMS$
+	redir @sha {vars.base_dest_url}/SHA256SUMS/SHA256SUMS
+
+	# None of the above matched, redirect to the website.
+	redir https://flatcar.github.io/sysext-bakery{uri}
+}

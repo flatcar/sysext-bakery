@@ -31,13 +31,13 @@ storage:
   files:
     - path: /etc/sysupdate.kubernetes.d/kubernetes-v1.31.conf
       contents:
-        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/kubernetes-v1.31.conf
+        source: https://extensions.flatcar.org/extensions/kubernetes-v1.31.conf
     - path: /etc/sysupdate.d/noop.conf
       contents:
-        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/noop.conf
+        source: https://extensions.flatcar.org/extensions/noop.conf
     - path: /opt/extensions/kubernetes/kubernetes-v1.31.3-x86-64.raw
       contents:
-        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/kubernetes-v1.31.3-x86-64.raw
+        source: https://extensions.flatcar.org/extensions/kubernetes-v1.31.3-x86-64.raw
 systemd:
   units:
     - name: systemd-sysupdate.timer

@@ -83,11 +83,13 @@ function _create_metadata() {
 function _create_sysupdate() {
   local extname="$1"
   local match_pattern="${2:-${extname}-@v-%a.raw}"
-  local target_path="${3:-/opt/extensions/${extname}}"
+  local source_rel="${3:-${extname}}"
+  local target_file="${4:-${source_rel}}"
 
   sed -e "s/{EXTNAME}/${extname}/g" \
       -e "s/{MATCH_PATTERN}/${match_pattern}/g" \
-      -e "s,{TARGET_PATH},${target_path},g" \
+      -e "s,{SOURCE_REL},${source_rel},g" \
+      -e "s,{TARGET_FILE},${target_file},g" \
       "${libroot}/sysupdate.conf.tmpl" \
     >"${extname}.conf"
 
@@ -100,25 +102,25 @@ function _generate_sysext() {
   local basedir="$2"
   local format="$3"
   local ext_fs_size="$4"
+  local fname="$5"
 
-  local filename="${extname}.raw"
-  announce "Creating extension image '${filename}' and generating SHA256SUM"
+  announce "Creating extension image '${fname}' and generating SHA256SUM"
   case "$format" in
     btrfs)
-      mkfs.btrfs --mixed -m single -d single --shrink --rootdir "${basedir}" "${filename}"
+      mkfs.btrfs --mixed -m single -d single --shrink --rootdir "${basedir}" "${fname}"
       ;;
     ext2|ext4)
-      truncate -s "${ext_fs_size}" "${filename}"
-      mkfs."${format}" -E root_owner=0:0 -d "${basedir}" "${filename}"
-      resize2fs -M "${filename}"
+      truncate -s "${ext_fs_size}" "${fname}"
+      mkfs."${format}" -E root_owner=0:0 -d "${basedir}" "${fname}"
+      resize2fs -M "${fname}"
       ;;
     squashfs)
-      mksquashfs "${basedir}" "${filename}" -all-root -noappend -xattrs-exclude '^btrfs.'
+      mksquashfs "${basedir}" "${fname}" -all-root -noappend -xattrs-exclude '^btrfs.'
       ;;
 
   esac
-  sha256sum "${filename}" > "SHA256SUMS.${extname}"
-  announce "'${filename}' is now ready"
+  sha256sum "${fname}" > "SHA256SUMS.${extname}"
+  announce "'${fname}' is now ready"
 }
 # --
 
@@ -128,6 +130,9 @@ function _generate_sysext() {
 function _generate_sysext_options() {
   echo " --name <name>:        Sysext (file) name ('<name>.raw')."
   echo "                       Defaults to 'basename \"\$basedir\"' if not set."
+  echo " --output-file <fname> Use <fname> as the output filename and for the SHA256SUMS file."
+  echo "                       This will NOT be used for sysext metadata or sysupdate. Useful for sym-linking"
+  echo "                       <name> -> <fname> on the destination host."
   echo " --os <os>:            OS version supported by the sysext. Either "_any" (the default)"
   echo "                         or a distro release version that must match the target distro's"
   echo "                         ID= field in /etc/os-release."
@@ -184,12 +189,14 @@ function generate_sysext() {
   _check_basedir "${basedir}"
 
   local name="$(get_optional_param "name" "$(cd "$basedir"; basename "$(pwd)")" "${@}")"
-  rm -f "${name}.raw"
+  local fname="$(get_optional_param "output-file" "${name}" "${@}")"
+  fname="${fname%%.raw}.raw"
+  rm -f "${fname}"
 
   export SOURCE_DATE_EPOCH
 
   _create_metadata "$name" "$basedir" "$os" "$arch" "$reload_services"
-  _generate_sysext "$name" "$basedir" "$format" "$ext_fs_size"
+  _generate_sysext "$name" "$basedir" "$format" "$ext_fs_size" "${fname}"
 
   local sysupdate="$(get_optional_param "sysupdate" "false" "${@}")"
   if [[ ${sysupdate} == true ]] ; then

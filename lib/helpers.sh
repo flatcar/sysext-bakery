@@ -76,11 +76,24 @@ function announce() {
 }
 # --
 
+function curl_wrapper() {
+  if [[ -n ${GH_TOKEN:-} ]] ; then
+    auth=( "-H" "Authorization: Bearer $GH_TOKEN")
+  fi
+
+  curl -fsSL --retry-delay 1 --retry 60 --retry-connrefused \
+       "${auth[@]}" \
+       --retry-max-time 60 --connect-timeout 20  \
+       "${@}"
+}
+# --
+
 function list_github_releases() {
   local org="$1"
   local project="$2"
-
-  curl -fsSL "https://api.github.com/repos/${org}/${project}/releases" \
+  
+  curl_wrapper \
+    "https://api.github.com/repos/${org}/${project}/releases" \
     | jq -r 'map_values(select(.prerelease == false)) | .[].tag_name' \
     | sort -Vr
 }
@@ -90,7 +103,8 @@ function list_github_tags() {
   local org="$1"
   local project="$2"
 
-  curl -fsSL "https://api.github.com/repos/${org}/${project}/tags" \
+  curl_wrapper \
+    "https://api.github.com/repos/${org}/${project}/tags" \
     | jq -r '.[].name' \
     | sort -Vr
 }
