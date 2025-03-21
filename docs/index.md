@@ -6,17 +6,18 @@ title: Overview
 
 The Sysext Bakery serves 3 main functions:
 
-1. Serve ready-to-use system extensions for consumption by users in their deployments via our [Releases](https://github.com/flatcar/sysext-bakery/releases/tag/latest).
-   - The extensions can be consumed directly from releases of this repository via a corresponding Butane/Ignition configuration.
+1. Serve ready-to-use system extensions for consumption by users in their deployments.
+   - The extensions can be consumed via a corresponding Butane/Ignition configuration.
    - Sysupdate configurations are provided too, so extensions can be made to auto-update when new versions are released in the bakery repo.
    - Check the "available extensions" section below for details and config snippets for individual extensions.
+   - New versions of extensions are built automatically when the extension's upstream publishes a new release.
 2. Provide a go-to point for the community to add new extensions to Flatcar and make them available to everyone.
-   - Regular release builds of the Flatcar maintainers team ensure extensions remain up to date.
+   - Automated daily update checks and release builds ensure extensions are available for the latest upstream releases.
    - A simple versioning mechanism ensures older releases remain available.
 3. Serve as an example to users for creating their own sysexts and operate sysext repositories (either from scratch or as a fork of this repo) to serve customised extensions.
    - Using Github for building and releasing allows for git-ops style releases.
+   - For our developer information please check out https://github.com/flatcar/sysext-bakery/.
 
-For our user documentation please check out https://flatcar.github.io/sysext-bakery/.
 
 ## What's a sysext and how does it extend Flatcar?
 
@@ -43,7 +44,7 @@ If you want to build extensions in this repository yourself and/or want to add a
 
 The following table lists all extensions built and released in this repository.
 "build script" instead of "released" denotes extensions that can be built with this repo but aren't hosted here.
-Check out the README files of specific extensions for detailed usage instructions and configuration examples.
+Check out documentation on specific extensions at the navigation menu on the left for detailed usage instructions and configuration examples.
 
 |    Extension     | Availability | Versions available |
 | ---------------- | ------------ | ------------- |
@@ -63,16 +64,17 @@ Check out the README files of specific extensions for detailed usage instruction
 | `wasmedge`       |  released    | [wasmedge versions](https://github.com/flatcar/sysext-bakery/releases/tag/wasmedge) |
 | `wasmtime`       |  released    | [wasmtime versions](https://github.com/flatcar/sysext-bakery/releases/tag/wasmtime) |
 
+A full list of all extensions and versions available can be found in our bakery [global metadata release](https://github.com/flatcar/sysext-bakery/releases/tag/SHA256SUMS).
 
 ## How do I use sysexts?
 
 Simply consume the extensions you need via Ignition, or use [`bake_flatcar_image.sh`](bake_flatcar_image.sh) to create an OS image with the sysext(s) of your choice included.
 
 **BEFORE YOU CONTINUE:**
-If you already know what extension(s) you want to use please refer to the individual extensions' readme files referenced above for ready-to-use configuration snippets (including sysupdate configuration).
+If you already know what extension(s) you want to use please refer to the individual extensions' documentation at the navigation menu on the left.
 The documentation below is a generic walk-through for sysext usage on Flatcar.
 The goal of this walk-through is to provide a comprehensive overview of all the steps and details involved.
-If you just want to use an extension, please check out the individual readmes above.
+If you just want to use an extension, please check out the extension documentation directly.
 
 The simplest way to consume a sysext `EXTNAME` is to configure Ignition to download and install it from this repo at provisioning time.
 ```yaml
@@ -130,7 +132,7 @@ Verify=false
 
 [Source]
 Type=url-file
-Path=https://github.com/flatcar/sysext-bakery/releases/latest/download/
+Path=https://extensions.flatcar.org/extensions/EXTNAME
 MatchPattern=EXTNAME-@v-%a.raw
 
 [Target]
@@ -195,7 +197,7 @@ storage:
 
           [Source]
           Type=url-file
-          Path=https://github.com/flatcar/sysext-bakery/releases/latest/download/
+          Path=https://extensions.flatcar.org/extensions/EXTNAME
           MatchPattern=EXTNAME-@v-%a.raw
 
           [Target]
@@ -243,7 +245,7 @@ Also, we include a dummy `noop.conf` for systemd-sysupdate to work around a spur
 
 Bakery extension images are hosted directly on the GitHub repository.
 We provide https://extensions.flatcar.org as a convenience wrapper - it will redirect to the respective extension release on GitHub.
-For a deep dive, please refer to the [Bakery developer documentation](https://github.com/flatcar/sysext-bakery/tree/t-lo/extensions-hosting-overhaul?tab=readme-ov-file#making-systemd-sysupdate-work-with-github-releases)
+For a deep dive, please refer to the [Bakery developer documentation](https://github.com/flatcar/sysext-bakery?tab=readme-ov-file#releases-structure-in-the-bakery).
 for details on the redirect wrappper's interaction with systemd-sysupdate.
 While understanding the redirect wrapper might be interesting for curious developers, it's not a requirement for using extension images.
 
