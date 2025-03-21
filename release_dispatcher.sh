@@ -26,6 +26,7 @@ for image in "${images[@]}"; do
   version="${image#* }"
 
   if [ "${version}" = "latest" ] ; then
+    unset version
     mapfile -t version < <( ./bakery.sh list "${extension}" --latest true )
   fi
 
@@ -38,14 +39,19 @@ for image in "${images[@]}"; do
       continue
     fi
 
-    echo "Build required. "
-    build_required="true"
-    builds+=( "${extension}:${v}" )
+    if [[ " ${builds[@]} " != *" ${extension}:${v} "* ]] ; then
+      echo "Build required. "
+      build_required="true"
+      builds+=( "${extension}:${v}" )
+    else
+      echo "Build already scheduled. "
+    fi
   done
 
   if [[ $build_required == true && " ${extensions[@]} " != *" ${extension} "* ]] ; then
     extensions+=( "${extension}" )
   fi
+  unset version
 done
 
 cat >> "${output}" <<EOF
