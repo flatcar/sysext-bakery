@@ -35,7 +35,8 @@ falco latest
 
 k3s latest
 
-keepalived latest
+keepalived v2.3.1
+# keepalived latest  # that's v2.3.2, it fails b/c upstream configure is broken
 
 kubernetes v1.28.5 # required for CAPO CI
 kubernetes v1.27.3 # required for CAPG CI
