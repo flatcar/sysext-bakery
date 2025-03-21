@@ -167,7 +167,7 @@ jobs:
       - name: create new metadata release
         uses: softprops/action-gh-release@v2
         with:
-          make_latest: false
+          make_latest: true
           tag_name: SHA256SUMS
           body_path: bakery/Release.md
           files: |
