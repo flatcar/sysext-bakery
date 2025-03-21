@@ -20,7 +20,7 @@ jobs:
 
           sudo apt update -qq && sudo apt install -yqq \
             curl \
-            jq \
+            jq
 
       - name: list
         id: list
@@ -53,7 +53,7 @@ jobs:
 
           sudo apt update -qq && sudo apt install -yqq \
             curl \
-            jq \
+            jq
 
       - name: Fetch extension release metadata
         env:
@@ -90,7 +90,7 @@ jobs:
 
           sudo apt update -qq && sudo apt install -yqq \
             curl \
-            jq \
+            jq
 
       - name: Fetch all extension releases metadata
         env:

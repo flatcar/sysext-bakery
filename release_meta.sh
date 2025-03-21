@@ -49,7 +49,6 @@ function fetch_extension_metadata() {
 
   if [[ -z "${versions}" ]] ; then
     out "* SKIPPED ${extension} as no releases are available"
-    touch SHA256SUMS
     return
   fi
 
@@ -69,12 +68,15 @@ if [[ -n $extension ]] ; then
   out "# Extension ${extension} metadata release."
 
   fetch_extension_metadata "$extension"
-
-  out ""
-  out "## Sysupdate confs:"
-  out '```'
-  ls -1 *.conf | tee -a Release.md
-  out '```'
+  if [[ ! -f SHA256SUMS ]] ; then
+    out "No releases available at this time."
+  else
+    out ""
+    out "## Sysupdate confs:"
+    out '```'
+    ls -1 *.conf | tee -a Release.md
+    out '```'
+  fi
 
 else
 
@@ -83,25 +85,31 @@ else
 
   for extension in $(./bakery.sh list --plain true); do
     fetch_artefacts "$extension"
-		if [[ ! -f SHA256SUMS ]] ; then
-	    out "* SKIPPED ${extension} as no SHA256SUMS is available"
-			continue
-		fi
+    if [[ ! -f SHA256SUMS ]] ; then
+      out "* SKIPPED ${extension} as no SHA256SUMS is available"
+      continue
+    fi
     cat SHA256SUMS >> SHA256SUMS.global
-		out "* ${extension}:"
-		sed 's:.*\s:  * :' SHA256SUMS | tee -a Release.md
+    out "* ${extension}:"
+    sed 's:.*\s:  * :' SHA256SUMS | tee -a Release.md
     rm SHA256SUMS
   done
 
-  mv SHA256SUMS.global SHA256SUMS
+  if [[ ! -f SHA256SUMS.global ]] ; then
+    out "No releases available at this time."
+  else
+    mv SHA256SUMS.global SHA256SUMS
+  fi
 fi
 # --
 
-out ""
-out "# SHA256SUMS:"
-out '```'
-cat SHA256SUMS | tee -a Release.md
-out '```'
+if [[ -f SHA256SUMS ]] ; then
+  out ""
+  out "# SHA256SUMS:"
+  out '```'
+  cat SHA256SUMS | tee -a Release.md
+  out '```'
+fi
 
 git tag -f "${tag}" --force
 git push origin "${tag}" --force
