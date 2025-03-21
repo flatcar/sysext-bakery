@@ -16,6 +16,10 @@
 #  for `multi-user.target` in the "files/..." directory of this extension.
 RELOAD_SERVICES_ON_MERGE="true"
 
+# If you need to run curl calls to api.github.com consider using
+# 'curl_wrapper' (from lib/helpers.sh). The wrapper will use GH_TOKEN
+# if set to prevent throttling of unathenticated calls.
+
 # Fetch and print a list of available versions.
 # Called by 'bakery.sh list <sysext>.
 function list_available_versions() {
