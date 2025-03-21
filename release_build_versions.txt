@@ -43,7 +43,7 @@ kubernetes latest
 
 # TODO: llamaedge sysext depends on wasmedge sysext version, so we can't automatically build it :-/
 
-nebula 1.9.5
+nebula v1.9.5
 nebula latest
 
 nerdctl latest
@@ -51,23 +51,23 @@ nerdctl latest
 nvidia-runtime v1.16.2
 nvidia-runtime latest
 
-ollama 0.3.9
+ollama v0.3.9
 ollama latest
 
 rke2 latest
 
-tailscale 1.76.6
+tailscale v1.76.6
 tailscale latest
 
-wasmcloud 1.0.0
-wasmcloud 1.1.1
-wasmcloud 1.2.1
+wasmcloud v1.0.0
+wasmcloud v1.1.1
+wasmcloud v1.2.1
 wasmcloud latest
 
-wasmedge 0.14.1
+wasmedge 0.15.1
 wasmedge latest
 
-wasmtime 12.0.0
-wasmtime 13.0.0 # Used in Flatcar wasm OS demo
-wasmtime 24.0.0 # Used in README.md. Update readme when version changes.
+wasmtime v12.0.0
+wasmtime v13.0.0 # Used in Flatcar wasm OS demo
+wasmtime v24.0.0 # Used in README.md. Update readme when version changes.
 wasmtime latest
