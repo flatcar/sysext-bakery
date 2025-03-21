@@ -1,0 +1,109 @@
+name: Force an update to all metadata.
+
+on:
+  workflow_dispatch:
+
+jobs:
+  list-extensions:
+    runs-on: ubuntu-24.04
+    outputs:
+      extensions: ${{ steps.list.outputs.extensions }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.branch != '' && inputs.branch || 'main' }}
+          path: bakery
+
+      - name: install prerequisites
+        run: |
+          set -euxo pipefail
+
+          sudo apt update -qq && sudo apt install -yqq \
+            curl \
+            jq \
+
+      - name: list
+        id: list
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          pushd bakery
+          echo -n "extensions=" >> $GITHUB_OUTPUT
+          mapfile -t list < <(./bakery.sh list --plain true)
+          jq -r -c -n --args '$ARGS.positional' "${list[@]}" >> $GITHUB_OUTPUT
+
+  update-extension-metadata:
+    needs: [ list-extensions ]
+    strategy:
+      matrix:
+        extension: ${{ fromJson(needs.list-extensions.outputs.extensions) }}
+    runs-on: ubuntu-24.04
+    permissions:
+      # allow the action to create a release
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.branch != '' && inputs.branch || 'main' }}
+          path: bakery
+
+      - name: install prerequisites
+        run: |
+          set -euxo pipefail
+
+          sudo apt update -qq && sudo apt install -yqq \
+            curl \
+            jq \
+
+      - name: Fetch extension release metadata
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          pushd bakery
+          ./release_meta.sh ${{ matrix.extension }}
+
+      - name: create new metadata release
+        uses: softprops/action-gh-release@v2
+        with:
+          make_latest: false
+          tag_name: ${{ matrix.extension }}
+          body_path: bakery/Release.md
+          files: |
+            bakery/SHA256SUMS
+            bakery/*.conf
+
+  update-global-metadata:
+    needs: update-extension-metadata
+    runs-on: ubuntu-24.04
+    permissions:
+      # allow the action to create a release
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.branch != '' && inputs.branch || 'main' }}
+          path: bakery
+
+      - name: install prerequisites
+        run: |
+          set -euxo pipefail
+
+          sudo apt update -qq && sudo apt install -yqq \
+            curl \
+            jq \
+
+      - name: Fetch all extension releases metadata
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          pushd bakery
+          ./release_meta.sh
+
+      - name: create new metadata release
+        uses: softprops/action-gh-release@v2
+        with:
+          make_latest: false
+          tag_name: SHA256SUMS
+          body_path: bakery/Release.md
+          files: |
+            bakery/SHA256SUMS

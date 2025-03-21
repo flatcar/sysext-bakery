@@ -34,7 +34,7 @@ for image in "${images[@]}"; do
   for v in "${version[@]}"; do
     echo -n "*  ${extension} ${v}: "
 
-    if ./bakery.sh list-bakery "${extension}" | grep -qFx "${v}"; then
+    if github_release_exists "${bakery%/*}" "${bakery#*/}" "${extension}-${v}"; then
       echo "Bakery release exists."
       continue
     fi

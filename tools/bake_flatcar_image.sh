@@ -16,7 +16,7 @@ install_to="root:/opt/extensions/"
 
 set -euo pipefail
 workdir="$(pwd)/flatcar-os-image"
-bakery_base_url="https://github.com/flatcar/sysext-bakery/releases/latest/download"
+bakery_base_url="https://extensions.flatcar.org/extensions"
 
 # ./run_sdk_container ./image_to_vm.sh --help 2>&1 | grep '\--format' | sed -e 's/.*: /supported_vendors=(/' -e 's/ /" "/g' -e 's/=(/=( "' -e 's/$/" )/'
 supported_vendors=( "akamai" "ami" "ami_vmdk" "azure" "cloudsigma" "cloudstack" "cloudstack_vhd" "digitalocean" "exoscale" "gce" "hetzner" "hyperv" "hyperv_vhdx" "iso" "kubevirt" "openstack" "openstack_mini" "packet" "parallels" "pxe" "qemu_uefi" "rackspace" "rackspace_onmetal" "rackspace_vhd" "scaleway" "vagrant" "vagrant_parallels" "vagrant_virtualbox" "vagrant_vmware_fusion" "virtualbox" "vmware" "vmware_insecure" "vmware_ova" "vmware_raw" "xen" )
@@ -32,7 +32,7 @@ function print_help() {
     echo "                            file (e.g. 'kuibernetes-v1.29.1.raw') must be present in the local directory."
     echo "                            If a '<name>.conf' sysupdate conf exists it will also be installed in the image."
     echo "       --fetch            Instead of using a local syysext, fetch sysext and sysupdate conf from the latest"
-    echo "                            Bakery release (https://github.com/flatcar/sysext-bakery/releases/tag/latest)."
+    echo "                            Bakery release (see https://github.com/flatcar/sysext-bakery/releases/tag/SHA256SUMS for a list)."
     echo "       --vendor <vendor>  Create cloud vendor image from generic image after embedding."
     echo "                            By default, only a generic image is produced."
     echo "                            This command will run the Flatcar SDK container via 'docker'."

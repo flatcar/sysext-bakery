@@ -93,9 +93,19 @@ function list_github_releases() {
   local project="$2"
   
   curl_wrapper \
-    "https://api.github.com/repos/${org}/${project}/releases" \
+    "https://api.github.com/repos/${org}/${project}/releases?per_page=100" \
     | jq -r 'map_values(select(.prerelease == false)) | .[].tag_name' \
     | sort -Vr
+}
+# --
+
+function github_release_exists() {
+  local org="$1"
+  local project="$2"
+  local tag="$3"
+
+  curl_wrapper \
+    "https://api.github.com/repos/${org}/${project}/releases/tags/${tag}" >/dev/null 2>&1
 }
 # --
 
