@@ -132,9 +132,14 @@ Have a look at other extension builds for inspiration;
 
 # Hosting your own bakery
 
-Just fork the Bakery, update `lib/sysupdate.conf.tmpl` to point to the correct URL, and start building and publishing!
+Just fork the Bakery, update
+[`lib/sysupdate.conf.tmpl`](lib/sysupdate.conf.tmpl)
+and
+[`lib/libbakery.sh`](lib/libbakery.sh)
+to use the new home, and start building and publishing!
 
 In general, the extension images can be consumed straight from the respective GitHub releases download sections.
+However, making systemd-sysupdate work requires extra steps - see below.
 
 ## Releases structure in the bakery
 
@@ -156,7 +161,7 @@ The bakery hosts extensions' individual releases, a per-extension metadata relea
 * **Global Metadata release**:
   Version information metadata for all extensions.
   Global metadata releases ship one single SHA256SUMS file with all extensions' versions.
-  This release can be seen as the inventory of the Bakery.
+  This release can be seen as the global inventory of the whole Bakery.
   * The release is named `SHA256SUMS`.
 
 
