@@ -7,7 +7,10 @@
 RELOAD_SERVICES_ON_MERGE="true"
 
 function list_available_versions() {
-  list_github_releases "falcosecurity" "falco"
+  # falco started with "v.." releases but switched
+  # to plain semver ages ago. 
+  list_github_releases "falcosecurity" "falco" \
+      | grep -v '^v'
 }
 # --
 
