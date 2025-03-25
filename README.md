@@ -15,6 +15,7 @@ If you want to build yourself, the following packages are required:
 
 - `curl`
 - `docker`
+- `erofs-utils`
 - `git`
 - `jq`
 - `squashfs-tools`

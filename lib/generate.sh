@@ -19,12 +19,12 @@ function _check_format() {
   local fmt="$1"
 
   case "$fmt" in
-    squashfs|btrfs|ext4|ext2)
+    squashfs|btrfs|ext4|ext2|erofs)
         return 0;;
   esac
 
   echo "ERROR: unsupported sysext file system format '$fmt'."
-  echo "Supported file system formats are: squashfs, btrfs, ext4, or ext2."
+  echo "Supported file system formats are: squashfs, btrfs, ext4, ext2, or erofs."
 
   exit 1
 }
@@ -116,6 +116,9 @@ function _generate_sysext() {
       ;;
     squashfs)
       mksquashfs "${basedir}" "${fname}" -all-root -noappend -xattrs-exclude '^btrfs.'
+      ;;
+    erofs)
+      mkfs.erofs --mixed -z none --rootdir "${basedir}" "${fname}"
       ;;
 
   esac
