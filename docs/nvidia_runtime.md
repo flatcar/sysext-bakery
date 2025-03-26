@@ -13,7 +13,9 @@ The snippet includes automated updates via systemd-sysupdate.
 Sysupdate will stage updates and request a reboot by creating a flag file at `/run/reboot-required`.
 
 You can deactivate updates by changing `enabled: true` to `enabled: false` in `systemd-sysupdate.timer`.
-Note that the snippet is for the x86-64 version of the NVIDIA runtime version v1.16.2.
+Note that the snippet is for the x86-64 version of the NVIDIA runtime version v1.17.5.
+
+Check out the metadata release at https://github.com/flatcar/sysext-bakery/releases/tag/nvidia-runtime for a list of all versions available in the bakery.
 
 ```yaml
 variant: flatcar
@@ -21,10 +23,10 @@ version: 1.0.0
 
 storage:
   files:
-    - path: /opt/extensions/nvidia_runtime/nvidia_runtime-v1.16.2-x86-64.raw
+    - path: /opt/extensions/nvidia_runtime/nvidia_runtime-v1.17.5-x86-64.raw
       mode: 0644
       contents:
-        source: https://extensions.flatcar.org/extensions/nvidia_runtime-v1.16.2-x86-64.raw
+        source: https://extensions.flatcar.org/extensions/nvidia_runtime-v1.17.5-x86-64.raw
     - path: /etc/sysupdate.nvidia_runtime.d/nvidia_runtime.conf
       contents:
         source: https://extensions.flatcar.org/extensions/nvidia_runtime.conf
@@ -32,7 +34,7 @@ storage:
       contents:
         source: https://extensions.flatcar.org/extensions/noop.conf
   links:
-    - target: /opt/extensions/nvidia_runtime/nvidia_runtime-v1.16.2-x86-64.raw
+    - target: /opt/extensions/nvidia_runtime/nvidia_runtime-v1.17.5-x86-64.raw
       path: /etc/extensions/nvidia_runtime.raw
       hard: false
 systemd:

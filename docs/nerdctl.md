@@ -8,19 +8,20 @@ If the plugins are not included, `nerdctl` can only operate in `--net host` mode
 
 # Usage
 
-The first (and simplest) example ships nerdctl (version 2.0.3) only; i.e. it uses containerd provided by the OS.
+The example ships nerdctl (version 2.0.4) only; i.e. it uses containerd provided by the OS.
 Please refer to the containerd and docker extension documentation referenced above to combine nerdctl with a custom containerd.
 
+Check out the metadata release at https://github.com/flatcar/sysext-bakery/releases/tag/nerdctl for a list of all versions available in the bakery.
 ```yaml
 variant: flatcar
 version: 1.0.0
 
 storage:
   files:
-    - path: /opt/extensions/nerdctl-v2.0.3.raw
+    - path: /opt/extensions/nerdctl-v2.0.4.raw
       mode: 0420
       contents:
-        source: https://extensions.flatcar.org/extensions/nerdctl-v2.0.3.raw
+        source: https://extensions.flatcar.org/extensions/nerdctl-v2.0.4.raw
     - path: /etc/sysupdate.nerdctl.d/nerdctl.conf
       contents:
         source: https://extensions.flatcar.org/extensions/nerdctl.conf
@@ -28,7 +29,7 @@ storage:
       contents:
         source: https://extensions.flatcar.org/extensions/noop.conf
   links:
-    - target: /opt/extensions/nerdctl-v2.0.3.raw
+    - target: /opt/extensions/nerdctl-v2.0.4.raw
       path: /etc/extensions/nerdctl.raw
       hard: false
 

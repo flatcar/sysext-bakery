@@ -18,6 +18,8 @@ This is because upstream Kubernetes does not support unattended automated upgrad
 
 Note that the snippet is for the x86-64 version of k3s v1.32.2 w/ k3s1.
 
+Check out the metadata release at https://github.com/flatcar/sysext-bakery/releases/tag/k3s for a list of all versions available in the bakery.
+
 Any specific configuration required would need to be added to the below configuration,
 e.g. by providing a token for an agent or server to join or creating a `config.yaml` file.
 
