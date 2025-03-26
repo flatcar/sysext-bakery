@@ -13,8 +13,12 @@ As mentioned above, a full howto is available.
 Below are a few config snippets from that howto.
 We'll discuss 2 node types - control plane and worker nodes - with minor differences in their configuration.
 
-Note that the snippets are for the x86-64 version of Kubernetes v1.31.3.
+Note that the snippets are for the x86-64 version of Kubernetes v1.32.2.
 The snippet includes automated updates via systemd-sysupdate.
+
+Updates are only supported within the same minor release, e.g. v1.32.2 -> v1.32.3; _never_ across releases (v1.31.x -> v1.32.x).
+This is because upstream Kubernetes does not support unattended automated upgrades across releases.
+
 Sysupdate will stage updates and request a reboot by creating a flag file at `/run/reboot-required`.
 It is recommended to deploy [kured](https://kured.dev/) to the cluster to manage reboots.
 Alternatively, you can deactivate updates by changing `enabled: true` to `enabled: false` in `systemd-sysupdate.timer`.
@@ -25,19 +29,19 @@ version: 1.0.0
 
 storage:
   links:
-    - target: /opt/extensions/kubernetes/kubernetes-v1.31.3-x86-64.raw
+    - target: /opt/extensions/kubernetes/kubernetes-v1.32.2-x86-64.raw
       path: /etc/extensions/kubernetes.raw
       hard: false
   files:
-    - path: /etc/sysupdate.kubernetes.d/kubernetes-v1.31.conf
+    - path: /etc/sysupdate.kubernetes.d/kubernetes-v1.32.conf
       contents:
-        source: https://extensions.flatcar.org/extensions/kubernetes-v1.31.conf
+        source: https://extensions.flatcar.org/extensions/kubernetes/kubernetes-v1.32.conf
     - path: /etc/sysupdate.d/noop.conf
       contents:
         source: https://extensions.flatcar.org/extensions/noop.conf
-    - path: /opt/extensions/kubernetes/kubernetes-v1.31.3-x86-64.raw
+    - path: /opt/extensions/kubernetes/kubernetes-v1.32.2-x86-64.raw
       contents:
-        source: https://extensions.flatcar.org/extensions/kubernetes-v1.31.3-x86-64.raw
+        source: https://extensions.flatcar.org/extensions/kubernetes-v1.32.2-x86-64.raw
 systemd:
   units:
     - name: systemd-sysupdate.timer
@@ -48,7 +52,7 @@ systemd:
           contents: |
             [Service]
             ExecStartPre=/usr/bin/sh -c "readlink --canonicalize /etc/extensions/kubernetes.raw > /tmp/kubernetes"
-            ExecStartPre=/usr/lib/systemd/systemd-sysupdate -C kubernetes update
+            ExecStartPre=/usr/lib/systemd/systemd-sysupdate -C kubernetes-v1.32 update
             ExecStartPost=/usr/bin/sh -c "readlink --canonicalize /etc/extensions/kubernetes.raw > /tmp/kubernetes-new"
             ExecStartPost=/usr/bin/sh -c "if ! cmp --silent /tmp/kubernetes /tmp/kubernetes-new; then touch /run/reboot-required; fi"
     - name: locksmithd.service
