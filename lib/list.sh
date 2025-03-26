@@ -90,10 +90,19 @@ function _list_sysext_versions() {
 
 function _list_bakery_releases() {
   local extname="$(extension_name "$(get_positional_param 1 "${@}")")"
+  local extscript="${scriptroot}/${extname}.sysext/create.sh"
 
-  list_github_releases "${bakery%/*}" "${bakery#*/}" \
-    | sed --quiet "s/^${extname}-\\([^-]\\+\\)/\\1/p" \
-    | uniq
+ (
+    EXTENSION_VERSION_MATCH_PATTERN='[.v0-9]+'
+
+    if [[ -f "${extscript}" ]] ; then
+      source "${extscript}"
+    fi
+
+    list_github_releases "${bakery%/*}" "${bakery#*/}" \
+      | sed --quiet -r "s/^${extname}-(${EXTENSION_VERSION_MATCH_PATTERN})$/\\1/p" \
+      | uniq
+ )
 }
 # --
 

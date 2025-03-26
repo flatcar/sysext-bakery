@@ -42,9 +42,11 @@ function populate_sysext_root() {
   local rel_arch="$(arch_transform "x86-64" "amd64" "$arch")"
 
   if [[ -z ${cni_version} ]] ; then
-    cni_version="$(curl_wrapper https://api.github.com/repos/containernetworking/plugins/releases/latest \
+    cni_version="$(curl_api_wrapper https://api.github.com/repos/containernetworking/plugins/releases/latest \
                    | jq -r .tag_name)"
   fi
+
+  announce "Using CNI version '${version}'"
 
   mkdir -p "${sysextroot}/usr/bin"
 

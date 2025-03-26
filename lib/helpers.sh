@@ -76,24 +76,35 @@ function announce() {
 }
 # --
 
-function curl_wrapper() {
+function curl_api_wrapper() {
+  local url="${@}"
+
   if [[ -n ${GH_TOKEN:-} ]] ; then
-    auth=( "-H" "Authorization: Bearer $GH_TOKEN")
+    auth=( "-H" "Authorization: Bearer $GH_TOKEN" )
   fi
 
-  curl -fsSL --retry-delay 1 --retry 60 --retry-connrefused \
-       "${auth[@]}" \
-       --retry-max-time 60 --connect-timeout 20  \
-       "${@}"
+  local curl="curl -fsSL --retry-delay 1 --retry 60 --retry-connrefused"
+  curl="$curl --retry-max-time 60 --connect-timeout 20"
+
+  # pagination: get number of result pages.
+  # See https://docs.github.com/en/rest/using-the-rest-api/using-pagination-in-the-rest-api?apiVersion=2022-11-28
+  local pages="$($curl "${auth[@]}" --head "${url}" \
+                    | grep -E '^link:' \
+                    | sed -r 's/.*<[^<>]+page=([0-9]+)>;[[:space:]]*rel="last".*/\1/')"
+  local page
+  for page in $(seq 1 $pages); do
+    $curl "${auth[@]}" "${url}?page=$page"
+  done
+
 }
 # --
 
 function list_github_releases() {
   local org="$1"
   local project="$2"
-  
-  curl_wrapper \
-    "https://api.github.com/repos/${org}/${project}/releases?per_page=100" \
+
+  curl_api_wrapper \
+    "https://api.github.com/repos/${org}/${project}/releases" \
     | jq -r 'map_values(select(.prerelease == false)) | .[].tag_name' \
     | sort -Vr
 }
@@ -104,7 +115,7 @@ function github_release_exists() {
   local project="$2"
   local tag="$3"
 
-  curl_wrapper \
+  curl_api_wrapper \
     "https://api.github.com/repos/${org}/${project}/releases/tags/${tag}" >/dev/null 2>&1
 }
 # --
@@ -113,7 +124,7 @@ function list_github_tags() {
   local org="$1"
   local project="$2"
 
-  curl_wrapper \
+  curl_api_wrapper \
     "https://api.github.com/repos/${org}/${project}/tags" \
     | jq -r '.[].name' \
     | sort -Vr
