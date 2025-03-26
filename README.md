@@ -184,6 +184,10 @@ Simplified, this looks like:
   The actual extension image.
 * `.../<extension>.conf` => `/releases/<extension>/<extension>.conf` - sysupdate configuration for that extension
 
+Lastly, for extensions that do not support unattended in-place updates across major releases (like Kubernetes, rke2, etc.)
+we support an additional `<release>` sub-path in the source URL to select a specific release and not have it deduced from the filename:
+* `.../<release>/<extension>.conf` => `/releases/<release>/<extension>.conf`
+
 This requires self-hosting, but is low traffic and low CPU load, as the only task this service has is to re-write HTTP URLs.
 Usually the smallest instance type of your favourite hoster suffices.
 Flatcar uses https://extensions.flatcar.org.
