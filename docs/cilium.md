@@ -20,9 +20,9 @@ version: 1.1.0
 
 storage:
   files:
-    - path: /opt/extensions/cilium/cilium-v0.16.24-x86-64.raw
+    - path: /opt/extensions/cilium/cilium-v0.18.2-x86-64.raw
       contents:
-        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/cilium-v0.16.24-x86-64.raw
+        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/cilium-v0.18.2-x86-64.raw
     - path: /etc/sysupdate.cilium.d/cilium.conf
       contents:
         source: https://github.com/flatcar/sysext-bakery/releases/download/latest/clium.conf
@@ -30,13 +30,13 @@ storage:
       contents:
         source: https://github.com/flatcar/sysext-bakery/releases/download/latest/noop.conf
   links:
-    - target: /opt/extensions/cilium/cilium-v0.16.24-x86-64.raw
+    - target: /opt/extensions/cilium/cilium-v0.18.2-x86-64.raw
       path: /etc/extensions/cilium.raw
       hard: false
 
 systemd:
   units:
-    - name: ollama.service
+    - name: cilium.service
       enabled: true
       dropins:
         - name: 10-cilium-env-override.conf

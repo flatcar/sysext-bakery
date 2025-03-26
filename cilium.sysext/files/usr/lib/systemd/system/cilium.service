@@ -1,0 +1,13 @@
+[Unit]
+Description=Install cilium to running k8s cluster
+Documentation=https://docs.cilium.io/en/stable
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Environment=KUBECONFIG='/home/core/.kube/config'
+ExecStart=/opt/bin/cilium install ${CILIUM_INSTALL_ARGS}
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
