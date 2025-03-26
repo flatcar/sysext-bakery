@@ -116,6 +116,10 @@ function create_sysext() {
     return 1
   fi
 
+  if [[ ${version} == latest ]] ; then
+    version="$(list_sysext "$extname" --latest true)"
+  fi
+
   local workdir="$(mktemp -d)"
   local sysextroot_tmp="$(mktemp -d)"
   trap "rm -rf '${workdir}' '${sysextroot_tmp}'" EXIT
