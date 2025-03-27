@@ -15,10 +15,9 @@ If you want to build yourself, the following packages are required:
 
 - `curl`
 - `docker`
-- `squashfs-tools` (or `erofs-utils` if the sysexts are built with `erofs` format instead of default `squashfs`)
 - `git`
 - `jq`
-- `squashfs-tools`
+- `squashfs-tools` (or `erofs-utils` if the sysexts are built with `erofs` format instead of default `squashfs`)
 - `xz-utils`
 - [`yq`](https://github.com/mikefarah/yq/releases/latest/)
 
