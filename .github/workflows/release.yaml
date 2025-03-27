@@ -32,7 +32,8 @@ jobs:
             curl \
             jq \
             squashfs-tools \
-            xz-utils
+            xz-utils \
+            erofs-utils
 
       - name: list
         id: list
