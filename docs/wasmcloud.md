@@ -13,8 +13,9 @@ The snippet includes automated updates via systemd-sysupdate.
 Sysupdate will **merge the new sysext immediately after successful download**.
 You can deactivate updates by changing `enabled: true` to `enabled: false` in `systemd-sysupdate.timer`.
 
-Note that the snippet is for the x86-64 version of wasmcloud 1.2.1.
+Note that the snippet is for the x86-64 version of wasmcloud 1.7.0.
 
+Check out the metadata release at https://github.com/flatcar/sysext-bakery/releases/tag/wasmcloud for a list of all versions available in the bakery.
 
 The following customisations have been made (see comments in the config snippet)
 
@@ -29,13 +30,13 @@ version: 1.0.0
 
 storage:
   links:
-    - target: /opt/extensions/wasmcloud/wasmcloud-v1.2.1-x86-64.raw
+    - target: /opt/extensions/wasmcloud/wasmcloud-v1.7.0-x86-64.raw
       path: /etc/extensions/wasmcloud.raw
       hard: false
   files:
-    - path: /opt/extensions/wasmcloud/wasmcloud-v1.2.1-x86-64.raw
+    - path: /opt/extensions/wasmcloud/wasmcloud-v1.7.0-x86-64.raw
       contents:
-        source: https://extensions.flatcar.org/extensions/wasmcloud-v1.2.1-x86-64.raw
+        source: https://extensions.flatcar.org/extensions/wasmcloud-v1.7.0-x86-64.raw
     - path: /etc/sysupdate.wasmcloud.d/wasmcloud.conf
       contents:
         source: https://extensions.flatcar.org/extensions/wasmcloud.conf

@@ -15,7 +15,9 @@ The snippet includes automated updates via systemd-sysupdate.
 Sysupdate will stage updates and request a reboot by creating a flag file at `/run/reboot-required`.
 You can deactivate updates by changing `enabled: true` to `enabled: false` in `systemd-sysupdate.timer`.
 
-Note that the snippet is for the x86-64 version of docker 25.0.3.
+Note that the snippet is for the x86-64 version of docker 28.0.4.
+
+Check out the metadata release at https://github.com/flatcar/sysext-bakery/releases/tag/docker for a list of all versions available in the bakery.
 
 ```yaml
 variant: flatcar
@@ -23,10 +25,10 @@ version: 1.0.0
 
 storage:
   files:
-    - path: /opt/extensions/docker/docker-25.0.3-x86-64.raw
+    - path: /opt/extensions/docker/docker-28.0.4-x86-64.raw
       mode: 0644
       contents:
-        source: https://extensions.flatcar.org/extensions/docker-25.0.3-x86-64.raw
+        source: https://extensions.flatcar.org/extensions/docker-28.0.4-x86-64.raw
     - path: /etc/sysupdate.docker.d/docker.conf
       contents:
         source: https://extensions.flatcar.org/extensions/docker.conf
@@ -34,7 +36,7 @@ storage:
       contents:
         source: https://extensions.flatcar.org/extensions/noop.conf
   links:
-    - target: /opt/extensions/docker/docker-25.0.3-x86-64.raw
+    - target: /opt/extensions/docker/docker-28.0.4-x86-64.raw
       path: /etc/extensions/docker.raw
       hard: false
     - path: /etc/extensions/docker-flatcar.raw

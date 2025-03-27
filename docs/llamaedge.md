@@ -25,6 +25,8 @@ You can deactivate updates by changing `enabled: true` to `enabled: false` in `s
 
 Note that the snippet is for the x86-64 version of WasmEdge 0.14.1 and LlamaEdge 0.14.16.
 
+Check out the metadata release at https://github.com/flatcar/sysext-bakery/releases/tag/llamaedge for a list of all versions available in the bakery.
+
 ```yaml
 variant: flatcar
 version: 1.0.0
@@ -34,7 +36,7 @@ storage:
     - path: /opt/extensions/wasmedge-0.14.1-x86-64.raw
       mode: 0420
       contents:
-        source: https://extensions.flatcar.org/extensions/wasmaedge-0.14.1-x86-64.raw
+        source: https://extensions.flatcar.org/extensions/wasmedge-0.14.1-x86-64.raw
     - path: /opt/extensions/llamaedge-0.14.16-x86-64.raw
       mode: 0420
       contents:

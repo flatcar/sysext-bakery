@@ -26,8 +26,6 @@ docker-compose 2.22.0
 docker-compose 2.24.5
 docker-compose latest
 
-docker 24.0.9
-docker 25.0.3
 docker latest
 
 falco 0.39.1
@@ -42,7 +40,7 @@ kubernetes v1.28.5 # required for CAPO CI
 kubernetes v1.27.3 # required for CAPG CI
 kubernetes latest
 
-# TODO: llamaedge sysext depends on wasmedge sysext version, so we can't automatically build it :-/
+# TODO: llamaedge sysext depends on wasmedge sysext version (build parameter), so we can't automatically build it :-/
 
 nebula v1.9.5
 nebula latest
@@ -65,7 +63,7 @@ wasmcloud v1.1.1
 wasmcloud v1.2.1
 wasmcloud latest
 
-wasmedge 0.14.1
+wasmedge 0.14.1 # manually built llamaedge 0.14.16 uses this
 wasmedge latest
 
 wasmtime v12.0.0

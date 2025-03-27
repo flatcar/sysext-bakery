@@ -15,7 +15,9 @@ The snippet includes automated updates via systemd-sysupdate.
 Sysupdate will stage updates and request a reboot by creating a flag file at `/run/reboot-required`.
 You can deactivate updates by changing `enabled: true` to `enabled: false` in `systemd-sysupdate.timer`.
 
-The snippet below deploys the x86-64 version of Ollama 0.3.9.
+The snippet below deploys the x86-64 version of Ollama 0.6.3.
+Check out the metadata release at https://github.com/flatcar/sysext-bakery/releases/tag/ollama for a list of all versions available in the bakery.
+
 **NOTE** in the default configuration, the Ollama API will be **publicly accessible**.
 Please update `OLLAMA_HOST` before deployment if you want to change that.
 
@@ -25,9 +27,9 @@ version: 1.0.0
 
 storage:
   files:
-    - path: /opt/extensions/ollama/ollama-v0.3.9-x86-64.raw
+    - path: /opt/extensions/ollama/ollama-v0.6.3-x86-64.raw
       contents:
-        source: https://extensions.flatcar.org/extensions/ollama-v0.3.9-x86-64.raw
+        source: https://extensions.flatcar.org/extensions/ollama-v0.6.3-x86-64.raw
     - path: /etc/sysupdate.ollama.d/ollama.conf
       contents:
         source: https://extensions.flatcar.org/extensions/ollama.conf
@@ -35,7 +37,7 @@ storage:
       contents:
         source: https://extensions.flatcar.org/extensions/noop.conf
   links:
-    - target: /opt/extensions/ollama/ollama-v0.3.9-x86-64.raw
+    - target: /opt/extensions/ollama/ollama-v0.6.3-x86-64.raw
       path: /etc/extensions/ollama.raw
       hard: false
 

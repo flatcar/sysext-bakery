@@ -14,8 +14,10 @@ Below are a few config snippets from that howto.
 We'll discuss 2 node types - control plane and worker nodes - with minor differences in their configuration.
 
 Note that the snippets are for the x86-64 version of Kubernetes v1.32.2.
-The snippet includes automated updates via systemd-sysupdate.
 
+Check out the metadata release at https://github.com/flatcar/sysext-bakery/releases/tag/kubernetes for a list of all versions available in the bakery.
+
+The snippet includes automated updates via systemd-sysupdate.
 Updates are only supported within the same minor release, e.g. v1.32.2 -> v1.32.3; _never_ across releases (v1.31.x -> v1.32.x).
 This is because upstream Kubernetes does not support unattended automated upgrades across releases.
 

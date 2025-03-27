@@ -17,7 +17,9 @@ The snippet includes automated updates via systemd-sysupdate.
 Sysupdate will stage updates and request a reboot by creating a flag file at `/run/reboot-required`.
 You can deactivate updates by changing `enabled: true` to `enabled: false` in `systemd-sysupdate.timer`.
 
-Note that the snippet is for the x86-64 version of cri-o v1.31.3.
+Note that the snippet is for the x86-64 version of cri-o v1.32.2.
+
+Check out the metadata release at https://github.com/flatcar/sysext-bakery/releases/tag/crio for a list of all versions available in the bakery.
 
 ```yaml
 variant: flatcar
@@ -25,10 +27,10 @@ version: 1.0.0
 
 storage:
   files:
-    - path: /opt/extensions/crio/crio-v1.31.3-x86-64.raw
+    - path: /opt/extensions/crio/crio-v1.32.2-x86-64.raw
       mode: 0644
       contents:
-        source: https://extensions.flatcar.org/extensions/crio-v1.31.3-x86-64.raw
+        source: https://extensions.flatcar.org/extensions/crio-v1.32.2-x86-64.raw
     - path: /etc/sysupdate.crio.d/crio.conf
       contents:
         source: https://extensions.flatcar.org/extensions/crio.conf
@@ -36,7 +38,7 @@ storage:
       contents:
         source: https://extensions.flatcar.org/extensions/noop.conf
   links:
-    - target: /opt/extensions/crio/crio-v1.31.3-x86-64.raw
+    - target: /opt/extensions/crio/crio-v1.32.2-x86-64.raw
       path: /etc/extensions/crio.raw
       hard: false
 systemd:

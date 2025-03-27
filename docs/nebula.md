@@ -6,6 +6,8 @@ This sysext ships [Nebula](https://github.com/slackhq/nebula).
 
 Refer to the following Butane snippet that enables Nebula v1.9.5 for an x86-64 machine with automated updates using `systemd-sysupdate`.
 
+Check out the metadata release at https://github.com/flatcar/sysext-bakery/releases/tag/nebula for a list of all versions available in the bakery.
+
 Note that you will also need to supply a [Nebula config file](https://github.com/slackhq/nebula/blob/master/examples/config.yml) at `/etc/nebula/config.yaml`, as well as necessary key files. You can embed them into the `files` section of your Butane configuration.
 
 ```yaml
