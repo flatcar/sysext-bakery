@@ -16,9 +16,16 @@
 #  for `multi-user.target` in the "files/..." directory of this extension.
 RELOAD_SERVICES_ON_MERGE="true"
 
+# If your extension publishes custom versions other than
+# "<extension>-v1.2.3" or "<extension>-1.2.3" please provide a regex match
+# pattern. Will be used by "bakery.sh list-bakery <extension>" and
+# by the release scripts.
+# EXTENSION_VERSION_MATCH_PATTERN='[.v0-9]+'
+
 # If you need to run curl calls to api.github.com consider using
-# 'curl_wrapper' (from lib/helpers.sh). The wrapper will use GH_TOKEN
-# if set to prevent throttling of unathenticated calls.
+# 'curl_api_wrapper' (from lib/helpers.sh). The wrapper will use GH_TOKEN
+# if set to prevent throttling of unathenticated calls, and handle pagination
+# etc.
 
 # Fetch and print a list of available versions.
 # Called by 'bakery.sh list <sysext>.

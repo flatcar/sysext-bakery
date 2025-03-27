@@ -5,6 +5,7 @@
 #
 
 RELOAD_SERVICES_ON_MERGE="true"
+EXTENSION_VERSION_MATCH_PATTERN='[.v0-9]+\+rke2r[0-9]+'
 
 function list_available_versions() {
   list_github_releases "rancher" "rke2"

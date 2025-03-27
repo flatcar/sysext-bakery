@@ -26,15 +26,14 @@ function out() {
 function fetch_artefacts() {
   local release="$1"
 
-
-  { curl_wrapper \
+  { curl_api_wrapper \
          "https://api.github.com/repos/${bakery}/releases/tags/${release}" \
   | jq -r '.assets[] | "\(.name)\t\(.browser_download_url)"' | grep -E '(\bSHA256SUMS|\.conf)$' || true; } \
   > downloads.txt
 
   while IFS=$'\t' read -r name url; do
     echo "  Fetching ${name} <-- ${url}"
-    curl_wrapper \
+    curl \
       -o "${name}" -fsSL --retry-delay 1 --retry 60 --retry-connrefused --retry-max-time 60 \
        --connect-timeout 20  "${url}"
   done <downloads.txt
@@ -84,6 +83,7 @@ else
   out ""
 
   for extension in $(./bakery.sh list --plain true); do
+    echo
     fetch_artefacts "$extension"
     if [[ ! -f SHA256SUMS ]] ; then
       out "* SKIPPED ${extension} as no SHA256SUMS is available"
@@ -110,6 +110,7 @@ if [[ -f SHA256SUMS ]] ; then
   cat SHA256SUMS | tee -a Release.md
   out '```'
 fi
+
 
 git tag -f "${tag}" --force
 git push origin "${tag}" --force

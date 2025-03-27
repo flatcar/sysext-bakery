@@ -13,10 +13,10 @@ Download and merge the sysext at provisioning time using the below butane snippe
 The snippet includes automated updates via systemd-sysupdate.
 Sysupdate will stage updates and request a reboot by creating a flag file at `/run/reboot-required`.
 You can deactivate updates by changing `enabled: true` to `enabled: false` in `systemd-sysupdate.timer`.
-Updates are only supported within the same minor release, e.g. v1.31.2 -> v1.31.3; _never_ across releases (v1.31.x -> v1.32.x).
-This is because upstream Kubernetes does not support unattended automated upgrades across minor releases.
+Updates are only supported within the same minor release, e.g. v1.32.2 -> v1.32.3; _never_ across releases (v1.31.x -> v1.32.x).
+This is because upstream Kubernetes does not support unattended automated upgrades across releases.
 
-Note that the snippet is for the x86-64 version of k3s v1.31.3 w/ k3s1.
+Note that the snippet is for the x86-64 version of k3s v1.32.2 w/ k3s1.
 
 Any specific configuration required would need to be added to the below configuration,
 e.g. by providing a token for an agent or server to join or creating a `config.yaml` file.
@@ -28,18 +28,18 @@ version: 1.0.0
 
 storage:
   files:
-    - path: /opt/extensions/k3s/k3s-v1.31.3+k3s1-x86-64.raw
+    - path: /opt/extensions/k3s/k3s-v1.32.2+k3s1-x86-64.raw
       mode: 0644
       contents:
-        source: https://extensions.flatcar.org/extensions/k3s-v1.31.3+k3s1-x86-64.raw
-    - path: /etc/sysupdate.k3s.d/k3s-v1.31.conf
+        source: https://extensions.flatcar.org/extensions/k3s-v1.32.2+k3s1-x86-64.raw
+    - path: /etc/sysupdate.k3s.d/k3s-v1.32.conf
       contents:
-        source: https://extensions.flatcar.org/extensions/k3s.conf
+        source: https://extensions.flatcar.org/extensions/k3s/k3s-v1.32.conf
     - path: /etc/sysupdate.d/noop.conf
       contents:
         source: https://extensions.flatcar.org/extensions/noop.conf
   links:
-    - target: /opt/extensions/k3s/k3s-v1.31.3+k3s1-x86-64.raw
+    - target: /opt/extensions/k3s/k3s-v1.32.2+k3s1-x86-64.raw
       path: /etc/extensions/k3s.raw
       hard: false
 systemd:
@@ -52,7 +52,7 @@ systemd:
           contents: |
             [Service]
             ExecStartPre=/usr/bin/sh -c "readlink --canonicalize /etc/extensions/k3s.raw > /tmp/k3s"
-            ExecStartPre=/usr/lib/systemd/systemd-sysupdate -C k3s-v1.31 update
+            ExecStartPre=/usr/lib/systemd/systemd-sysupdate -C k3s-v1.32 update
             ExecStartPost=/usr/bin/sh -c "readlink --canonicalize /etc/extensions/k3s.raw > /tmp/k3s-new"
             ExecStartPost=/usr/bin/sh -c "if ! cmp --silent /tmp/k3s /tmp/k3s-new; then touch /run/reboot-required; fi"
 ```

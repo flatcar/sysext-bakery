@@ -21,7 +21,7 @@ function populate_sysext_root() {
 
   local nats="$(get_optional_param "nats" "latest" "${@}")"
   if [[ $nats == latest ]] ; then
-    nats="$(curl_wrapper https://api.github.com/repos/nats-io/nats-server/releases/latest | jq -r .tag_name)"
+    nats="$(curl_api_wrapper https://api.github.com/repos/nats-io/nats-server/releases/latest | jq -r .tag_name)"
   fi
 
   echo "Using NATS server version '$nats'"

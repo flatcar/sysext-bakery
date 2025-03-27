@@ -132,9 +132,14 @@ Have a look at other extension builds for inspiration;
 
 # Hosting your own bakery
 
-Just fork the Bakery, update `lib/sysupdate.conf.tmpl` to point to the correct URL, and start building and publishing!
+Just fork the Bakery, update
+[`lib/sysupdate.conf.tmpl`](lib/sysupdate.conf.tmpl)
+and
+[`lib/libbakery.sh`](lib/libbakery.sh)
+to use the new home, and start building and publishing!
 
 In general, the extension images can be consumed straight from the respective GitHub releases download sections.
+However, making systemd-sysupdate work requires extra steps - see below.
 
 ## Releases structure in the bakery
 
@@ -156,7 +161,7 @@ The bakery hosts extensions' individual releases, a per-extension metadata relea
 * **Global Metadata release**:
   Version information metadata for all extensions.
   Global metadata releases ship one single SHA256SUMS file with all extensions' versions.
-  This release can be seen as the inventory of the Bakery.
+  This release can be seen as the global inventory of the whole Bakery.
   * The release is named `SHA256SUMS`.
 
 
@@ -183,6 +188,10 @@ Simplified, this looks like:
 * `.../<extension>-<version>-<arch>.raw` => `/releases/<extension>-<version>/<extension>-<version>-<arch>.raw` -
   The actual extension image.
 * `.../<extension>.conf` => `/releases/<extension>/<extension>.conf` - sysupdate configuration for that extension
+
+Lastly, for extensions that do not support unattended in-place updates across major releases (like Kubernetes, rke2, etc.)
+we support an additional `<release>` sub-path in the source URL to select a specific release and not have it deduced from the filename:
+* `.../<release>/<extension>.conf` => `/releases/<release>/<extension>.conf`
 
 This requires self-hosting, but is low traffic and low CPU load, as the only task this service has is to re-write HTTP URLs.
 Usually the smallest instance type of your favourite hoster suffices.
