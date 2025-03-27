@@ -118,7 +118,7 @@ function _generate_sysext() {
       mksquashfs "${basedir}" "${fname}" -all-root -noappend -xattrs-exclude '^btrfs.'
       ;;
     erofs)
-      mkfs.erofs --mixed -z none --rootdir "${basedir}" "${fname}"
+      mkfs.erofs "${fname}" "${basedir}"
       ;;
 
   esac
