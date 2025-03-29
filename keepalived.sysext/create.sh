@@ -30,9 +30,13 @@ function populate_sysext_root() {
               -i \
               -v "$(pwd)":/install_root \
               --platform "linux/${img_arch}" \
-              alpine \
+              --pull always \
+              alpine:v3.21 \
                   /install_root/build.sh "${version}" "$user_group"
 
+  # /usr/sbin is a symlink to /usr/bin on Flatcar.
+  mv usr/sbin/keepalived usr/bin
+  rmdir usr/sbin
   cp -aR usr "${sysextroot}"/
 }
 # --
