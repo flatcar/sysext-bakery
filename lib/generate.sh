@@ -91,7 +91,7 @@ function _create_sysupdate() {
       -e "s/{MATCH_PATTERN}/${match_pattern}/g" \
       -e "s,{SOURCE_REL},${source_rel},g" \
       -e "s,{TARGET_FILE},${target_file},g" \
-      -e "s,{BAKERY_URL},${bakery_base_url},g" \
+      -e "s,{BAKERY_BASE_URL},${bakery_base_url},g" \
       "${libroot}/sysupdate.conf.tmpl" \
     >"${extname}.conf"
 

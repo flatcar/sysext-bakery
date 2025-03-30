@@ -45,7 +45,7 @@ function _create_sysext_help() {
   echo " --arch <arch>:  Architecture supported by the sysext."
   echo "                    Either x86-64 (the default)  or arm64."
   echo " --bakery <url>: URL for the bakery."
-  echo "                    Default is: extensions.flatcar.org"
+  echo "                    Default is: 'https://extensions.flatcar.org/extensions'."
   _generate_sysext_options
   if [[ $(type -t populate_sysext_root_options ) == function ]] ; then
     echo "Sysext specific optional parameters:"
