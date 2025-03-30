@@ -26,8 +26,8 @@ extensions.flatcar.org {
 	#     <extension>-<version>-<arch>.raw
 	#       ==>  https://[...]/releases/download/<extension>-<version>/<extension>-<version>-<arch>.raw
 	# Match groups: 1 - extension, 2 - version, 3 - arch
-	@raw path_regexp raw ^.*/extensions/([^/]+)-([^/]+)-(x86-64|arm64).raw$
-	redir @raw {vars.base_dest_url}/{re.raw.1}-{re.raw.2}/{re.raw.1}-{re.raw.2}-{re.raw.3}.raw
+	@raw path_regexp raw ^.*/extensions/(.*/)*([^/]+)-([^/]+)-(x86-64|arm64).raw$
+	redir @raw {vars.base_dest_url}/{re.raw.2}-{re.raw.3}/{re.raw.2}-{re.raw.3}-{re.raw.4}.raw
 
 	# Sysupdate conf. This is only used by Ignition.
 	#     <extension>-<version>.conf
@@ -36,12 +36,14 @@ extensions.flatcar.org {
 	@conf path_regexp conf ^.*/extensions/([^/]+).conf$
 	redir @conf {vars.base_dest_url}/{re.conf.1}/{re.conf.1}.conf
 
-	# Sysupdate or extension image with explicit release sub-path.
-	#     /<release>/<extension-conf-or-raw>
-	#       ==>  https://[...]/releases/download/<release>/<extension-conf-or-raw>
-	# Match groups: 1 - release, 2 - filename, 3 - suffix
-	@expl path_regexp expl ^.*/extensions/([^/]+)/([^/]+).(conf|raw)$
-	redir @expl {vars.base_dest_url}/{re.expl.1}/{re.expl.2}.{re.expl.3}
+	# Sysupdate with explicit release sub-path.
+	# Used by extensions to limit updates to a specific version range, e.g.
+	# patchlevel.
+	#     /<release>/<extension>.*.conf
+	#       ==>  https://[...]/releases/download/<release>/<extension>.*.conf
+	# Match groups: 1 - release, 2 - filename
+	@pconf path_regexp pconf ^.*/extensions/([^/]+)/([^/]+)\.conf$
+	redir @pconf {vars.base_dest_url}/{re.pconf.1}/{re.pconf.2}.conf
 
 	# Extension specific SHA file with extension name in path (group 1)
 	#     <extension>/SHA256SUMS
