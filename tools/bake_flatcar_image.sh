@@ -56,6 +56,8 @@ function print_help() {
     echo "       --install_to      <partition:install-root> Partition and installation directory of sysexts"
     echo "                            in the OS image. Partition can be 'root' and 'oem'."
     echo "                            Defaults to '${install_to}'"
+    echo "       --bakery <url>    URL for bakery to fetch sysexts from."
+    echo "                            Defaults to 'https://extensions.flatcar.org/extensions'."
     echo
 }
 # --
@@ -260,11 +262,12 @@ declare -a sysexts
 
 while [ $# -gt 0 ]; do
     case "$1" in
-        "--fetch")      fetch="yes";     shift;;
-        "--vendor")     vendor="$2";     shift 2;;
-        "--arch")       arch="$2";       shift 2;;
-        "--release")    release="$2";    shift 2;;
-        "--install_to") install_to="$2"; shift 2;;
+        "--fetch")      fetch="yes";         shift;;
+        "--vendor")     vendor="$2";         shift 2;;
+        "--arch")       arch="$2";           shift 2;;
+        "--release")    release="$2";        shift 2;;
+        "--install_to") install_to="$2";     shift 2;;
+        "--bakery")     bakery_base_url="$2" shift 2;;
         --help) print_help; exit;;
         -h)  print_help; exit;;
         --*) echo -e "\nUnknown option '$1'\n"
