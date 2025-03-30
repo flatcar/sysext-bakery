@@ -83,8 +83,12 @@ function _create_metadata() {
 function _create_sysupdate() {
   local extname="$1"
   local match_pattern="${2:-${extname}-@v-%a.raw}"
-  local source_rel="${3:-${extname}}"
-  local target_file="${4:-${source_rel}}"
+  local source_rel="${3:-}"
+  local target_file="${4:-${extname}}"
+
+  if [[ -n $source_rel ]] ; then
+    source_rel="${source_rel%/}/"
+  fi
 
   sed -e "s/{EXTNAME}/${extname}/g" \
       -e "s/{MATCH_PATTERN}/${match_pattern}/g" \
