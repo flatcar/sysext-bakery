@@ -59,7 +59,7 @@ function populate_sysext_root() {
   local img_arch="$(arch_transform 'x86-64' 'amd64' "$arch")"
   img_arch="$(arch_transform 'arm64' 'arm64/v8' "$img_arch")"
 
-  local image="docker.io/${img_arch}/alpine:3.21"
+  local image="docker.io/alpine:3.21"
 
   announce "Building bird $version for $arch"
 
