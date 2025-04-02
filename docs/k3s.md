@@ -32,7 +32,7 @@ storage:
       mode: 0644
       contents:
         source: https://extensions.flatcar.org/extensions/k3s-v1.32.2+k3s1-x86-64.raw
-    - path: /etc/sysupdate.k3s.d/k3s-v1.32.conf
+    - path: /etc/sysupdate.k3s-v1.32.d/k3s-v1.32.conf
       contents:
         source: https://extensions.flatcar.org/extensions/k3s/k3s-v1.32.conf
     - path: /etc/sysupdate.d/noop.conf
