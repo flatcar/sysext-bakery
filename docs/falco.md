@@ -25,7 +25,9 @@ The snippet includes automated updates via systemd-sysupdate.
 Sysupdate will stage updates and request a reboot by creating a flag file at `/run/reboot-required`.
 You can deactivate updates by changing `enabled: true` to `enabled: false` in `systemd-sysupdate.timer`.
 
-Note that the snippet is for the x86-64 version of falco 0.39.1.
+Note that the snippet is for the x86-64 version of falco 0.40.0.
+
+Check out the metadata release at https://github.com/flatcar/sysext-bakery/releases/tag/falco for a list of all versions available in the bakery.
 
 ```yaml
 variant: flatcar
@@ -33,10 +35,10 @@ version: 1.0.0
 
 storage:
   files:
-    - path: /opt/extensions/falco/falco-0.39.1-x86-64.raw
+    - path: /opt/extensions/falco/falco-0.40.0-x86-64.raw
       mode: 0644
       contents:
-        source: https://extensions.flatcar.org/extensions/falco-0.39.1-x86-64.raw
+        source: https://extensions.flatcar.org/extensions/falco-0.40.0-x86-64.raw
     - path: /etc/sysupdate.falco.d/falco.conf
       contents:
         source: https://extensions.flatcar.org/extensions/falco.conf
@@ -44,7 +46,7 @@ storage:
       contents:
         source: https://extensions.flatcar.org/extensions/noop.conf
   links:
-    - target: /opt/extensions/falco/falco-0.39.1-x86-64.raw
+    - target: /opt/extensions/falco/falco-0.40.0-x86-64.raw
       path: /etc/extensions/falco.raw
       hard: false
 systemd:

@@ -18,6 +18,8 @@ This is because upstream Kubernetes does not support unattended automated upgrad
 
 Note that the snippet is for the x86-64 version of k3s v1.32.2 w/ k3s1.
 
+Check out the metadata release at https://github.com/flatcar/sysext-bakery/releases/tag/k3s for a list of all versions available in the bakery.
+
 Any specific configuration required would need to be added to the below configuration,
 e.g. by providing a token for an agent or server to join or creating a `config.yaml` file.
 
@@ -32,7 +34,7 @@ storage:
       mode: 0644
       contents:
         source: https://extensions.flatcar.org/extensions/k3s-v1.32.2+k3s1-x86-64.raw
-    - path: /etc/sysupdate.k3s.d/k3s-v1.32.conf
+    - path: /etc/sysupdate.k3s-v1.32.d/k3s-v1.32.conf
       contents:
         source: https://extensions.flatcar.org/extensions/k3s/k3s-v1.32.conf
     - path: /etc/sysupdate.d/noop.conf
