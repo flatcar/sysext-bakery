@@ -19,7 +19,7 @@ function populate_sysext_root() {
   local img_arch="$(arch_transform 'x86-64' 'amd64' "$arch")"
   img_arch="$(arch_transform 'arm64' 'arm64/v8' "$img_arch")"
 
-  local image="docker.io/${img_arch}/alpine:3.19"
+  local image="docker.io/alpine:3.21"
 
   announce "Building keepalived $version for $arch"
 
@@ -31,7 +31,7 @@ function populate_sysext_root() {
               -v "$(pwd)":/install_root \
               --platform "linux/${img_arch}" \
               --pull always \
-              alpine:v3.21 \
+              ${image} \
                   /install_root/build.sh "${version}" "$user_group"
 
   # /usr/sbin is a symlink to /usr/bin on Flatcar.
