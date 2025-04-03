@@ -19,6 +19,8 @@ This is because upstream Kubernetes does not support unattended automated upgrad
 
 Note that the snippet is for the x86-64 version of rke2 v1.32.2.
 
+Check out the metadata release at https://github.com/flatcar/sysext-bakery/releases/tag/rke2 for a list of all versions available in the bakery.
+
 Generic configuration for both Server (control plane) and Agent (worker):
 
 ```yaml

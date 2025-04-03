@@ -12,6 +12,8 @@ You can deactivate updates by changing `enabled: true` to `enabled: false` in `s
 
 Note that the snippet is for the x86-64 version of keepalived v2.3.1.
 
+Check out the metadata release at https://github.com/flatcar/sysext-bakery/releases/tag/keepalived for a list of all versions available in the bakery.
+
 ```yaml
 variant: flatcar
 version: 1.0.0
