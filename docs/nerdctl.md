@@ -18,10 +18,10 @@ version: 1.0.0
 
 storage:
   files:
-    - path: /opt/extensions/nerdctl-v2.0.4.raw
+    - path: /opt/extensions/nerdctl-v2.0.4-x86-64.raw
       mode: 0420
       contents:
-        source: https://extensions.flatcar.org/extensions/nerdctl-v2.0.4.raw
+        source: https://extensions.flatcar.org/extensions/nerdctl-v2.0.4-x86-64.raw
     - path: /etc/sysupdate.nerdctl.d/nerdctl.conf
       contents:
         source: https://extensions.flatcar.org/extensions/nerdctl.conf
@@ -29,7 +29,7 @@ storage:
       contents:
         source: https://extensions.flatcar.org/extensions/noop.conf
   links:
-    - target: /opt/extensions/nerdctl-v2.0.4.raw
+    - target: /opt/extensions/nerdctl-v2.0.4-x86-64.raw
       path: /etc/extensions/nerdctl.raw
       hard: false
 
