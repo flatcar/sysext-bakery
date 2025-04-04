@@ -11,7 +11,7 @@ libroot="$(dirname "${BASH_SOURCE[0]}")"
 scriptroot="$(cd "$(dirname "${BASH_SOURCE[0]}")/../"; pwd)"
 
 bakery="flatcar/sysext-bakery"
-bakery_hub="extensions.flatcar.org"
+bakery_base_url="https://extensions.flatcar.org/extensions"
 
 # Add new library function scripts here:
 source "${libroot}/helpers.sh"
