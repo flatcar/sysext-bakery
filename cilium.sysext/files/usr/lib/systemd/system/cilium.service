@@ -6,7 +6,7 @@ After=network-online.target
 
 [Service]
 Environment=KUBECONFIG='/home/core/.kube/config'
-ExecStart=/opt/bin/cilium install ${CILIUM_INSTALL_ARGS}
+ExecStart=/usr/local/bin/cilium install ${CILIUM_INSTALL_ARGS}
 Restart=always
 
 [Install]
