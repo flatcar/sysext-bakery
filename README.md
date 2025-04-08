@@ -8,6 +8,7 @@
 [![Bluesky](https://img.shields.io/badge/Bluesky-Follow-0285FF?logo=bluesky)](https://bsky.app/profile/flatcar.org)
 
 </div>
+
 # The Flatcar Sysext Bakery
 
 For information on using extensions availabe through the bakery please refer to https://extensions.flatcar.org.
