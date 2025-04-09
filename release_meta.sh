@@ -65,6 +65,8 @@ function fetch_extension_metadata() {
 if [[ -n $extension ]] ; then
 
   out "# Extension ${extension} metadata release."
+  out ""
+  out "Updated $(date --rfc-3339 seconds)"
 
   fetch_extension_metadata "$extension"
   if [[ ! -f SHA256SUMS ]] ; then
@@ -81,6 +83,7 @@ else
 
   out "# Global SHA256SUMS metadata release."
   out ""
+  out "Updated $(date --rfc-3339 seconds)"
 
   for extension in $(./bakery.sh list --plain true); do
     echo
@@ -102,15 +105,6 @@ else
   fi
 fi
 # --
-
-if [[ -f SHA256SUMS ]] ; then
-  out ""
-  out "# SHA256SUMS:"
-  out '```'
-  cat SHA256SUMS | tee -a Release.md
-  out '```'
-fi
-
 
 git tag -f "${tag}" --force
 git push origin "${tag}" --force
