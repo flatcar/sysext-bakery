@@ -28,7 +28,7 @@ storage:
         source: https://github.com/flatcar/sysext-bakery/releases/download/latest/clium.conf
     - path: /etc/sysupdate.d/noop.conf
       contents:
-        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/noop.conf
+https://extensions.flatcar.org/extensions/noop.conf
   links:
     - target: /opt/extensions/cilium/cilium-v0.18.2-x86-64.raw
       path: /etc/extensions/cilium.raw
