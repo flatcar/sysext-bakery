@@ -22,7 +22,7 @@ storage:
   files:
     - path: /opt/extensions/cilium/cilium-v0.18.2-x86-64.raw
       contents:
-        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/cilium-v0.18.2-x86-64.raw
+        source: https://extensions.flatcar.org/extensions/cilium-v0.18.2-x86-64.raw
     - path: /etc/sysupdate.cilium.d/cilium.conf
       contents:
         source: https://github.com/flatcar/sysext-bakery/releases/download/latest/clium.conf
