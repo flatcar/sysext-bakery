@@ -19,6 +19,8 @@ This is because upstream Kubernetes does not support unattended automated upgrad
 
 Note that the snippet is for the x86-64 version of rke2 v1.32.2.
 
+Check out the metadata release at https://github.com/flatcar/sysext-bakery/releases/tag/rke2 for a list of all versions available in the bakery.
+
 Generic configuration for both Server (control plane) and Agent (worker):
 
 ```yaml
@@ -37,8 +39,8 @@ storage:
       contents:
         source: https://extensions.flatcar.org/extensions/noop.conf
   links:
-    - target: /opt/extensions/rke2/rke2-v1.32.2+k3s1-x86-64.raw
-      path: /etc/extensions/k3s.raw
+    - target: /opt/extensions/rke2/rke2-v1.32.2+rke2r1-x86-64.raw
+      path: /etc/extensions/rke2.raw
       hard: false
 
 systemd:
