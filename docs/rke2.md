@@ -39,8 +39,8 @@ storage:
       contents:
         source: https://extensions.flatcar.org/extensions/noop.conf
   links:
-    - target: /opt/extensions/rke2/rke2-v1.32.2+k3s1-x86-64.raw
-      path: /etc/extensions/k3s.raw
+    - target: /opt/extensions/rke2/rke2-v1.32.2+rke2r1-x86-64.raw
+      path: /etc/extensions/rke2.raw
       hard: false
 
 systemd:
