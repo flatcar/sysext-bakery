@@ -11,6 +11,7 @@
 
 # The Flatcar Sysext Bakery
 
+[![Extension Builds Status](https://github.com/flatcar/sysext-bakery/actions/workflows/release.yaml/badge.svg)](https://github.com/flatcar/sysext-bakery/actions/workflows/release.yaml)
 For information on using extensions availabe through the bakery please refer to https://extensions.flatcar.org.
 
 This document covers developer information, i.e. improving existing extensions, developing new extensions, and self-hosting your own bakery.
