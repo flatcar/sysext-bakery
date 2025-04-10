@@ -91,6 +91,7 @@ jobs:
             bakery/SHA256SUMS
             bakery/*.raw
             bakery/*.conf
+            bakery/*-build.log
 
   update-extension-metadata:
     needs: [ list-builds, create-release ]
