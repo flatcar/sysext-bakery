@@ -73,6 +73,7 @@ Check out documentation on specific extensions at the navigation menu on the lef
 | `llamaedge`      |  released    | [llamaedge versions](https://github.com/flatcar/sysext-bakery/releases/tag/llamaedge) |
 | `nebula`         |  released    | [nebula versions](https://github.com/flatcar/sysext-bakery/releases/tag/nebula) |
 | `nerdctl`        |  released    | [nerdctl versions](https://github.com/flatcar/sysext-bakery/releases/tag/nerdctl) |
+| `nomad`          |  released    | [nomad versions](https://github.com/flatcar/sysext-bakery/releases/tag/nomad) |
 | `nvidia-runtime` |  released    | [nvidia-runtime versions](https://github.com/flatcar/sysext-bakery/releases/tag/nvidia-runtime) |
 | `ollama`         |  released    | [ollama versions](https://github.com/flatcar/sysext-bakery/releases/tag/ollama) |
 | `opkssh`         |  released    | [opkssh versions](https://github.com/flatcar/sysext-bakery/releases/tag/opkssh) |

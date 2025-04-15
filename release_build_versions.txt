@@ -53,6 +53,8 @@ nebula latest
 
 nerdctl latest
 
+nomad 1.10.0
+
 nvidia-runtime v1.16.2
 nvidia-runtime latest
 
