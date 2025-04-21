@@ -22,6 +22,8 @@ function populate_sysext_root() {
   local arch="$2"
   local version="$3"
 
+  # This script follows the same pattern as the nvidia driver installation
+  # Reference: /usr/share/flatcar/nvidia-metadata
   mkdir -p "${sysextroot}/usr/share/flatcar"
     cat <<EOF >"${sysextroot}/usr/share/flatcar/gasket-metadata"
 GASKET_REPOSITORY=https://github.com/${ORG}/${PROJECT}.git

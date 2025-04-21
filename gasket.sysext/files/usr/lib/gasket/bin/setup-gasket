@@ -1,4 +1,7 @@
 #!/bin/bash
+
+# This script follows the same pattern as the nvidia driver installation
+# Reference: /usr/lib/nvidia/bin/setup-nvidia
 set -euo pipefail
 
 . /usr/share/flatcar/release
