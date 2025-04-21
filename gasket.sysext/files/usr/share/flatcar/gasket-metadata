@@ -1,0 +1,2 @@
+GASKET_REPOSITORY=https://github.com/KyleGospo/gasket-dkms.git
+GASKET_BRANCH=main

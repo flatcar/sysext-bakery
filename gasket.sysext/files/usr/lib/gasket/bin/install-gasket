@@ -1,0 +1,34 @@
+#!/bin/bash
+
+. /usr/share/coreos/release
+WORKDIR="/gasket"
+KERNEL_NAME="$(ls /lib/modules)"
+
+#sudo emerge -gKv bootengine coreos-sources dracut
+sudo emerge -gKv coreos-sources
+
+#make -C /usr/src/linux distclean
+#update-bootengine -o /usr/src/linux/bootengine.cpio
+cp /lib/modules/`uname -r`/build/Module.symvers /usr/src/linux
+gzip -cd /proc/config.gz > /usr/src/linux/.config
+#make -C /usr/src/linux olddefconfig
+
+mkdir /usr/src/linux/drivers/staging/gasket
+cp -r /gasket/src/* /usr/src/linux/drivers/staging/gasket/
+
+echo "CONFIG_MODULE_COMPRESS_NONE=y" >> /usr/src/linux/.config
+echo "CONFIG_STAGING=y" >> /usr/src/linux/.config
+echo "CONFIG_STAGING_GASKET_FRAMEWORK=m" >> /usr/src/linux/.config
+echo "CONFIG_STAGING_APEX_DRIVER=m" >> /usr/src/linux/.config
+
+make -C /usr/src/linux prepare
+make -C /usr/src/linux modules_prepare
+make -C /usr/src/linux scripts
+make -C /usr/src/linux M=drivers/staging/gasket modules
+
+mkdir -p "${WORKDIR}"/install-mod
+cp "/usr/src/linux/drivers/staging/gasket/"*.ko "${WORKDIR}"/install-mod/
+mkdir -p /lib/modules/${KERNEL_NAME}/gasket
+cp "${WORKDIR}"/install-mod/*.ko /lib/modules/${KERNEL_NAME}/gasket/
+depmod -a
+cp /lib/modules/${KERNEL_NAME}/modules.* "${WORKDIR}/install-mod/"

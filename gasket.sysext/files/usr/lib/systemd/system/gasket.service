@@ -1,0 +1,15 @@
+[Unit]
+Description=Google ASIC Configure Service
+Wants=network-online.target
+After=network-online.target
+Before=containerd.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=true
+Restart=no
+Environment=PATH=/opt/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin
+ExecStart=/usr/lib/gasket/bin/setup-gasket
+
+[Install]
+WantedBy=multi-user.target
