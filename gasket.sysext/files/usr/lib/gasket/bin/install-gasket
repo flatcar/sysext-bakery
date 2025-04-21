@@ -13,6 +13,7 @@ mkdir -p /usr/src/linux/drivers/staging/gasket
 cp -r /gasket/src/* /usr/src/linux/drivers/staging/gasket/
 
 echo "Preparing kernel module compilation..."
+gzip -cd /proc/config.gz > /usr/src/linux/.config
 make -C /usr/src/linux olddefconfig 
 make -C /usr/src/linux prepare
 make -C /usr/src/linux modules_prepare
