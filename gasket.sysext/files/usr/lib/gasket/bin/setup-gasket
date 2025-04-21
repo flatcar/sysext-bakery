@@ -81,11 +81,6 @@ EOF
 
 
 function install_and_load() {
-  # This creates symlinks to sonames
-  mkdir -p /etc/ld.so.conf.d/
-  echo "/opt/gasket/${GASKET_CURRENT_INSTALLATION}/usr/lib" > /etc/ld.so.conf.d/gasket.conf
-  ldconfig
-
   insmod "/opt/gasket/${GASKET_CURRENT_INSTALLATION}/usr/lib/modules/$(uname -r)"/gasket/gasket.ko
   insmod "/opt/gasket/${GASKET_CURRENT_INSTALLATION}/usr/lib/modules/$(uname -r)"/gasket/apex.ko
 }
