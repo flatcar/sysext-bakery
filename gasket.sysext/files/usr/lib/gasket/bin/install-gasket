@@ -6,16 +6,14 @@ KERNEL_NAME="$(ls /lib/modules)"
 
 echo "Installing CoreOS sources..."
 sudo emerge -gKv coreos-sources
-
-echo "Preparing Sources..."
 cp /lib/modules/`uname -r`/build/Module.symvers /usr/src/linux
-gzip -cd /proc/config.gz > /usr/src/linux/.config
 
 echo "Copying Gasket driver sources..."
 mkdir -p /usr/src/linux/drivers/staging/gasket
 cp -r /gasket/src/* /usr/src/linux/drivers/staging/gasket/
 
 echo "Preparing kernel module compilation..."
+make -C /usr/src/linux olddefconfig 
 make -C /usr/src/linux prepare
 make -C /usr/src/linux modules_prepare
 make -C /usr/src/linux scripts
