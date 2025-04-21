@@ -24,17 +24,20 @@ function download_flatcar_developer_container() {
     FLATCAR_REMOTE_FILENAME=${FLATCAR_DEVELOPER_CONTAINER%%-*}.bin.bz2
     if [[ "$(curl -I --retry-delay 1 --retry 60 --retry-connrefused --retry-max-time 60 --connect-timeout 20 -L -s -o /dev/null -w "%{http_code}" "https://${GROUP}.release.flatcar-linux.net/${FLATCAR_RELEASE_BOARD}/${FLATCAR_RELEASE_VERSION}/${FLATCAR_REMOTE_FILENAME}")" == 200 ]]
     then
+      # If the URL is available, use the new URL format
       FLATCAR_DEVELOPER_CONTAINER_URL="https://${GROUP}.release.flatcar-linux.net/${FLATCAR_RELEASE_BOARD}/${FLATCAR_RELEASE_VERSION}/${FLATCAR_REMOTE_FILENAME}"
     else
+      # If the URL is not available, try the old URL format
       FLATCAR_RELEASE_BOARD=${FLATCAR_RELEASE_BOARD//-usr/}
       FLATCAR_DEVELOPER_CONTAINER_URL="https://bincache.flatcar-linux.net/images/${FLATCAR_RELEASE_BOARD}/${FLATCAR_RELEASE_VERSION}/${FLATCAR_REMOTE_FILENAME}"
     fi
 
     if [ ! -n "${FLATCAR_DEVELOPER_CONTAINER_URL}" ]
     then
+      echo "Flatcar Developer Container URL not found!"
       return 1
     fi
-
+    echo "Downloading Flatcar Developer Container from ${FLATCAR_DEVELOPER_CONTAINER_URL}"
     curl -L --fail "${FLATCAR_DEVELOPER_CONTAINER_URL}" -o "${FLATCAR_ROOT_WORKDIR}/${FLATCAR_DEVELOPER_CONTAINER}.bz2"
     lbzip2 -d "${FLATCAR_ROOT_WORKDIR}/${FLATCAR_DEVELOPER_CONTAINER}.bz2"
 
@@ -48,6 +51,7 @@ function clone_gasket_driver() {
 
   if [ ! -d "${FLATCAR_ROOT_WORKDIR}/${GASKET_WORKDIR}/.git" ]
   then
+    echo "Cloning GASKET Driver repository..."
     git clone --depth 1 --branch "${GASKET_BRANCH}" "${GASKET_REPOSITORY}" "${FLATCAR_ROOT_WORKDIR}/${GASKET_WORKDIR}" 
   fi
 }
@@ -64,28 +68,33 @@ function run_nspawn_container() {
 }
 
 function copy_gasket_build_artifacts() {
+  echo Copying GASKET driver artifacts to/ opt/gasket/${GASKET_FLATCAR_VERSION_PAIR}/usr/lib/modules/$(uname -r)
   mkdir -p "/opt/gasket/${GASKET_FLATCAR_VERSION_PAIR}/usr/lib/modules/$(uname -r)/gasket/"
   cp "$FLATCAR_ROOT_WORKDIR/$GASKET_WORKDIR/install-mod"/*.ko "/opt/gasket/${GASKET_FLATCAR_VERSION_PAIR}/usr/lib/modules/$(uname -r)/gasket/"
   cp "$FLATCAR_ROOT_WORKDIR/$GASKET_WORKDIR/install-mod"/modules.* "/opt/gasket/${GASKET_FLATCAR_VERSION_PAIR}/usr/lib/modules/$(uname -r)/"
 
+  echo "Creating sysext metadata for GASKET driver"
   mkdir -p "/opt/gasket/${GASKET_FLATCAR_VERSION_PAIR}/usr/lib/extension-release.d/"
   cat <<EOF >"/opt/gasket/${GASKET_FLATCAR_VERSION_PAIR}/usr/lib/extension-release.d/extension-release.gasket-driver"
 ID=flatcar
 SYSEXT_LEVEL=1.0
 EOF
 
+  echo "Creating symlink to current GASKET driver installation"
   pushd /opt/gasket
-  ln -sfn "${GASKET_FLATCAR_VERSION_PAIR}" current
+  ln -sfn "${GASKET_FLATCAR_VERSION_PAIR}" "${GASKET_CURRENT_INSTALLATION}"
   popd
 }
 
 
 function install_and_load() {
+  echo "Installing Gasket driver modules..."
   insmod "/opt/gasket/${GASKET_CURRENT_INSTALLATION}/usr/lib/modules/$(uname -r)"/gasket/gasket.ko
   insmod "/opt/gasket/${GASKET_CURRENT_INSTALLATION}/usr/lib/modules/$(uname -r)"/gasket/apex.ko
 }
 
 function verify_installation() {
+  echo "Verifying Gasket driver installation..."
   if lsmod | grep -wq "gasket"
   then
     echo "Gasket module loaded successfully!"
@@ -105,6 +114,7 @@ function verify_installation() {
 function is_gasket_probe_required() {
   # Vendor: Global Unichip Corp., Class: Coral Edge TPU
   if [[ -n "$(lspci -d 1ac1:089a)" ]]; then
+    echo "Gasket probe required!"
     return 0
   fi
   return 1
@@ -112,16 +122,19 @@ function is_gasket_probe_required() {
 
 function is_gasket_installation_required() {
   if ! is_gasket_probe_required; then
+    echo "Gasket installation not required!"
     return 1
   fi
 
   if [[ -d "/opt/gasket/${GASKET_FLATCAR_VERSION_PAIR}" ]]; then
+    echo "Gasket installation already exists!"
     return 1
   fi
 }
 
 
 function presetup() {
+  echo "Creating workdir for Gasket driver installation..."
   mkdir -p "${FLATCAR_ROOT_WORKDIR}"
   mkdir -p "${FLATCAR_ROOT_WORKDIR}/${GASKET_WORKDIR}"
 }
