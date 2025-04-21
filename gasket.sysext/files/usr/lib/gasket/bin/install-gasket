@@ -4,28 +4,25 @@
 WORKDIR="/gasket"
 KERNEL_NAME="$(ls /lib/modules)"
 
-#sudo emerge -gKv bootengine coreos-sources dracut
+echo "Installing CoreOS sources..."
 sudo emerge -gKv coreos-sources
 
-#make -C /usr/src/linux distclean
-#update-bootengine -o /usr/src/linux/bootengine.cpio
+echo "Preparing Sources..."
 cp /lib/modules/`uname -r`/build/Module.symvers /usr/src/linux
 gzip -cd /proc/config.gz > /usr/src/linux/.config
-#make -C /usr/src/linux olddefconfig
 
-mkdir /usr/src/linux/drivers/staging/gasket
+echo "Copying Gasket driver sources..."
+mkdir -p /usr/src/linux/drivers/staging/gasket
 cp -r /gasket/src/* /usr/src/linux/drivers/staging/gasket/
 
-echo "CONFIG_MODULE_COMPRESS_NONE=y" >> /usr/src/linux/.config
-echo "CONFIG_STAGING=y" >> /usr/src/linux/.config
-echo "CONFIG_STAGING_GASKET_FRAMEWORK=m" >> /usr/src/linux/.config
-echo "CONFIG_STAGING_APEX_DRIVER=m" >> /usr/src/linux/.config
-
+echo "Preparing kernel module compilation..."
 make -C /usr/src/linux prepare
 make -C /usr/src/linux modules_prepare
 make -C /usr/src/linux scripts
+echo "Building Gasket driver as external kernel module..."
 make -C /usr/src/linux M=drivers/staging/gasket modules
 
+echo "Collecting Gasket driver artifacts..."
 mkdir -p "${WORKDIR}"/install-mod
 cp "/usr/src/linux/drivers/staging/gasket/"*.ko "${WORKDIR}"/install-mod/
 mkdir -p /lib/modules/${KERNEL_NAME}/gasket

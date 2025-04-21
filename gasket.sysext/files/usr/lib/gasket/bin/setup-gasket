@@ -86,28 +86,24 @@ function install_and_load() {
   echo "/opt/gasket/${GASKET_CURRENT_INSTALLATION}/usr/lib" > /etc/ld.so.conf.d/gasket.conf
   ldconfig
 
-  pushd "/opt/gasket/${GASKET_CURRENT_INSTALLATION}/usr/lib/modules/$(uname -r)/gasket/"
-  insmod gasket.ko
-  insmod apex.ko
-  popd
+  insmod "/opt/gasket/${GASKET_CURRENT_INSTALLATION}/usr/lib/modules/$(uname -r)"/gasket/gasket.ko
+  insmod "/opt/gasket/${GASKET_CURRENT_INSTALLATION}/usr/lib/modules/$(uname -r)"/gasket/apex.ko
 }
 
 function verify_installation() {
-  gasketVersion=$(modinfo gasket --field=version)
-  if [ -z "${gasketVersion}" ]
+  if lsmod | grep -wq "gasket"
   then
+    echo "Gasket module loaded successfully!"
+  else
     echo "Gasket module not loaded!"
     exit 1
-  else
-    echo "Gasket module loaded with version: ${gasketVersion}"
   fi
-  apexVersion=$(modinfo apex --field=version)
-  if [ -z "${apexVersion}" ]
+  if lsmod | grep -wq "apex"
   then
+    echo "Apex module loaded successfully!"
+  else
     echo "Apex module not loaded!"
     exit 1
-  else
-    echo "Apex module loaded with version: ${apexVersion}"
   fi
 }
 
