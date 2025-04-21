@@ -22,5 +22,6 @@ function populate_sysext_root() {
   local arch="$2"
   local version="$3"
 
-  # Only shipping static service files
+  chmod +x "${sysextroot}/usr/lib/gasket/bin/install-gasket"
+  chmod +x "${sysextroot}/usr/lib/gasket/bin/setup-gasket"
 }
