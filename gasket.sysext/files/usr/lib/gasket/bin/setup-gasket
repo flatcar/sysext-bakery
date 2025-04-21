@@ -95,14 +95,14 @@ function install_and_load() {
 
 function verify_installation() {
   echo "Verifying Gasket driver installation..."
-  if lsmod | grep -wq "gasket"
+  if [[ -n "$(lsmod | grep -E '^gasket ')" ]]
   then
     echo "Gasket module loaded successfully!"
   else
     echo "Gasket module not loaded!"
     exit 1
   fi
-  if lsmod | grep -wq "apex"
+  if [[ -n "$(lsmod | grep -E '^apex ')" ]]
   then
     echo "Apex module loaded successfully!"
   else
