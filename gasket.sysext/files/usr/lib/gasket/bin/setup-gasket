@@ -68,7 +68,7 @@ function run_nspawn_container() {
 }
 
 function copy_gasket_build_artifacts() {
-  echo Copying GASKET driver artifacts to/ opt/gasket/${GASKET_FLATCAR_VERSION_PAIR}/usr/lib/modules/$(uname -r)
+  echo Copying GASKET driver artifacts to /opt/gasket/${GASKET_FLATCAR_VERSION_PAIR}/usr/lib/modules/$(uname -r)
   mkdir -p "/opt/gasket/${GASKET_FLATCAR_VERSION_PAIR}/usr/lib/modules/$(uname -r)/gasket/"
   cp "$FLATCAR_ROOT_WORKDIR/$GASKET_WORKDIR/install-mod"/*.ko "/opt/gasket/${GASKET_FLATCAR_VERSION_PAIR}/usr/lib/modules/$(uname -r)/gasket/"
   cp "$FLATCAR_ROOT_WORKDIR/$GASKET_WORKDIR/install-mod"/modules.* "/opt/gasket/${GASKET_FLATCAR_VERSION_PAIR}/usr/lib/modules/$(uname -r)/"
