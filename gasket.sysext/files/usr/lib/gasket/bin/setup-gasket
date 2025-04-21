@@ -6,7 +6,7 @@ set -euo pipefail
 . /usr/share/flatcar/gasket-metadata
 [ -f /etc/flatcar/gasket-metadata ] && . /etc/flatcar/gasket-metadata
     
-GASKED_WORKDIR="gasket-${GASKET_BRANCH}-workdir"
+GASKET_WORKDIR="gasket-${GASKET_BRANCH}-workdir"
 
 FLATCAR_DEVELOPER_CONTAINER="flatcar_developer_container-${FLATCAR_RELEASE_VERSION}.bin"
 FLATCAR_DEVELOPER_CONTAINER_URL=""
@@ -46,9 +46,9 @@ function download_flatcar_developer_container() {
 function clone_gasket_driver() {
   echo Cloning GASKET Driver from repository "${GASKET_REPOSITORY} at branch ${GASKET_BRANCH}"
 
-  if [ ! -d "${FLATCAR_ROOT_WORKDIR}/${GASKED_WORKDIR}/.git" ]
+  if [ ! -d "${FLATCAR_ROOT_WORKDIR}/${GASKET_WORKDIR}/.git" ]
   then
-    git clone --depth 1 --branch "${GASKET_BRANCH}" "${GASKET_REPOSITORY}" "${FLATCAR_ROOT_WORKDIR}/${GASKED_WORKDIR}" 
+    git clone --depth 1 --branch "${GASKET_BRANCH}" "${GASKET_REPOSITORY}" "${FLATCAR_ROOT_WORKDIR}/${GASKET_WORKDIR}" 
   fi
 }
 
@@ -58,15 +58,15 @@ function run_nspawn_container() {
   sudo systemd-nspawn --read-only \
                       --volatile=overlay \
                       --image="${FLATCAR_ROOT_WORKDIR}/${FLATCAR_DEVELOPER_CONTAINER}" \
-                      --bind="${FLATCAR_ROOT_WORKDIR}/${GASKED_WORKDIR}":/gasket \
+                      --bind="${FLATCAR_ROOT_WORKDIR}/${GASKET_WORKDIR}":/gasket \
                       --bind=/usr/lib/gasket/bin:/app/bin/ \
                       /app/bin/install-gasket
 }
 
 function copy_gasket_build_artifacts() {
   mkdir -p "/opt/gasket/${GASKET_FLATCAR_VERSION_PAIR}/usr/lib/modules/$(uname -r)/gasket/"
-  cp "$FLATCAR_ROOT_WORKDIR/$GASKED_WORKDIR/install-mod"/*.ko "/opt/gasket/${GASKET_FLATCAR_VERSION_PAIR}/usr/lib/modules/$(uname -r)/gasket/"
-  cp "$FLATCAR_ROOT_WORKDIR/$GASKED_WORKDIR/install-mod"/modules.* "/opt/gasket/${GASKET_FLATCAR_VERSION_PAIR}/usr/lib/modules/$(uname -r)/"
+  cp "$FLATCAR_ROOT_WORKDIR/$GASKET_WORKDIR/install-mod"/*.ko "/opt/gasket/${GASKET_FLATCAR_VERSION_PAIR}/usr/lib/modules/$(uname -r)/gasket/"
+  cp "$FLATCAR_ROOT_WORKDIR/$GASKET_WORKDIR/install-mod"/modules.* "/opt/gasket/${GASKET_FLATCAR_VERSION_PAIR}/usr/lib/modules/$(uname -r)/"
 
   mkdir -p "/opt/gasket/${GASKET_FLATCAR_VERSION_PAIR}/usr/lib/extension-release.d/"
   cat <<EOF >"/opt/gasket/${GASKET_FLATCAR_VERSION_PAIR}/usr/lib/extension-release.d/extension-release.gasket-driver"
