@@ -31,6 +31,8 @@ docker latest
 falco 0.39.1
 falco latest
 
+gasket main
+
 k3s v1.32.2+k3s1
 k3s latest
 
