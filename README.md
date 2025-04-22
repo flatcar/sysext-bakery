@@ -145,11 +145,14 @@ Have a look at other extension builds for inspiration;
 
 # Hosting your own bakery
 
-Just fork the Bakery, update
-[`lib/sysupdate.conf.tmpl`](lib/sysupdate.conf.tmpl)
-and
-[`lib/libbakery.sh`](lib/libbakery.sh)
-to use the new home, and start building and publishing!
+Just fork the Bakery, rename
+[`.env.example`](.env.example)
+to `.env` and update the variables to their new home. Now you can start building and publishing!
+
+Note: By default `.env` is in .gitignore to prevent any sensitive information from being uploaded and `.env` could be extended in the future. One can run the following to push it to git:
+```sh
+git add --force .env
+```
 
 In general, the extension images can be consumed straight from the respective GitHub releases download sections.
 However, making systemd-sysupdate work requires extra steps - see below.

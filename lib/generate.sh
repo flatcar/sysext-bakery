@@ -89,6 +89,7 @@ function _create_sysupdate() {
 
   sed -e "s/{EXTNAME}/${extname}/g" \
       -e "s/{MATCH_PATTERN}/${match_pattern}/g" \
+      -e "s,{BAKERY_HUB},${bakery_hub},g" \
       -e "s,{SOURCE_REL},${source_rel},g" \
       -e "s,{TARGET_FILE},${target_file},g" \
       "${libroot}/sysupdate.conf.tmpl" \
