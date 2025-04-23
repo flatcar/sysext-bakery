@@ -51,8 +51,5 @@ function populate_sysext_root() {
 
   cp -aR out/usr/bin/* "${sysextroot}/usr/bin/"
   cp -aR out/usr/lib/*-linux-gnu/* "${sysextroot}/usr/lib/"
-
-  ln -s /opt/nvidia "${sysextroot}/usr/local/nvidia"
-  ln -s /opt/bin/nvidia-smi "${sysextroot}/usr/bin/nvidia-smi"
 }
 # --
