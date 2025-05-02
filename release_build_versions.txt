@@ -73,4 +73,5 @@ wasmtime v13.0.0 # Used in Flatcar wasm OS demo
 wasmtime v24.0.0 # Used in README.md. Update readme when version changes.
 wasmtime latest
 
-bird 3.0.1
+bird 2.17
+bird 3.1.0
