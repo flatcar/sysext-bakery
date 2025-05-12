@@ -16,7 +16,7 @@ echo "Checking for new extension images to be built"
 echo "============================================="
 echo
 
-mapfile -t images < <( sed -e 's:\s*#.*::' -e '/^$/d' release_build_versions.txt )
+mapfile -t images < <( sed -e 's:\s*#.*::' -e 's/[[:space:]]*$//' -e '/^$/d' release_build_versions.txt )
 
 builds=()
 extensions=()
