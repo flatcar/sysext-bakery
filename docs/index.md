@@ -300,7 +300,7 @@ First, we use the `qemu_uefi` vendor to build an OS image that contains the syse
 We'll continue to use the kubernetes example from above.
 
 ```bash
-./bake_flatcar_image.sh --vendor qemu_uefo kubernetes:kubernetes.raw
+./bake_flatcar_image.sh --vendor qemu_uefi kubernetes:kubernetes.raw
 ```
 
 This will produce the OS image, `flatcar_production_qemu_uefi_image.img.bz2`, with kubernetes baked in, as well as a few other artifacts.
