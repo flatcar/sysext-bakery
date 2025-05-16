@@ -1,0 +1,43 @@
+#!/bin/bash
+set -euo pipefail
+
+SYSEXT_MODE=0
+if systemd-sysext list 2>&1 | grep -q flatcar-nvidia-drivers; then
+  SYSEXT_MODE=1
+fi
+
+_pre() {
+  if [ "$SYSEXT_MODE" -eq 0 ]; then
+    rm /run/extensions/nvidia-driver && systemctl restart systemd-sysext || true
+  fi
+}
+
+_post() {
+  chcon -R -t container_file_t /dev/nvidia* || true
+
+  if [ "$SYSEXT_MODE" -eq 0 ]; then
+    mkdir -p /run/extensions
+    # /opt/nvidia/current gets mounted as an overlay on root filesystem
+    mkdir -p /opt/nvidia/current/usr/bin && ln -sf /opt/bin/nvidia-smi /opt/nvidia/current/usr/bin/nvidia-smi
+    ln -sf /opt/nvidia/current /run/extensions/nvidia-driver
+    systemctl restart systemd-sysext
+  fi
+}
+
+if [ ! "$#" -eq 1 ]; then
+  echo "You need to specify action"
+  exit 1
+fi
+
+case "$1" in
+  pre)
+    _pre
+    ;;
+  post)
+    _post
+    ;;
+  *)
+    echo "Wrong action"
+    exit 1
+    ;;
+esac
