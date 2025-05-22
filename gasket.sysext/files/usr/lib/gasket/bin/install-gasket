@@ -1,0 +1,32 @@
+#!/bin/bash
+
+# This script follows the same pattern as the nvidia driver installation
+# Reference: /usr/lib/nvidia/bin/install-nvidia
+. /usr/share/coreos/release
+WORKDIR="/gasket"
+KERNEL_NAME="$(ls /lib/modules)"
+
+echo "Installing CoreOS sources..."
+sudo emerge -gKv coreos-sources
+cp /lib/modules/`uname -r`/build/Module.symvers /usr/src/linux
+
+echo "Copying Gasket driver sources..."
+mkdir -p /usr/src/linux/drivers/staging/gasket
+cp -r /gasket/src/* /usr/src/linux/drivers/staging/gasket/
+
+echo "Preparing kernel module compilation..."
+gzip -cd /proc/config.gz > /usr/src/linux/.config
+make -C /usr/src/linux olddefconfig 
+make -C /usr/src/linux prepare
+make -C /usr/src/linux modules_prepare
+make -C /usr/src/linux scripts
+echo "Building Gasket driver as external kernel module..."
+make -C /usr/src/linux M=drivers/staging/gasket modules
+
+echo "Collecting Gasket driver artifacts..."
+mkdir -p "${WORKDIR}"/install-mod
+cp "/usr/src/linux/drivers/staging/gasket/"*.ko "${WORKDIR}"/install-mod/
+mkdir -p /lib/modules/${KERNEL_NAME}/gasket
+cp "${WORKDIR}"/install-mod/*.ko /lib/modules/${KERNEL_NAME}/gasket/
+depmod -a
+cp /lib/modules/${KERNEL_NAME}/modules.* "${WORKDIR}/install-mod/"
