@@ -68,6 +68,7 @@ Check out documentation on specific extensions at the navigation menu on the lef
 | `keepalived`     |  released    | [keepalived versions](https://github.com/flatcar/sysext-bakery/releases/tag/keepalived) |
 | `kubernetes`     |  released    | [kubernetes versions](https://github.com/flatcar/sysext-bakery/releases/tag/kubernetes) |
 | `nerdctl`        |  released    | [nerdctl versions](https://github.com/flatcar/sysext-bakery/releases/tag/nerdctl) |
+| `nomad`          |  released    | [nomad versions](https://github.com/flatcar/sysext-bakery/releases/tag/nomad) |
 | `nvidia-runtime` |  released    | [nvidia-runtime versions](https://github.com/flatcar/sysext-bakery/releases/tag/nvidia-runtime) |
 | `ollama`         |  released    | [ollama versions](https://github.com/flatcar/sysext-bakery/releases/tag/ollama) |
 | `rke2`           |  released    | [rke2 versions](https://github.com/flatcar/sysext-bakery/releases/tag/rke2) |
