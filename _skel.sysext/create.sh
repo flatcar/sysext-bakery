@@ -24,7 +24,7 @@ RELOAD_SERVICES_ON_MERGE="true"
 
 # If you need to run curl calls to api.github.com consider using
 # 'curl_api_wrapper' (from lib/helpers.sh). The wrapper will use GH_TOKEN
-# if set to prevent throttling of unathenticated calls, and handle pagination
+# if set to prevent throttling of unauthenticated calls, and handle pagination
 # etc.
 
 # Fetch and print a list of available versions.
@@ -78,7 +78,7 @@ function populate_sysext_root() {
 #   --foo.
 # Use
 #   local val="$(get_optional_param "foo" "$@")"
-# to retrieve the value (or an empry string when not set).
+# to retrieve the value (or an empty string when not set).
 function populate_sysext_root_options() {
   echo "  --foo <bar|baz>  : Build foo as bar or baz."
 }
