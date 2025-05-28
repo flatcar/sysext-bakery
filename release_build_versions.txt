@@ -79,5 +79,5 @@ cilium v0.16.24
 cilium v0.18.2
 cilium latest
 
-bird 3.1.1
+bird 3.1.2
 bird latest
