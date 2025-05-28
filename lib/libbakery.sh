@@ -13,6 +13,10 @@ scriptroot="$(cd "$(dirname "${BASH_SOURCE[0]}")/../"; pwd)"
 bakery="flatcar/sysext-bakery"
 bakery_hub="extensions.flatcar.org"
 
+if [[ -s "${scriptroot}/.env" ]]; then
+  source "${scriptroot}/.env"
+fi
+
 # Add new library function scripts here:
 source "${libroot}/helpers.sh"
 source "${libroot}/generate.sh"

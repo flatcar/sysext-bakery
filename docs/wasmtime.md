@@ -13,7 +13,9 @@ The snippet includes automated updates via systemd-sysupdate.
 Sysupdate will **merge the new sysext immediately after successful download**.
 You can deactivate updates by changing `enabled: true` to `enabled: false` in `systemd-sysupdate.timer`.
 
-Note that the snippet is for the x86-64 version of wasmtime 24.0.0.
+Note that the snippet is for the x86-64 version of wasmtime 31.0.0.
+
+Check out the metadata release at https://github.com/flatcar/sysext-bakery/releases/tag/wasmtime for a list of all versions available in the bakery.
 
 ```yaml
 variant: flatcar
@@ -21,13 +23,13 @@ version: 1.0.0
 
 storage:
   links:
-    - target: /opt/extensions/wasmtime/wasmtime-v24.0.0-x86-64.raw
+    - target: /opt/extensions/wasmtime/wasmtime-v31.0.0-x86-64.raw
       path: /etc/extensions/wasmtime.raw
       hard: false
   files:
-    - path: /opt/extensions/wasmtime/wasmtime-v24.0.0-x86-64.raw
+    - path: /opt/extensions/wasmtime/wasmtime-v31.0.0-x86-64.raw
       contents:
-        source: https://extensions.flatcar.org/extensions/wasmtime-v24.0.0-x86-64.raw
+        source: https://extensions.flatcar.org/extensions/wasmtime-v31.0.0-x86-64.raw
     - path: /etc/sysupdate.wasmtime.d/wasmtime.conf
       contents:
         source: https://extensions.flatcar.org/extensions/wasmtime.conf

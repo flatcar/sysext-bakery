@@ -32,7 +32,7 @@ function populate_sysext_root() {
        -fsSL "https://github.com/LlamaEdge/LlamaEdge/releases/download/${version}/llama-api-server.wasm"
 
   tar --force-local -xzf "WasmEdge-plugin.tar.gz"
-  mkdir -p "${sysextroot}"/usr/lib/wasmedge/wasm
+  mkdir -p "${sysextroot}"/usr/lib/wasmedge/wasm "${sysextroot}"/usr/share/llamaedge/
 
   cp -a libwasmedgePluginWasiNN.so "${sysextroot}"/usr/lib/wasmedge
   cp -a llama-api-server.wasm "${sysextroot}"/usr/lib/wasmedge/wasm

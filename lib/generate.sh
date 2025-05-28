@@ -85,13 +85,15 @@ function _create_sysupdate() {
   local match_pattern="${2:-${extname}-@v-%a.raw}"
   local source_rel="${3:-${extname}}"
   local target_file="${4:-${source_rel}}"
+  local sysupdate_file="${5:-${extname}.conf}"
 
   sed -e "s/{EXTNAME}/${extname}/g" \
       -e "s/{MATCH_PATTERN}/${match_pattern}/g" \
+      -e "s,{BAKERY_HUB},${bakery_hub},g" \
       -e "s,{SOURCE_REL},${source_rel},g" \
       -e "s,{TARGET_FILE},${target_file},g" \
       "${libroot}/sysupdate.conf.tmpl" \
-    >"${extname}.conf"
+    >"${sysupdate_file}"
 
   echo "Generated sysupdate configuration '${extname}.conf'"
 }
