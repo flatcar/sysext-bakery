@@ -35,7 +35,7 @@ function list_available_versions() {
   #  e.g. using list_github_releases from lib/helpers.sh.      
   # true
 
-  list_github_tags "CZ-NIC" "bird" \
+  list_gitlab_tags "gitlab.nic.cz" "6" \
     | sed 's/^v//'
 }
 # --
