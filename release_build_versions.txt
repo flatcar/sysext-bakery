@@ -77,4 +77,6 @@ wasmtime latest
 
 cilium v0.16.24 
 cilium v0.18.2
+cilium v0.18.3
+cilium v0.18.4
 cilium latest
