@@ -49,6 +49,12 @@ jobs:
     strategy:
       matrix:
         release: ${{ fromJson(needs.list-builds.outputs.builds) }}
+    # Try to finish all jobs even if one fails.
+    # Job fails can be transient and will be re-tried every time this action runs.
+    # NOTE that this will cause succeeding jobs (update metadata) to run even if the whole matrix fails.
+    #      This is intended and should not cause any issues[tm].
+    continue-on-error: true 
+
     runs-on: ubuntu-24.04
     permissions:
       # allow the action to create a release

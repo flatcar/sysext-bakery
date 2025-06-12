@@ -62,16 +62,20 @@ Check out documentation on specific extensions at the navigation menu on the lef
 | ---------------- | ------------ | ------------- |
 | `bird`           |  released    | [bird versions](https://github.com/flatcar/sysext-bakery/releases/tag/bird) |
 | `cilium`         |  released    | [cilium versions](https://github.com/flatcar/sysext-bakery/releases/tag/cilium) |
+| `containerd`     |  released    | [containerd versions](https://github.com/flatcar/sysext-bakery/releases/tag/containerd) |
 | `crio`           |  released    | [crio versions](https://github.com/flatcar/sysext-bakery/releases/tag/crio) |
-| `docker`         |  released    | [docker versions](https://github.com/flatcar/sysext-bakery/releases/tag/docker) |
 | `docker-compose` |  released    | [docker-compose versions](https://github.com/flatcar/sysext-bakery/releases/tag/docker-compose) |
+| `docker`         |  released    | [docker versions](https://github.com/flatcar/sysext-bakery/releases/tag/docker) |
 | `falco`          |  released    | [falco versions](https://github.com/flatcar/sysext-bakery/releases/tag/falco) |
 | `k3s`            |  released    | [k3s versions](https://github.com/flatcar/sysext-bakery/releases/tag/k3s) |
 | `keepalived`     |  released    | [keepalived versions](https://github.com/flatcar/sysext-bakery/releases/tag/keepalived) |
 | `kubernetes`     |  released    | [kubernetes versions](https://github.com/flatcar/sysext-bakery/releases/tag/kubernetes) |
+| `llamaedge`      |  released    | [llamaedge versions](https://github.com/flatcar/sysext-bakery/releases/tag/llamaedge) |
+| `nebula`         |  released    | [nebula versions](https://github.com/flatcar/sysext-bakery/releases/tag/nebula) |
 | `nerdctl`        |  released    | [nerdctl versions](https://github.com/flatcar/sysext-bakery/releases/tag/nerdctl) |
 | `nvidia-runtime` |  released    | [nvidia-runtime versions](https://github.com/flatcar/sysext-bakery/releases/tag/nvidia-runtime) |
 | `ollama`         |  released    | [ollama versions](https://github.com/flatcar/sysext-bakery/releases/tag/ollama) |
+| `opkssh`         |  released    | [opkssh versions](https://github.com/flatcar/sysext-bakery/releases/tag/opkssh) |
 | `rke2`           |  released    | [rke2 versions](https://github.com/flatcar/sysext-bakery/releases/tag/rke2) |
 | `tailscale`      |  released    | [tailscale versions](https://github.com/flatcar/sysext-bakery/releases/tag/tailscale) |
 | `wasmcloud`      |  released    | [wasmcloud versions](https://github.com/flatcar/sysext-bakery/releases/tag/wasmcloud) |
