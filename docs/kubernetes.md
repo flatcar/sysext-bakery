@@ -54,7 +54,7 @@ systemd:
           contents: |
             [Service]
             ExecStartPre=/usr/bin/sh -c "readlink --canonicalize /etc/extensions/kubernetes.raw > /tmp/kubernetes"
-            ExecStartPre=/usr/lib/systemd/systemd-sysupdate -C kubernetes-v1.32 update
+            ExecStartPre=/usr/lib/systemd/systemd-sysupdate -C kubernetes update
             ExecStartPost=/usr/bin/sh -c "readlink --canonicalize /etc/extensions/kubernetes.raw > /tmp/kubernetes-new"
             ExecStartPost=/usr/bin/sh -c "if ! cmp --silent /tmp/kubernetes /tmp/kubernetes-new; then touch /run/reboot-required; fi"
     - name: locksmithd.service
