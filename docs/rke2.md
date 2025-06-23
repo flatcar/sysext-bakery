@@ -53,7 +53,7 @@ systemd:
           contents: |
             [Service]
             ExecStartPre=/usr/bin/sh -c "readlink --canonicalize /etc/extensions/rke2.raw > /tmp/rke2"
-            ExecStartPre=/usr/lib/systemd/systemd-sysupdate -C rke2-v1.32 update
+            ExecStartPre=/usr/lib/systemd/systemd-sysupdate -C rke2 update
             ExecStartPost=/usr/bin/sh -c "readlink --canonicalize /etc/extensions/rke2.raw > /tmp/rke2-new"
             ExecStartPost=/usr/bin/sh -c "if ! cmp --silent /tmp/rke2 /tmp/rke2-new; then touch /run/reboot-required; fi"
 ```
