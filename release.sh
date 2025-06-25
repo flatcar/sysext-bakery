@@ -30,8 +30,12 @@ for arch in x86-64 arm64; do
   target="${extension}-${version}-${arch}"
   out "## \`${target}.raw\`"
   ./bakery.sh create "${extension}" "${version}" --arch "${arch}" --sysupdate true --output-file "${target}" 2>&1 \
-    | tee "${extension}-${version}-${arch}-build.log"
-  cat SHA256SUMS."${extension}" >> SHA256SUMS
+    | tee "${target}-build.log"
+
+  out "## \`${target}-signed-ddi.raw\`"
+  ./bakery.sh create "${extension}" "${version}" --arch "${arch}" --sysupdate true --output-file "${target}" --signed-ddi true 2>&1 \
+    | tee "${target}-signed-ddi-build.log"
+  cat SHA256SUMS."${extension}"{,-signed-ddi} >> SHA256SUMS
 done
 
 out "## SHA256SUMS"
