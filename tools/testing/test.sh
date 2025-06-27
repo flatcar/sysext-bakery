@@ -11,6 +11,8 @@ extension_arg="${1}"
 extension="$(basename "${extension_arg}")"
 extension_path="$(dirname "${extension_arg}")"
 
+script_dir="$(dirname "$0")"
+
 # --
 
 function download_if_needed() {
@@ -34,7 +36,8 @@ function download_if_needed() {
 
   echo "Flatcar image not found, downloading."
 
-curl -fL --progress-bar --retry-delay 1 --retry 60 --retry-connrefused --remote-name "${files[@]/#/https://stable.release.flatcar-linux.net/amd64-usr/current/}"
+  curl -fL --retry-delay 1 --retry 60 --retry-connrefused --remote-name-all --parallel \
+    "${files[@]/#/https://stable.release.flatcar-linux.net/amd64-usr/current/}"
 
   chmod 755 flatcar_production_qemu_uefi.sh
 }
@@ -43,7 +46,7 @@ curl -fL --progress-bar --retry-delay 1 --retry 60 --retry-connrefused --remote-
 function webserver() {
   local path="$1"
   cd "${path}"
-  exec docker run -i --rm \
+  exec docker run --rm \
       -p 8000:80 \
       -v "${PWD}":/usr/share/caddy \
   caddy
@@ -52,13 +55,12 @@ function webserver() {
 
 download_if_needed
 
-sed "s/EXTENSION/${extension}/g" "test.yaml.tmpl" > "test.yaml"
-cat test.yaml \
-    | docker run --rm \
+sed "s/EXTENSION/${extension}/g" "${script_dir}/test.yaml.tmpl" > "test.yaml"
+docker run --rm \
       -v "${PWD}":/files \
       -i quay.io/coreos/butane:latest \
       --files-dir /files  \
-    > test.json
+    > test.json <test.yaml
 
 trap 'kill %1' EXIT
 webserver "${extension_path}" &
