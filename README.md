@@ -142,6 +142,10 @@ Have a look at other extension builds for inspiration;
 * [keepalived](/keepalived.sysext/create.sh) is rather unusual in that it spawns an ephemeral Alpine docker container
   to statically compile keepalived (via a [build script](/keepalived.sysext/build.sh) mounted into the container).
 
+# Test sysexts in a local Flatcar qemu instance
+
+A complementary helper script for interactive local testing is provided in [`tools/testing`](tools/testing).
+The script aims to automate all boiler plating such as downloading OS images, generating configuration to install the extension, and serving the extension to the qemu instance.
 
 # Hosting your own bakery
 
