@@ -63,6 +63,7 @@ Check out documentation on specific extensions at the navigation menu on the lef
 | `cilium`         |  released    | [cilium versions](https://github.com/flatcar/sysext-bakery/releases/tag/cilium) |
 | `containerd`     |  released    | [containerd versions](https://github.com/flatcar/sysext-bakery/releases/tag/containerd) |
 | `crio`           |  released    | [crio versions](https://github.com/flatcar/sysext-bakery/releases/tag/crio) |
+| `docker-buildx`  |  released    | [docker-buildx versions](https://github.com/flatcar/sysext-bakery/releases/tag/docker-buildx) |
 | `docker-compose` |  released    | [docker-compose versions](https://github.com/flatcar/sysext-bakery/releases/tag/docker-compose) |
 | `docker`         |  released    | [docker versions](https://github.com/flatcar/sysext-bakery/releases/tag/docker) |
 | `falco`          |  released    | [falco versions](https://github.com/flatcar/sysext-bakery/releases/tag/falco) |
