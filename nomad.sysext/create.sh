@@ -8,7 +8,11 @@ function list_available_versions() {
   curl -fsSL --retry-delay 1 --retry 60 \
     --retry-connrefused --retry-max-time 60 --connect-timeout 20 \
     https://api.releases.hashicorp.com/v1/releases/nomad \
-  | jq -r '.[].version| capture("(?<v>[[:digit:].]+)").v' \
+  | jq -r '.[] | select(has("version"))
+               | .version
+               | select(type == "string")
+               | select(test("^[0-9.]+$"))
+               | capture("(?<v>[[:digit:].]+)").v' \
   | sort -Vr
 }
 # --
@@ -26,6 +30,6 @@ function populate_sysext_root() {
   # Unzip the binary
   mkdir -p "${sysextroot}/usr/bin"
   unzip -q "nomad_${version}_linux_${rel_arch}.zip"
-  install -m 0755 "nomad" "${sysextroot}/usr/bin/nomad"
+  install -m 0755 nomad "${sysextroot}/usr/bin
 }
 # --

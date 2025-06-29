@@ -45,7 +45,7 @@ systemd:
         - name: nomad.conf
           contents: |
             [Service]
-            ExecStartPre=/usr/bin/sh -c "readlink --canonicalize /etc/extensions/nomad.raw > /tmp/tailscale"
+            ExecStartPre=/usr/bin/sh -c "readlink --canonicalize /etc/extensions/nomad.raw > /tmp/nomad"
             ExecStartPre=/usr/lib/systemd/systemd-sysupdate -C nomad update
             ExecStartPost=/usr/bin/sh -c "readlink --canonicalize /etc/extensions/nomad.raw > /tmp/nomad-new"
             ExecStartPost=/usr/bin/sh -c "if ! cmp --silent /tmp/nomad /tmp/nomad-new; then touch /run/reboot-required; fi"
