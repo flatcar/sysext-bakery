@@ -30,6 +30,6 @@ function populate_sysext_root() {
   # Unzip the binary
   mkdir -p "${sysextroot}/usr/bin"
   unzip -q "nomad_${version}_linux_${rel_arch}.zip"
-  install -m 0755 nomad "${sysextroot}/usr/bin
+  install -m 0755 nomad "${sysextroot}/usr/bin"
 }
 # --
