@@ -2,12 +2,17 @@ version: 1.0.0
 variant: flatcar
 
 storage:
+  links:
+    - target: /opt/extensions/%EXTENSION_FILE%
+      path: /etc/extensions/%EXTENSION_NAME%
+      hard: false
   files:
-    - path: /etc/extensions/EXTENSION
+    - path: /opt/extensions/%EXTENSION_FILE%
       mode: 0644
       contents:
         # QEmu's default traffic-to-host IP
-        source: http://10.0.2.2:8000/EXTENSION
+        source: http://10.0.2.2:8000/%EXTENSION_FILE%
+
 systemd:
   units:
     - name: update-engine.service

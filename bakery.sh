@@ -22,8 +22,14 @@ function usage() {
   echo "  list <sysext> [--latest true] - List available releases of the project shipped by <sysext>."
   echo "                                  If --latest is true, list only the project's latest release(s)."
   echo "  list-bakery <sysext>          - List all Bakery release versions of <sysext>."
+  echo
   echo "  create <sysext>               - Create the specified system extension."
   echo "  create <sysext> help          - List sysext specific parameters. Rarely used."
+  echo
+  echo "  test <sysext>                 - Run tests for an extension on an extension image in a local Flatcar VM."
+  echo
+  echo "  test-interactive <sysext>     - Starts a local Flatcar VM with an extension image included."
+  echo "                                  Drops at the login for interactive testing."
   echo
   echo "Use '$0 <command> help' to print help for a specific command."
   echo
@@ -142,7 +148,7 @@ function create_sysext() {
 # --
 
 case "${1:-}" in
-  list|list-bakery|create|test)
+  list|list-bakery|create|test|test-interactive)
     cmd="${1}"
     shift
     "${cmd}"_sysext "${@}"

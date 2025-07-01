@@ -149,3 +149,18 @@ function list_latest_release() {
   list_available_versions | head -n 1
 }
 # --
+
+# Run a local webserver.
+function webserver() {
+  local path="$1"
+  local port="${2:-12345}"
+
+  cd "${path}"
+
+  exec docker run --rm \
+      -p "${port}":80 \
+      -v "${PWD}":/usr/share/caddy \
+  caddy
+}
+# --
+
