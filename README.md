@@ -34,6 +34,9 @@ If you want to build yourself, the following packages are required:
 - `xz-utils`
 - [`yq`](https://github.com/mikefarah/yq/releases/latest/)
 
+Optional for testing (`bakery.sh boot` command):
+- qemu
+
 First, clone the repository.
 The `bakery.sh` script is used to interact with individual extension build scripts.
 Try
@@ -93,6 +96,27 @@ to display these; e.g.
 ./bakery.sh create docker help
 ```
 
+### Interactively test extension images in a local VM
+
+Extension images can be tested and explored interactively in a local Flatcar VM.
+The command
+
+```sh
+./bakery.sh boot <extension>
+```
+will provision `extension` to a local Flatcar VM.
+
+A suitable Flatcar OS image will be downloaded if not present in the local directory.
+The command will then
+- Start a local containerised webserver (caddy) to serve the extension images to the VM.
+- Generate an ignition config that installs the sysext(s) (if no custom Butane YAML was provided via a command line parameter)
+- Start a Flatcar VM, and drop to a shell (via TTY).
+
+Users can then run commands to validate the extension.
+Note that the shell is started for the unprivileged `core` user.
+The user has passwordless `sudo` access set up.
+
+
 ### Build all sysext images in this repository
 
 This builds `x86-64` and `arm64` versions of **all** sysext images listed in `release_build_versions.txt`.
@@ -141,11 +165,6 @@ Have a look at other extension builds for inspiration;
 * [docker](/docker.sysext/create.sh) is quite complex and even features its own command line build option.
 * [keepalived](/keepalived.sysext/create.sh) is rather unusual in that it spawns an ephemeral Alpine docker container
   to statically compile keepalived (via a [build script](/keepalived.sysext/build.sh) mounted into the container).
-
-# Test sysexts in a local Flatcar qemu instance
-
-A complementary helper script for interactive local testing is provided in [`tools/testing`](tools/testing).
-The script aims to automate all boiler plating such as downloading OS images, generating configuration to install the extension, and serving the extension to the qemu instance.
 
 # Hosting your own bakery
 

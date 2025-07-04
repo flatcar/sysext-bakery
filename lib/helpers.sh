@@ -44,6 +44,17 @@ function get_positional_param() {
 }
 # --
 
+function get_all_positional_params() {
+  while [[ $# -gt 0 ]] ; do
+    case "$1" in
+      --*) shift ;;
+      *) echo "$1" ;;
+    esac
+    shift
+  done
+}
+# --
+
 function check_arch() {
   local arch="$1"
 
@@ -147,5 +158,35 @@ function extension_name() {
 # Must be called with the extension "create.sh" script sourced.
 function list_latest_release() {
   list_available_versions | head -n 1
+}
+# --
+
+# Run a local webserver.
+function webserver() {
+  local path="$1"
+  local port="${2:-12345}"
+
+  cd "${path}"
+
+  exec docker run --rm \
+      -p "${port}":80 \
+      -v "${PWD}":/usr/share/caddy \
+  caddy
+}
+# --
+
+function transpile() {
+  local yamlfile="$1"
+  local outfile="$2"
+
+  # We pass the YAML file directory into the container so additional local resources
+  #  to be merged into the provisioning JSON can be specified there.
+  local yamldir="$(dirname "${yamlfile}")"
+
+  docker run --rm \
+      -v "${yamldir}":/files \
+      -i quay.io/coreos/butane:latest \
+      --files-dir /files  \
+    >"${outfile}" <"${yamlfile}"
 }
 # --

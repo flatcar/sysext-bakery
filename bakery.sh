@@ -24,6 +24,8 @@ function usage() {
   echo "  list-bakery <sysext>          - List all Bakery release versions of <sysext>."
   echo "  create <sysext>               - Create the specified system extension."
   echo "  create <sysext> help          - List sysext specific parameters. Rarely used."
+  echo "  boot <sysext> [<sysext> ...]  - Boot a local Flatcar VM (qemu) with sysext(s) merged."
+  echo "                                  Great for testing and interactively exploring sysexts."
   echo
   echo "Use '$0 <command> help' to print help for a specific command."
   echo
@@ -142,7 +144,7 @@ function create_sysext() {
 # --
 
 case "${1:-}" in
-  list|list-bakery|create|test)
+  list|list-bakery|create|boot|test)
     cmd="${1}"
     shift
     "${cmd}"_sysext "${@}"
