@@ -28,7 +28,7 @@ storage:
         source: https://extensions.flatcar.org/extensions/nomad-v1.10.0-x86-64.raw
     - path: /etc/sysupdate.nomad.d/nomad.conf
       contents:
-        source: https://extensions.flatcar.org/extensions/tailscale.conf
+        source: https://extensions.flatcar.org/extensions/nomad.conf
   links:
     - path: /etc/systemd/system/multi-user.target.wants/nomad.service
       target: /usr/local/lib/systemd/system/nomad.service
