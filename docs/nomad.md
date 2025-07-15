@@ -22,10 +22,10 @@ version: 1.0.0
 
 storage:
   files:
-    - path: /opt/extensions/nomad/nomad-v1.10.0-x86-64.raw
+    - path: /opt/extensions/nomad/nomad-1.10.0-x86-64.raw
       mode: 0644
       contents:
-        source: https://extensions.flatcar.org/extensions/nomad-v1.10.0-x86-64.raw
+        source: https://extensions.flatcar.org/extensions/nomad-1.10.0-x86-64.raw
     - path: /etc/sysupdate.nomad.d/nomad.conf
       contents:
         source: https://extensions.flatcar.org/extensions/nomad.conf
@@ -33,7 +33,7 @@ storage:
     - path: /etc/systemd/system/multi-user.target.wants/nomad.service
       target: /usr/local/lib/systemd/system/nomad.service
       overwrite: true
-    - target: /opt/extensions/nomad/nomad-v1.10.0-x86-64.raw
+    - target: /opt/extensions/nomad/nomad-1.10.0-x86-64.raw
       path: /etc/extensions/nomad.raw
       hard: false
 systemd:
