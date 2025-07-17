@@ -19,10 +19,10 @@ version: 1.0.0
 
 storage:
   files:
-    - path: /opt/extensions/bird/bird-3.1.1-x86-64.raw
+    - path: /opt/extensions/bird/bird-3.1.2-x86-64.raw
       mode: 0644
       contents:
-        source: https://extensions.flatcar.org/extensions/bird-3.1.1-x86-64.raw
+        source: https://extensions.flatcar.org/extensions/bird-3.1.2-x86-64.raw
     - path: /etc/sysupdate.bird.d/bird.conf
       contents:
         source: https://extensions.flatcar.org/extensions/bird/bird.conf
@@ -30,7 +30,7 @@ storage:
       contents:
         source: https://extensions.flatcar.org/extensions/noop.conf
   links:
-    - target: /opt/extensions/bird/bird-3.1.1-x86-64.raw
+    - target: /opt/extensions/bird/bird-3.1.2-x86-64.raw
       path: /etc/extensions/bird.raw
       hard: false
     - path: /etc/systemd/system/multi-user.target.wants/bird.service
