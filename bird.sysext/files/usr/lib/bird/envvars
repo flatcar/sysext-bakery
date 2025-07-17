@@ -1,0 +1,3 @@
+BIRD_RUN_USER=root
+BIRD_RUN_GROUP=root
+#BIRD_ARGS=
