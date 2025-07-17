@@ -21,4 +21,5 @@ fi
 source "${libroot}/helpers.sh"
 source "${libroot}/generate.sh"
 source "${libroot}/list.sh"
+source "${libroot}/boot.sh"
 source "${libroot}/test.sh"
