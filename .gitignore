@@ -2,6 +2,10 @@
 *.tgz
 *.tar.gz
 *.conf
+*.swp
+release-tag.txt
+releases.json
+releases_to_build.txt
 SHA256SUMS*
 mnt*
 Release.md
@@ -9,3 +13,7 @@ prev_release_sysexts.txt
 tags
 .env
 .env.backup
+
+*test.json
+*test.yaml
+*flatcar_production_*

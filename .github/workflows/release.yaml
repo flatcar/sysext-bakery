@@ -77,7 +77,8 @@ jobs:
             curl \
             jq \
             squashfs-tools \
-            xz-utils
+            xz-utils \
+            erofs-utils
 
       - name: build
         id: build
@@ -123,7 +124,8 @@ jobs:
             curl \
             jq \
             squashfs-tools \
-            xz-utils
+            xz-utils \
+            erofs-utils
 
       - name: Fetch extension release metadata
         env:
@@ -163,7 +165,8 @@ jobs:
             curl \
             jq \
             squashfs-tools \
-            xz-utils
+            xz-utils \
+            erofs-utils
 
       - name: Fetch all extension releases metadata
         env:
