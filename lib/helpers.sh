@@ -131,6 +131,20 @@ function github_release_exists() {
 }
 # --
 
+function list_gitlab_tags() {
+  local instance="$1"
+  local projectid="$2"
+
+  local curl="curl -fsSL --retry-delay 1 --retry 60 --retry-connrefused"
+  curl="$curl --retry-max-time 60 --connect-timeout 20"
+
+  $curl \
+    "https://${instance}/api/v4/projects/${projectid}/repository/tags" \
+    | jq -r '.[].name' \
+    | sort -Vr
+}
+# --
+
 function list_github_tags() {
   local org="$1"
   local project="$2"
