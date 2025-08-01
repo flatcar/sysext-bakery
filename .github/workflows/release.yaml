@@ -86,6 +86,8 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           pushd bakery
+          echo "${{ secrets.SYSEXT_PRIVATE_KEY }}" > sysext.key
+          echo "${{ secrets.SYSEXT_CERTIFICATE }}" > sysext.crt
           ./release.sh ${{ matrix.release }}
 
       - name: create a new release

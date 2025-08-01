@@ -99,6 +99,32 @@ function _create_sysupdate() {
 }
 # --
 
+function _generate_signed_sysext() {
+  BASEDIR="$1"
+  OUTPUT_IMAGE="$2"
+  FS_FORMAT="$3"
+
+  # Create temporary working directory
+  WORKDIR=$(mktemp -d)
+  trap 'rm -rf "$WORKDIR"' RETURN
+
+  cp -r "/usr/lib/systemd/repart/definitions/sysext.repart.d/" "$WORKDIR"
+  sed -Ei "s/^Format=erofs/Format=${FS_FORMAT}/" "$WORKDIR/sysext.repart.d/10-root.conf"
+
+  # Run systemd-repart
+  systemd-repart \
+    --empty=create \
+    --size=auto \
+    --private-key=sysext.key \
+    --certificate=sysext.crt \
+    --definitions="${WORKDIR}/sysext.repart.d" \
+    --copy-source="$BASEDIR" \
+    "$OUTPUT_IMAGE"
+
+  echo "Signed sysext created: $OUTPUT_IMAGE"
+}
+# --
+
 function _generate_sysext() {
   local extname="$1"
   local basedir="$2"
@@ -107,23 +133,15 @@ function _generate_sysext() {
   local fname="$5"
 
   announce "Creating extension image '${fname}' and generating SHA256SUM"
-  case "$format" in
-    btrfs)
-      mkfs.btrfs --mixed -m single -d single --shrink --rootdir "${basedir}" "${fname}"
-      ;;
-    ext2|ext4)
-      truncate -s "${ext_fs_size}" "${fname}"
-      mkfs."${format}" -E root_owner=0:0 -d "${basedir}" "${fname}"
-      resize2fs -M "${fname}"
-      ;;
-    squashfs)
-      mksquashfs "${basedir}" "${fname}" -all-root -noappend -xattrs-exclude '^btrfs.'
-      ;;
-    erofs)
-      mkfs.erofs "${fname}" "${basedir}"
-      ;;
+  (
+    export SYSTEMD_REPART_MKFS_OPTIONS_BTRFS="--mixed -m single -d single --shrink"
+    export SYSTEMD_REPART_MKFS_OPTIONS_EXT2="-E root_owner=0:0"
+    export SYSTEMD_REPART_MKFS_OPTIONS_EXT4="$SYSTEMD_REPART_MKFS_OPTIONS_EXT2"
+    export SYSTEMD_REPART_MKFS_OPTIONS_SQUASHFS="-all-root -noappend -xattrs-exclude '^btrfs.'"
 
-  esac
+    _generate_signed_sysext "${basedir}" "${fname}" "$format"
+  )
+
   sha256sum "${fname}" > "SHA256SUMS.${extname}"
   announce "'${fname}' is now ready"
 }
