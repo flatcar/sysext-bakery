@@ -109,7 +109,8 @@ function _generate_sysext() {
   announce "Creating extension image '${fname}' and generating SHA256SUM"
   case "$format" in
     btrfs)
-      mkfs.btrfs --mixed -m single -d single --shrink --rootdir "${basedir}" "${fname}"
+      # Note: We didn't chown to root:root, meaning that the file ownership is left as is
+      mkfs.btrfs --mixed -m single -d single --shrink --compress zstd --rootdir "${basedir}" "${fname}"
       ;;
     ext2|ext4)
       truncate -s "${ext_fs_size}" "${fname}"
