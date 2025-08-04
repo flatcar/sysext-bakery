@@ -33,6 +33,7 @@ function populate_sysext_root() {
 
   mkdir -p "${sysextroot}/usr/bin"
   cp -a "wasmcloud-${rel_arch}-unknown-linux-musl" "${sysextroot}/usr/bin/wasmcloud"
+  chmod +x "${sysextroot}/usr/bin/wasmcloud"
   cp -a "nats-server-${nats}-linux-${go_arch}/nats-server" "${sysextroot}/usr/bin/"
 }
 # --
