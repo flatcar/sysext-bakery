@@ -120,7 +120,9 @@ function _generate_sysext() {
       mksquashfs "${basedir}" "${fname}" -all-root -noappend -xattrs-exclude '^btrfs.'
       ;;
     erofs)
-      mkfs.erofs "${fname}" "${basedir}"
+      # Compression recommendations from https://erofs.docs.kernel.org/en/latest/mkfs.html
+      # and forcing a zero UUID for reproducibility (maybe we could also hash the name and version)
+      mkfs.erofs -zlz4hc,12 -C65536 -Efragments,ztailpacking -Uclear --all-root "${fname}" "${basedir}"
       ;;
 
   esac
