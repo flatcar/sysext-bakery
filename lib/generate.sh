@@ -109,7 +109,8 @@ function _generate_sysext() {
   announce "Creating extension image '${fname}' and generating SHA256SUM"
   case "$format" in
     btrfs)
-      mkfs.btrfs --mixed -m single -d single --shrink --rootdir "${basedir}" "${fname}"
+      # Note: We didn't chown to root:root, meaning that the file ownership is left as is
+      mkfs.btrfs --mixed -m single -d single --shrink --compress zstd --rootdir "${basedir}" "${fname}"
       ;;
     ext2|ext4)
       truncate -s "${ext_fs_size}" "${fname}"
@@ -120,7 +121,9 @@ function _generate_sysext() {
       mksquashfs "${basedir}" "${fname}" -all-root -noappend -xattrs-exclude '^btrfs.'
       ;;
     erofs)
-      mkfs.erofs "${fname}" "${basedir}"
+      # Compression recommendations from https://erofs.docs.kernel.org/en/latest/mkfs.html
+      # and forcing a zero UUID for reproducibility (maybe we could also hash the name and version)
+      mkfs.erofs -zlz4hc,12 -C65536 -Efragments,ztailpacking -Uclear --all-root "${fname}" "${basedir}"
       ;;
 
   esac
