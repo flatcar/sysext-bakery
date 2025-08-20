@@ -153,7 +153,7 @@ To add an extension:
    - `populate_sysext_root` populates the system extension root directory (available via `$sysextroot`).
       This function runs in a temporary directory; stuff can be downloaded / built in `./` and then moved to `$sysextroot`.
       The temporary directory will be removed when the extension build is complete (or when it errors out); no need to clean up manually.
-4. Add `docs/<my-extension-name>.md` with documentation and example configuration for the new extension, and reference the new file from the list of extensions in `docs/_index.md`.
+4. Add `docs/<my-extension-name>.md` with documentation and example configuration for the new extension, and reference the new file from the list of extensions in `docs/index.md`.
 5. Optionally add the new extension name to [release_build_versions.txt](https://github.com/flatcar/sysext-bakery/blob/main/release_build_versions.txt) to automatically build it when new upstream versions are released.
 6. File a PR.
 
