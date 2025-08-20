@@ -99,6 +99,11 @@ function _create_sysupdate() {
 }
 # --
 
+function _version_ge() {
+    test "$(printf '%s\n' "$@" | sort -rV | head -n 1)" == "$1";
+}
+# --
+
 function _generate_sysext() {
   local extname="$1"
   local basedir="$2"
@@ -118,7 +123,12 @@ function _generate_sysext() {
       resize2fs -M "${fname}"
       ;;
     squashfs)
-      mksquashfs "${basedir}" "${fname}" -all-root -noappend -xattrs-exclude '^btrfs.'
+      VERSION=$({ mksquashfs -version || true ; } | head -n1 | cut -d " " -f 3)
+      ARG=(-all-root -noappend)
+      if _version_ge "${VERSION}" "4.6.1"; then
+        ARG+=('-xattrs-exclude' '^btrfs.')
+      fi
+      mksquashfs "${basedir}" "${fname}" "${ARG[@]}"
       ;;
     erofs)
       # Compression recommendations from https://erofs.docs.kernel.org/en/latest/mkfs.html
