@@ -67,6 +67,7 @@ Check out documentation on specific extensions at the navigation menu on the lef
 | `docker-compose` |  released    | [docker-compose versions](https://github.com/flatcar/sysext-bakery/releases/tag/docker-compose) |
 | `docker`         |  released    | [docker versions](https://github.com/flatcar/sysext-bakery/releases/tag/docker) |
 | `falco`          |  released    | [falco versions](https://github.com/flatcar/sysext-bakery/releases/tag/falco) |
+| `ig`             |  released    | [ig versions](https://github.com/flatcar/sysext-bakery/releases/tag/ig) |
 | `k3s`            |  released    | [k3s versions](https://github.com/flatcar/sysext-bakery/releases/tag/k3s) |
 | `keepalived`     |  released    | [keepalived versions](https://github.com/flatcar/sysext-bakery/releases/tag/keepalived) |
 | `kubernetes`     |  released    | [kubernetes versions](https://github.com/flatcar/sysext-bakery/releases/tag/kubernetes) |
