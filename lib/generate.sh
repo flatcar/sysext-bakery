@@ -133,7 +133,7 @@ function _generate_sysext() {
     erofs)
       # Compression recommendations from https://erofs.docs.kernel.org/en/latest/mkfs.html
       # and forcing a zero UUID for reproducibility (maybe we could also hash the name and version)
-      mkfs.erofs -zlz4hc,12 -C65536 -Efragments,ztailpacking -Uclear --all-root "${fname}" "${basedir}"
+      mkfs.erofs -zlz4hc,12 -C65536 -Efragments,ztailpacking -U00000000-0000-0000-0000-000000000000 --all-root "${fname}" "${basedir}"
       ;;
 
   esac
