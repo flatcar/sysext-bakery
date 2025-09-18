@@ -22,8 +22,8 @@ function populate_sysext_root() {
   rel_arch="$(arch_transform 'arm64' 'arm64' "$rel_arch")"
 
   mkdir -p "${sysextroot}/usr/local/lib/docker/cli-plugins"
-  curl -o "${sysextroot}/usr/local/lib/docker/cli-plugins/docker-compose" \
+  curl -o "${sysextroot}/usr/local/lib/docker/cli-plugins/docker-buildx" \
     -fsSL "https://github.com/docker/buildx/releases/download/v${version}/buildx-v${version}.linux-${rel_arch}"
-  chmod +x "${sysextroot}/usr/local/lib/docker/cli-plugins/docker-compose"
+  chmod +x "${sysextroot}/usr/local/lib/docker/cli-plugins/docker-buildx"
 }
 # --
