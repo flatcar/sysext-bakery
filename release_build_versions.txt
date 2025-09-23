@@ -17,6 +17,9 @@
 # to build the latest (i.e. highest version number) release(s).
 #
 
+consul 1.21.4
+consul latest
+
 containerd 2.0.0
 containerd latest
 

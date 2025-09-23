@@ -61,6 +61,7 @@ Check out documentation on specific extensions at the navigation menu on the lef
 |    Extension     | Availability | Versions available |
 | ---------------- | ------------ | ------------- |
 | `cilium`         |  released    | [cilium versions](https://github.com/flatcar/sysext-bakery/releases/tag/cilium) |
+| `consul`          |  released    | [consul versions](https://github.com/flatcar/sysext-bakery/releases/tag/consul) |
 | `containerd`     |  released    | [containerd versions](https://github.com/flatcar/sysext-bakery/releases/tag/containerd) |
 | `crio`           |  released    | [crio versions](https://github.com/flatcar/sysext-bakery/releases/tag/crio) |
 | `docker-buildx`  |  released    | [docker-buildx versions](https://github.com/flatcar/sysext-bakery/releases/tag/docker-buildx) |
