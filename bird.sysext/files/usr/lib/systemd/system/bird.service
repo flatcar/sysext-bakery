@@ -1,0 +1,14 @@
+[Unit]
+Description=BIRD Internet Routing Daemon
+After=network.target
+
+[Service]
+EnvironmentFile=/usr/lib/bird/envvars
+ExecStartPre=/usr/lib/bird/prepare-environment
+ExecStartPre=/usr/bin/bird -p
+ExecReload=/usr/bin/birdc configure
+ExecStart=/usr/bin/bird -f -u $BIRD_RUN_USER -g $BIRD_RUN_GROUP $BIRD_ARGS
+Restart=on-abort
+
+[Install]
+WantedBy=multi-user.target

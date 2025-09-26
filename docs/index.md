@@ -60,6 +60,7 @@ Check out documentation on specific extensions at the navigation menu on the lef
 
 |    Extension     | Availability | Versions available |
 | ---------------- | ------------ | ------------- |
+| `bird`           |  released    | [bird versions](https://github.com/flatcar/sysext-bakery/releases/tag/bird) |
 | `cilium`         |  released    | [cilium versions](https://github.com/flatcar/sysext-bakery/releases/tag/cilium) |
 | `consul`          |  released    | [consul versions](https://github.com/flatcar/sysext-bakery/releases/tag/consul) |
 | `containerd`     |  released    | [containerd versions](https://github.com/flatcar/sysext-bakery/releases/tag/containerd) |
