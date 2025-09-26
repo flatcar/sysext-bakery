@@ -26,7 +26,12 @@ function populate_sysext_root() {
   mkdir -p "${sysextroot}/usr/bin"
   mkdir -p "${sysextroot}/usr/lib"
 
-  cp -a "WasmEdge-${version}-Linux"/bin/wasmedge "${sysextroot}"/usr/bin/
-  cp -a "WasmEdge-${version}-Linux"/lib/* "${sysextroot}"/usr/lib/
+  local prefix="./"
+  if semver_lower "${version}" "0.15.0" ; then
+    local prefix="WasmEdge-${version}-Linux/"
+  fi
+
+  cp -a "${prefix}"/bin/* "${sysextroot}"/usr/bin/
+  cp -a "${prefix}"/lib/* "${sysextroot}"/usr/lib/
 }
 # --

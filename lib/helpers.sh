@@ -190,3 +190,25 @@ function transpile() {
     >"${outfile}" <"${yamlfile}"
 }
 # --
+
+function semver_equals_or_higher() {
+  local ver="${1#v}"
+  local comp="${2#v}"
+
+  local highest="$(echo -e "${ver}\n${comp}" | sort --version-sort --reverse | head -n 1)"
+
+  if [[ "${highest}" == "${ver}" ]] ; then
+    return 0
+  fi
+
+  return 1
+}
+# --
+
+function semver_lower() {
+  if semver_equals_or_higher "${@}"; then
+    return 1
+  fi
+
+  return 0
+}
