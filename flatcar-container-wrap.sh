@@ -15,4 +15,4 @@ for VARNAME in $(bash -c "compgen -v | grep -vE \"$EXCLUDED_VARS\""); do
 done
 
 docker run "${ARGS[@]}" "${FLATCAR_SDK_CONTAINER}:$LATEST_FLATCAR_SDK_VERSION" \
-  bash -c "$*"
+  bash -c "sudo ./setup_scripts_repo.sh && $*"
