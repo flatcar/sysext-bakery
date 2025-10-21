@@ -92,3 +92,9 @@ cilium latest
 
 bird 3.1.2
 bird latest
+
+btop 1.4.0
+btop latest
+
+tilde 1.1.2
+tilde latest
