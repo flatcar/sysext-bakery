@@ -1,25 +1,21 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-export ARCH="${ARCH-amd64}"
 EXTRALIBS="${EXTRALIBS-}"
-KEEP="${KEEP-}"
-SCRIPTFOLDER="$(dirname "$(readlink -f "$0")")"
 
 if [ $# -lt 3 ] || [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
   echo "Usage: $0 FOLDER SYSEXTNAME PATHS..."
-  echo "The script will extract the specified binary paths (e.g., /usr/bin/nano) or resource paths (e.g., /usr/share/nano/) from FOLDER, resolve the dynamic libraries, and create a systemd-sysext squashfs image with the name SYSEXTNAME.raw in the current folder."
+  echo "The script will extract the specified binary paths (e.g., /usr/bin/nano) or resource paths (e.g., /usr/share/nano/) from FOLDER, resolve the dynamic libraries, and create a self-contained systemd-sysext structure in SYSEXTNAME in the current folder."
   echo "Paths under /usr are recommended but paths under /etc or /bin can also be specified as 'CHROOT:TARGET', e.g., '/etc/systemd/system/my.service:/usr/systemd/system/my.service' or '/bin/mybin:/usr/bin/mybin' supported (but not if they are symlinks under /bin/)."
   echo "Since dynamic libraries should not conflict, you must not pass libraries in PATHS."
   echo "If a particular library is needed for dlopen, pass EXTRALIBS as space-separated environment variable (current value is '${EXTRALIBS}')."
   echo "Note: The resolving of libraries copies them in one shared folder and might not cover all use cases."
   echo "E.g., specifying a folder with binaries does not work, each one has to be specified separately."
-  echo "For testing, pass KEEP=1 as environment variable (current value is '${KEEP}') and run the binaries with bwrap --bind /proc /proc --bind SYSEXTNAME/usr /usr /usr/bin/BINARY."
+  echo "For testing, run the binaries with bwrap --bind /proc /proc --bind SYSEXTNAME/usr /usr /usr/bin/BINARY."
   echo
-  echo "A temporary directory named SYSEXTNAME in the current folder will be created and deleted again."
-  echo "All files in the sysext image will be owned by root."
-  echo "To use a different architecture than amd64 pass 'ARCH=arm64' as environment variable (current value is '${ARCH}')."
-  "${SCRIPTFOLDER}"/bake.sh --help
+  echo "A directory named SYSEXTNAME in the current folder will be created, and should then be packed up as sysext image by other tools."
+  echo "E.g., 'mkdir -p SYSEXTNAME/usr/lib/extension-release.d/ && echo ID=_any > SYSEXTNAME/usr/lib/extension-release.d/extension-release.SYSEXTNAME'"
+  echo "and then something like 'mksquashfs SYSEXTNAME/ SYSEXTNAME.raw -all-root -noappend'"
   exit 1
 fi
 
@@ -74,7 +70,12 @@ find_deps() {
     fi
     NEW_RPATHS+=":/usr/local/${SYSEXTNAME}/${RP}"
   done
-  patchelf --no-default-lib --set-rpath "${NEW_RPATHS}" "${FILE}"
+  # For static binaries such as the linker itself we skip this because
+  # it's not needed and breaks the GNU linker (but not the musl linker)
+  if [ "$(patchelf --print-needed "${FILE}" 2>/dev/null || true)" != "" ]; then
+    patchelf --no-default-lib --set-rpath "${NEW_RPATHS}" "${FILE}"
+  fi
+  # Debug any issues with LD_DEBUG=libs BINARY
 }
 
 rm -rf "${SYSEXTNAME}"
@@ -131,8 +132,3 @@ for ENTRY in ${EXTRALIBS}; do
     find_deps "${FOLDER}" "${SYSEXTNAME}" "${FOLDER}/${ENTRY}"
   fi
 done
-
-RELOAD=1 "${SCRIPTFOLDER}"/bake.sh "${SYSEXTNAME}"
-if [ "${KEEP}" != 1 ]; then
-  rm -rf "${SYSEXTNAME}"
-fi
