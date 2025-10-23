@@ -1,30 +1,26 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-export ARCH="${ARCH-amd64}"
-KEEP="${KEEP-}"
 ETCMAP="${ETCMAP-host}"
 VARMAP="${VARMAP-host}"
 HOMEMAP="${HOMEMAP-host}"
 CHROOT="${CHROOT-/usr /lib /lib64 /bin /sbin}"
 HOST="${HOST-/dev /proc /sys /run /tmp /var/tmp}"
-SCRIPTFOLDER="$(dirname "$(readlink -f "$0")")"
 
 if [ $# -lt 3 ] || [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
   echo "Usage: $0 FOLDER SYSEXTNAME PATHS..."
-  echo "The script will set up entry points for the specified binary or systemd unit paths (e.g., /usr/bin/nano, /usr/systemd/system/my.service) from FOLDER into a chroot under /usr/local/, and create a systemd-sysext squashfs image with the name SYSEXTNAME.raw in the current folder."
-  echo "Paths under /usr are recommended but paths under /etc or /bin can also be specified as 'CHROOT:TARGET', e.g., '/etc/systemd/system/my.service:/usr/systemd/system/my.service' or '/bin/mybin:/usr/bin/mybin' supported."
+  echo "The script will set up entry points for the specified binary or systemd unit paths (e.g., /usr/bin/nano, /usr/systemd/system/my.service) from FOLDER into a chroot under /usr/local/, and create a self-contained systemd-sysext structure in SYSEXTNAME in the current folder."
+  echo "Paths under /usr are recommended but paths under /etc or /bin can also be specified as 'CHROOT:TARGET', e.g., '/etc/systemd/system/my.service:/usr/systemd/system/my.service' or '/bin/mybin:/usr/bin/mybin' are supported."
   echo "Since only the specified paths are available in the host, any files accessed by systemd for service units must also be specified."
   echo "The binary itself will be able to access all files of the chroot as specifed in the CHROOT environment variable (current value is '${CHROOT}')."
   echo "It will also be able to access all files of the host as specified in the HOST environment variable and to /etc, /var, /home if not disabled below (current value is '${HOST}')."
   echo "The mapping of /etc, /var, /home from host or the chroot can be controlled with the ETCMAP/VARMAP/HOMEMAP environment variables by setting them to 'chroot' (current values are '${ETCMAP}', '${VARMAP}', '${HOMEMAP}')."
   echo "The binaries will be spawned with bwrap if available for non-root users. When bwrap is missing, an almost equivalent combination of unshare commands is used."
-  echo "For testing, pass KEEP=1 as environment variable (current value is '${KEEP}') and run the binaries with [sudo] FLATWRAP_ROOT=SYSEXTNAME SYSEXTNAME/usr/bin/binary."
+  echo "For testing, run the binaries with [sudo] FLATWRAP_ROOT=SYSEXTNAME SYSEXTNAME/usr/bin/binary."
   echo
-  echo "A temporary directory named SYSEXTNAME in the current folder will be created and deleted again."
-  echo "All files in the sysext image will be owned by root."
-  echo "To use a different architecture than amd64 pass 'ARCH=arm64' as environment variable (current value is '${ARCH}')."
-  "${SCRIPTFOLDER}"/bake.sh --help
+  echo "A directory named SYSEXTNAME in the current folder will be created, and should then be packed up as sysext image by other tools."
+  echo "E.g., 'mkdir -p SYSEXTNAME/usr/lib/extension-release.d/ && echo ID=_any > SYSEXTNAME/usr/lib/extension-release.d/extension-release.SYSEXTNAME'"
+  echo "and then something like 'mksquashfs SYSEXTNAME/ SYSEXTNAME.raw -all-root -noappend'"
   exit 1
 fi
 
@@ -57,7 +53,7 @@ rm -rf "${SYSEXTNAME}"
 mkdir -p "${SYSEXTNAME}/usr/local/${SYSEXTNAME}"
 mkdir -p "${SYSEXTNAME}/usr/local/${SYSEXTNAME}/mount-dir"
 
-cp -ar "${FOLDER}/." "${SYSEXTNAME}/usr/local/${SYSEXTNAME}"
+cp --one-file-system -ar "${FOLDER}/." "${SYSEXTNAME}/usr/local/${SYSEXTNAME}"
 
 CARGS=() # CHROOT unshare bind mounts
 BWCARGS=() # CHROOT bwrap bind mounts
@@ -131,7 +127,3 @@ EOF
   fi
 done
 
-RELOAD=1 "${SCRIPTFOLDER}"/bake.sh "${SYSEXTNAME}"
-if [ "${KEEP}" != 1 ]; then
-  rm -rf "${SYSEXTNAME}"
-fi
