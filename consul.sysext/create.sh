@@ -7,12 +7,10 @@ RELOAD_SERVICES_ON_MERGE="true"
 function list_available_versions() {
   curl -fsSL --retry-delay 1 --retry 60 \
     --retry-connrefused --retry-max-time 60 --connect-timeout 20 \
-    https://api.releases.hashicorp.com/v1/releases/consul \
-  | jq -r '.[] | select(has("version"))
-               | .version
-               | select(type == "string")
-               | select(test("^[0-9.]+$"))
-               | capture("(?<v>[[:digit:].]+)").v' \
+    https://api.releases.hashicorp.com/v1/releases/consul?limit=20 \
+  | jq -r '.[] | select(.is_prerelease == false)
+               | select(.license_class == "oss")
+               | .version' \
   | sort -Vr
 }
 # --
