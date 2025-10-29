@@ -1,0 +1,13 @@
+# https://numtide.github.io/devshell
+[[commands]]
+package = "curl"
+[[commands]]
+package = "git"
+[[commands]]
+package = "jq"
+[[commands]]
+package = "squashfsTools"
+[[commands]]
+package = "xz"
+[[commands]]
+package = "yq"
