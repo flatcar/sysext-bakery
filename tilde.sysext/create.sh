@@ -25,6 +25,7 @@ function populate_sysext_root() {
   lib_arch="$(arch_transform 'x86-64' 'x86_64' "$lib_arch")"
   lib_arch="$(arch_transform 'arm64' 'aarch64' "$lib_arch")"
 
+  local sysextname=tilde
   docker run --rm \
               -i \
               -v "${scriptroot}/tools/":/tools \
@@ -33,7 +34,7 @@ function populate_sysext_root() {
               --pull always \
               --network host \
               docker.io/debian:bookworm-slim \
-                  sh -c "apt update && apt install -y tilde patchelf && cd /install_root && /tools/flix.sh / tilde /usr/bin/tilde /usr/lib/${lib_arch}-linux-gnu/transcript1 /usr/lib/${lib_arch}-linux-gnu/libt3widget"
+                  sh -c "apt update && apt install -y tilde patchelf && cd /install_root && /tools/flix.sh / $sysextname /usr/bin/tilde /usr/lib/${lib_arch}-linux-gnu/transcript1 /usr/lib/${lib_arch}-linux-gnu/libt3widget && OWNER=\$(stat -c '%u:%g' /install_root) && if [ \"\$OWNER\" != \"\$(id -u):\$(id -g)\" ]; then chown -R \"\$OWNER\" /install_root/$sysextname; fi"
   # We ship /usr/lib/...-linux-gnu/{transcript1,libt3widget} host folders.
   # But we assume that the host has /usr/share/terminfo around
   # otherwise we would need to add it as last argument above.
