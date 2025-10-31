@@ -21,6 +21,7 @@ function populate_sysext_root() {
   local img_arch="$(arch_transform 'x86-64' 'amd64' "$arch")"
   img_arch="$(arch_transform 'arm64' 'arm64/v8' "$img_arch")"
 
+  local sysextname=btop
   docker run --rm \
               -i \
               -v "${scriptroot}/tools/":/tools \
@@ -29,7 +30,7 @@ function populate_sysext_root() {
               --pull always \
               --network host \
               docker.io/alpine:latest \
-                  sh -c "apk add -U btop bash coreutils grep && cd /install_root && ETCMAP=chroot /tools/flatwrap.sh / btop /usr/bin/btop"
+                  sh -c "apk add -U btop bash coreutils grep && cd /install_root && ETCMAP=chroot /tools/flatwrap.sh / $sysextname /usr/bin/btop && OWNER=\$(stat -c '%u:%g' /install_root) && if [ \"\$OWNER\" != \"\$(id -u):\$(id -g)\" ]; then chown -R \"\$OWNER\" /install_root/$sysextname; fi"
   # Alpine has /etc/terminfo instead of /usr/terminfo,
   # so above we need to skip mapping the host /etc into the flatwrap env
   mv "${sysextroot}"/btop/usr "${sysextroot}"/usr
