@@ -71,7 +71,7 @@ ollama latest
 rke2 v1.32.2+rke2r1
 rke2 latest
 
-tailscale v1.76.6
+tailscale v1.90.8
 tailscale latest
 
 wasmcloud v1.0.0
