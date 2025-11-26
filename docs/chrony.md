@@ -10,8 +10,6 @@ The snippet includes automated updates via systemd-sysupdate.
 Sysupdate will stage updates and request a reboot by creating a flag file at `/run/reboot-required`.
 You can deactivate updates by changing `enabled: true` to `enabled: false` in `systemd-sysupdate.timer`.
 
-The chrony configuration needs to be added under `/etc/chrony/`. This sysext does not ship a default configuration.
-
 Generic configration:
 ```yaml
 variant: flatcar
@@ -29,6 +27,17 @@ storage:
     - path: /etc/sysupdate.d/noop.conf
       contents:
         source: https://extensions.flatcar.org/extensions/noop.conf
+    - path: /etc/chrony/chrony.conf
+      mode: 0644
+      contents:
+        inline: |
+          server 0.flatcar.pool.ntp.org iburst
+          server 1.flatcar.pool.ntp.org iburst
+          server 2.flatcar.pool.ntp.org iburst
+          server 3.flatcar.pool.ntp.org iburst
+          driftfile /var/lib/chrony/drift
+          makestep 1.0 3
+          rtcsync
   links:
     - target: /opt/extensions/chrony/chrony-4.8-x86-64.raw
       path: /etc/extensions/chrony.raw
@@ -51,20 +60,4 @@ systemd:
             ExecStartPre=/usr/lib/systemd/systemd-sysupdate -C chrony update
             ExecStartPost=/usr/bin/sh -c "readlink --canonicalize /etc/extensions/chrony.raw > /tmp/chrony-new"
             ExecStartPost=/usr/bin/sh -c "if ! cmp --silent /tmp/chrony /tmp/chrony-new; then touch /run/reboot-required; fi"
-```
-
-
-To add the configuration you can for example add the following to `storage.files`:
-```yaml
-    - path: /etc/chrony/chrony.conf
-      mode: 0644
-      contents:
-        inline: |
-          server 0.flatcar.pool.ntp.org iburst
-          server 1.flatcar.pool.ntp.org iburst
-          server 2.flatcar.pool.ntp.org iburst
-          server 3.flatcar.pool.ntp.org iburst
-          driftfile /var/lib/chrony/drift
-          makestep 1.0 3
-          rtcsync
 ```
