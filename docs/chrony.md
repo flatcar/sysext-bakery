@@ -33,8 +33,8 @@ storage:
     - target: /opt/extensions/chrony/chrony-4.8-x86-64.raw
       path: /etc/extensions/chrony.raw
       hard: false
-    - path: /etc/systemd/system/multi-user.target.wants/bird.service
-      target: /usr/lib/systemd/system/bird.service
+    - path: /etc/systemd/system/multi-user.target.wants/chrony.service
+      target: /usr/lib/systemd/system/chrony.service
       overwrite: true
 systemd:
   units:
