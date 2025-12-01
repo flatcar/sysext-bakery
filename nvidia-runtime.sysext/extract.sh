@@ -25,3 +25,4 @@ done
 
 chown -R "$export_user_group" /in
 chown -R "$export_user_group" /out
+chmod 0700 /in /out
