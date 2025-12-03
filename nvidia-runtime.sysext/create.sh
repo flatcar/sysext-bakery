@@ -26,6 +26,11 @@ function populate_sysext_root() {
 
   git clone -b ${version} --depth 1 https://github.com/NVIDIA/libnvidia-container
   git clone -b ${version} --depth 1 https://github.com/NVIDIA/nvidia-container-toolkit
+  if [ "${version}" == v1.18.1 ]; then
+    pushd nvidia-container-toolkit
+    patch -p1 <"${scriptroot}/nvidia-runtime.sysext/0001-nvidia-runtime-1.18.1-go-dl.patch"
+    popd
+  fi
 
   make -C libnvidia-container ubuntu18.04-${rel_arch}
   make -C nvidia-container-toolkit ubuntu18.04-${rel_arch}
