@@ -53,7 +53,11 @@ function populate_sysext_root() {
   mkdir -p "${sysextroot}/usr/bin/"
   mkdir -p "${sysextroot}/usr/lib64/"
   mkdir -p "${sysextroot}/usr/local/"
+  mkdir -p "${sysextroot}/usr/lib/systemd/sytem/"
+  mkdir -p "${sysextroot}/usr/share/flatcar/etc/"
 
+  cp -aR out/etc/systemd/. "${sysextroot}/usr/lib/systemd/"
+  cp -aR out/etc/nvidia-container-toolkit "${sysextroot}/usr/share/flatcar/etc/"
   cp -aR out/usr/bin/* "${sysextroot}/usr/bin/"
   cp -aR out/usr/lib/*-linux-gnu/* "${sysextroot}/usr/lib/"
 
