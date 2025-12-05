@@ -59,7 +59,7 @@ function populate_sysext_root() {
   cp -aR out/etc/systemd/. "${sysextroot}/usr/lib/systemd/"
   cp -aR out/etc/nvidia-container-toolkit "${sysextroot}/usr/share/flatcar/etc/"
   cp -aR out/usr/bin/* "${sysextroot}/usr/bin/"
-  cp -aR out/usr/lib/*-linux-gnu/* "${sysextroot}/usr/lib/"
+  cp -aR out/usr/lib/*-linux-gnu/* "${sysextroot}/usr/lib64/"
 
   ln -s /opt/nvidia "${sysextroot}/usr/local/nvidia"
 }
