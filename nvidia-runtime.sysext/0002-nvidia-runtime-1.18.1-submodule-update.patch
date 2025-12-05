@@ -1,0 +1,22 @@
+From f3326d2ca546d6329197c28f790d7a6f75e2181a Mon Sep 17 00:00:00 2001
+From: Carlos Eduardo Arango Gutierrez <eduardoa@nvidia.com>
+Date: Tue, 2 Dec 2025 10:49:33 +0100
+Subject: [PATCH] Bump third_party/libnvidia-container from `0964f81` to
+ `584976a`
+
+Signed-off-by: Carlos Eduardo Arango Gutierrez <eduardoa@nvidia.com>
+Signed-off-by: Jeremi Piotrowski <jeremi.piotrowski@gmail.com>
+---
+ third_party/libnvidia-container | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/third_party/libnvidia-container b/third_party/libnvidia-container
+index 889a3bb5..584976ab 160000
+--- a/third_party/libnvidia-container
++++ b/third_party/libnvidia-container
+@@ -1 +1 @@
+-Subproject commit 889a3bb5408c195ed7897ba2cb8341c7d249672f
++Subproject commit 584976abaef996d9466232a9bc7426fcdb0ed1e0
+-- 
+2.51.0
+

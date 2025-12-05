@@ -24,16 +24,17 @@ function populate_sysext_root() {
 
   cd in
 
-  git clone -b ${version} --depth 1 https://github.com/NVIDIA/libnvidia-container
-  git clone -b ${version} --depth 1 https://github.com/NVIDIA/nvidia-container-toolkit
+  git clone -b ${version} --depth 1 --recurse-submodules --shallow-submodules https://github.com/NVIDIA/nvidia-container-toolkit
   if [ "${version}" == v1.18.1 ]; then
     pushd nvidia-container-toolkit
-    patch -p1 <"${scriptroot}/nvidia-runtime.sysext/0001-nvidia-runtime-1.18.1-go-dl.patch"
+    git am "${scriptroot}/nvidia-runtime.sysext/0001-nvidia-runtime-1.18.1-go-dl.patch"
+    git am "${scriptroot}/nvidia-runtime.sysext/0002-nvidia-runtime-1.18.1-submodule-update.patch"
     popd
   fi
 
-  make -C libnvidia-container ubuntu18.04-${rel_arch}
-  make -C nvidia-container-toolkit ubuntu18.04-${rel_arch}
+  pushd nvidia-container-toolkit
+  ./scripts/build-packages.sh ubuntu18.04-${rel_arch}
+  popd
 
   cp "${scriptroot}/nvidia-runtime.sysext/extract.sh" .
 
