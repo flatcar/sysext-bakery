@@ -1,0 +1,80 @@
+From 5380d7a85d8bcaa5bff92ba53b840a992ba78b9f Mon Sep 17 00:00:00 2001
+From: Carlos Eduardo Arango Gutierrez <eduardoa@nvidia.com>
+Date: Tue, 2 Dec 2025 09:26:44 +0100
+Subject: [PATCH] [no-relnote] Update Go download URL to official go.dev/dl
+ endpoint
+
+Signed-off-by: Carlos Eduardo Arango Gutierrez <eduardoa@nvidia.com>
+---
+ deployments/container/Dockerfile | 2 +-
+ docker/Dockerfile.debian         | 2 +-
+ docker/Dockerfile.opensuse-leap  | 2 +-
+ docker/Dockerfile.rpm-yum        | 2 +-
+ docker/Dockerfile.ubuntu         | 2 +-
+ 5 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/deployments/container/Dockerfile b/deployments/container/Dockerfile
+index 9dc286e0a..d02492432 100644
+--- a/deployments/container/Dockerfile
++++ b/deployments/container/Dockerfile
+@@ -35,7 +35,7 @@ RUN set -eux; \
+         aarch64 | arm64) ARCH='arm64' ;; \
+         *) echo "unsupported architecture" ; exit 1 ;; \
+     esac; \
+-    wget -nv -O - https://storage.googleapis.com/golang/go${GOLANG_VERSION}.linux-${ARCH}.tar.gz \
++    wget -nv -O - https://go.dev/dl/go${GOLANG_VERSION}.linux-${ARCH}.tar.gz \
+     | tar -C /usr/local -xz
+ 
+ 
+diff --git a/docker/Dockerfile.debian b/docker/Dockerfile.debian
+index 76aa79195..52138ac63 100644
+--- a/docker/Dockerfile.debian
++++ b/docker/Dockerfile.debian
+@@ -25,7 +25,7 @@ RUN set -eux; \
+         aarch64 | arm64) ARCH='arm64' ;; \
+         *) echo "unsupported architecture" ; exit 1 ;; \
+     esac; \
+-    wget -nv -O - https://storage.googleapis.com/golang/go${GOLANG_VERSION}.linux-${ARCH}.tar.gz \
++    wget -nv -O - https://go.dev/dl/go${GOLANG_VERSION}.linux-${ARCH}.tar.gz \
+     | tar -C /usr/local -xz
+ 
+ ENV GOPATH /go
+diff --git a/docker/Dockerfile.opensuse-leap b/docker/Dockerfile.opensuse-leap
+index 600beaeb7..c545f3809 100644
+--- a/docker/Dockerfile.opensuse-leap
++++ b/docker/Dockerfile.opensuse-leap
+@@ -18,7 +18,7 @@ RUN set -eux; \
+         aarch64 | arm64) ARCH='arm64' ;; \
+         *) echo "unsupported architecture"; exit 1 ;; \
+     esac; \
+-    wget -nv -O - https://storage.googleapis.com/golang/go${GOLANG_VERSION}.linux-${ARCH}.tar.gz \
++    wget -nv -O - https://go.dev/dl/go${GOLANG_VERSION}.linux-${ARCH}.tar.gz \
+     | tar -C /usr/local -xz
+ 
+ ENV GOPATH /go
+diff --git a/docker/Dockerfile.rpm-yum b/docker/Dockerfile.rpm-yum
+index 464b66af7..8df1d667b 100644
+--- a/docker/Dockerfile.rpm-yum
++++ b/docker/Dockerfile.rpm-yum
+@@ -43,7 +43,7 @@ RUN set -eux; \
+         aarch64 | arm64) ARCH='arm64' ;; \
+         *) echo "unsupported architecture"; exit 1 ;; \
+     esac; \
+-    wget -nv -O - https://storage.googleapis.com/golang/go${GOLANG_VERSION}.linux-${ARCH}.tar.gz \
++    wget -nv -O - https://go.dev/dl/go${GOLANG_VERSION}.linux-${ARCH}.tar.gz \
+     | tar -C /usr/local -xz
+ 
+ ENV GOPATH /go
+diff --git a/docker/Dockerfile.ubuntu b/docker/Dockerfile.ubuntu
+index 37dbd59ec..63e2e5cc7 100644
+--- a/docker/Dockerfile.ubuntu
++++ b/docker/Dockerfile.ubuntu
+@@ -23,7 +23,7 @@ RUN set -eux; \
+         aarch64 | arm64) ARCH='arm64' ;; \
+         *) echo "unsupported architecture" ; exit 1 ;; \
+     esac; \
+-    wget -nv -O - https://storage.googleapis.com/golang/go${GOLANG_VERSION}.linux-${ARCH}.tar.gz \
++    wget -nv -O - https://go.dev/dl/go${GOLANG_VERSION}.linux-${ARCH}.tar.gz \
+     | tar -C /usr/local -xz
+ 
+ ENV GOPATH /go

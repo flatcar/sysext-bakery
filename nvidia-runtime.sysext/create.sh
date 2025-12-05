@@ -26,6 +26,11 @@ function populate_sysext_root() {
 
   git clone -b ${version} --depth 1 https://github.com/NVIDIA/libnvidia-container
   git clone -b ${version} --depth 1 https://github.com/NVIDIA/nvidia-container-toolkit
+  if [ "${version}" == v1.18.1 ]; then
+    pushd nvidia-container-toolkit
+    patch -p1 <"${scriptroot}/nvidia-runtime.sysext/0001-nvidia-runtime-1.18.1-go-dl.patch"
+    popd
+  fi
 
   make -C libnvidia-container ubuntu18.04-${rel_arch}
   make -C nvidia-container-toolkit ubuntu18.04-${rel_arch}
@@ -48,9 +53,13 @@ function populate_sysext_root() {
   mkdir -p "${sysextroot}/usr/bin/"
   mkdir -p "${sysextroot}/usr/lib64/"
   mkdir -p "${sysextroot}/usr/local/"
+  mkdir -p "${sysextroot}/usr/lib/systemd/sytem/"
+  mkdir -p "${sysextroot}/usr/share/flatcar/etc/"
 
+  cp -aR out/etc/systemd/. "${sysextroot}/usr/lib/systemd/"
+  cp -aR out/etc/nvidia-container-toolkit "${sysextroot}/usr/share/flatcar/etc/"
   cp -aR out/usr/bin/* "${sysextroot}/usr/bin/"
-  cp -aR out/usr/lib/*-linux-gnu/* "${sysextroot}/usr/lib/"
+  cp -aR out/usr/lib/*-linux-gnu/* "${sysextroot}/usr/lib64/"
 
   ln -s /opt/nvidia "${sysextroot}/usr/local/nvidia"
 }
