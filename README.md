@@ -22,6 +22,21 @@ This document covers developer information, i.e. improving existing extensions, 
 There is no strict need for building extensions yourself; most extensions are hosted in this repo as Github releases.
 Check out https://extensions.flatcar.org for more information like guides and configuration snippets on using these extensions.
 
+### Discovering and staging extensions via sysextctl
+
+The repository ships a small Go-based CLI (`sysextctl`) that wraps the most common bakery interactions:
+
+- Enumerate available extensions and the versions/architectures published in the bakery by reading the `SHA256SUMS` metadata.
+- Download an extension directly into `/opt/extensions/<name>/` and manage the `/etc/extensions/<name>.raw` symlink. Use `--root` to stage content in an alternative root directory (for image builds or chroots).
+- Emit a Butane Ignition snippet with checksum verification for provisioning-time downloads, optionally including the matching `systemd-sysupdate` configuration.
+- Pass `--debug` to print every HTTP request the tool performs together with GitHub rate limit headers, which helps when inspecting metadata downloads.
+
+Build the tool with:
+
+```bash
+go build ./cmd/sysextctl
+```
+
 ### Build sysexts
 
 If you want to build yourself, the following packages are required:
