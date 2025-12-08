@@ -9,7 +9,6 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
-	"time"
 
 	"github.com/flatcar/sysext-bakery/internal/catalog"
 )
@@ -31,7 +30,6 @@ func TestDownloaderDownload(t *testing.T) {
 		Arch:         "x86-64",
 		Checksum:     hex.EncodeToString(sum[:]),
 		DownloadURL:  server.URL,
-		PublishedAt:  time.Now(),
 		ReleaseNotes: "",
 	}
 

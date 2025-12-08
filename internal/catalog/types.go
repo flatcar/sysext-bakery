@@ -3,7 +3,6 @@ package catalog
 import (
 	"fmt"
 	"sort"
-	"time"
 )
 
 // Asset represents a downloadable artifact (typically a .raw sysext image).
@@ -14,22 +13,19 @@ type Asset struct {
 	Arch         string // e.g. "x86-64", "arm64"
 	Checksum     string // SHA256 digest in hex
 	DownloadURL  string // canonical bakery URL to download this asset
-	PublishedAt  time.Time
 	ReleaseNotes string // optional release body
 }
 
 // Release groups assets by extension version.
 type Release struct {
-	Extension   string
-	Version     string
-	PublishedAt time.Time
-	Assets      map[string]Asset // keyed by architecture
+	Extension string
+	Version   string
+	Assets    map[string]Asset // keyed by architecture
 }
 
 // Catalog contains the full set of extensions known to the bakery.
 type Catalog struct {
-	Extensions     map[string][]Release
-	HasPublishInfo bool
+	Extensions map[string][]Release
 }
 
 // Latest returns the most recent release for the extension/arch tuple.

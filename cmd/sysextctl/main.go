@@ -8,7 +8,6 @@ import (
 	"runtime"
 	"sort"
 	"text/tabwriter"
-	"time"
 
 	"github.com/spf13/cobra"
 
@@ -75,12 +74,11 @@ func newListCmd() *cobra.Command {
 			}
 
 			type item struct {
-				Extension   string    `json:"extension"`
-				Version     string    `json:"version"`
-				Arch        string    `json:"arch"`
-				Checksum    string    `json:"checksum"`
-				DownloadURL string    `json:"download_url"`
-				PublishedAt time.Time `json:"published_at,omitempty"`
+				Extension   string `json:"extension"`
+				Version     string `json:"version"`
+				Arch        string `json:"arch"`
+				Checksum    string `json:"checksum"`
+				DownloadURL string `json:"download_url"`
 			}
 
 			var items []item
@@ -112,7 +110,6 @@ func newListCmd() *cobra.Command {
 							Arch:        archKey,
 							Checksum:    asset.Checksum,
 							DownloadURL: asset.DownloadURL,
-							PublishedAt: asset.PublishedAt,
 						})
 					}
 				}
@@ -140,21 +137,9 @@ func newListCmd() *cobra.Command {
 			}
 
 			w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
-			if cat.HasPublishInfo {
-				fmt.Fprintln(w, "EXTENSION\tVERSION\tARCH\tPUBLISHED\tURL")
-			} else {
-				fmt.Fprintln(w, "EXTENSION\tVERSION\tARCH\tURL")
-			}
+			fmt.Fprintln(w, "EXTENSION\tVERSION\tARCH\tURL")
 			for _, it := range items {
-				if cat.HasPublishInfo {
-					published := "-"
-					if !it.PublishedAt.IsZero() {
-						published = it.PublishedAt.Format(time.RFC3339)
-					}
-					fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\n", it.Extension, it.Version, it.Arch, published, it.DownloadURL)
-				} else {
-					fmt.Fprintf(w, "%s\t%s\t%s\t%s\n", it.Extension, it.Version, it.Arch, it.DownloadURL)
-				}
+				fmt.Fprintf(w, "%s\t%s\t%s\t%s\n", it.Extension, it.Version, it.Arch, it.DownloadURL)
 			}
 			return w.Flush()
 		},

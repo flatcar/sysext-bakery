@@ -155,8 +155,7 @@ func assembleCatalog(entries []shaEntry) *Catalog {
 	}
 
 	catalog := &Catalog{
-		Extensions:     map[string][]Release{},
-		HasPublishInfo: false,
+		Extensions: map[string][]Release{},
 	}
 	for ext, versions := range extMap {
 		var rels []Release

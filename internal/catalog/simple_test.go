@@ -49,9 +49,6 @@ func TestBuildCatalogGlobal(t *testing.T) {
 	if err != nil {
 		t.Fatalf("BuildCatalog error: %v", err)
 	}
-	if cat.HasPublishInfo {
-		t.Fatalf("expected no publish info")
-	}
 	names := cat.ExtensionNames()
 	if len(names) != 1 || names[0] != "demo" {
 		t.Fatalf("unexpected extensions: %v", names)
