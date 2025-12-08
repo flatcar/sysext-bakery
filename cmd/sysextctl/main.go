@@ -4,9 +4,11 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"net/http"
 	"os"
 	"runtime"
 	"sort"
+	"strings"
 	"text/tabwriter"
 
 	"github.com/spf13/cobra"
@@ -168,10 +170,18 @@ func newDownloadCmd() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := commandContext(cmd)
 			client := newHTTPClient(debugFlag)
-			extension := args[0]
+			selections, err := parseExtensionSelections(args, version)
+			if err != nil {
+				return err
+			}
+			if len(selections) != 1 {
+				return fmt.Errorf("download accepts exactly one extension")
+			}
+			extension := selections[0].Name
+			version = selections[0].Version
 
 			releaseTag := extension
-			if version != "" {
+			if version != "" && !strings.EqualFold(version, "latest") {
 				releaseTag = fmt.Sprintf("%s-%s", extension, version)
 			}
 			cat, err := catalog.BuildCatalog(ctx, client, catalog.Options{
@@ -182,18 +192,9 @@ func newDownloadCmd() *cobra.Command {
 				return err
 			}
 
-			var asset catalog.Asset
-			var ok bool
-			if version != "" {
-				asset, ok = cat.Find(extension, version, arch)
-				if !ok {
-					return fmt.Errorf("extension %s version %s arch %s not found", extension, version, arch)
-				}
-			} else {
-				asset, ok = cat.Latest(extension, arch)
-				if !ok {
-					return fmt.Errorf("no release found for %s arch %s", extension, arch)
-				}
+			asset, err := selectAsset(cat, extension, arch, version)
+			if err != nil {
+				return err
 			}
 
 			if dryRun {
@@ -241,41 +242,24 @@ func newIgnitionCmd() *cobra.Command {
 		withConfig bool = true
 	)
 	cmd := &cobra.Command{
-		Use:   "ignition <extension>",
-		Short: "Emit a Butane snippet to provision an extension",
-		Args:  cobra.ExactArgs(1),
+		Use:   "ignition <extension[@version]> [extension[@version] ...]",
+		Short: "Emit a Butane snippet to provision one or more extensions",
+		Args:  cobra.MinimumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := commandContext(cmd)
 			client := newHTTPClient(debugFlag)
-			extension := args[0]
 
-			releaseTag := extension
-			if version != "" {
-				releaseTag = fmt.Sprintf("%s-%s", extension, version)
-			}
-			cat, err := catalog.BuildCatalog(ctx, client, catalog.Options{
-				ExtensionFilter: extension,
-				ReleaseTag:      releaseTag,
-			})
+			selections, err := parseExtensionSelections(args, version)
 			if err != nil {
 				return err
 			}
 
-			var asset catalog.Asset
-			var ok bool
-			if version != "" {
-				asset, ok = cat.Find(extension, version, arch)
-				if !ok {
-					return fmt.Errorf("extension %s version %s arch %s not found", extension, version, arch)
-				}
-			} else {
-				asset, ok = cat.Latest(extension, arch)
-				if !ok {
-					return fmt.Errorf("no release found for %s arch %s", extension, arch)
-				}
+			assets, err := resolveAssets(ctx, client, arch, selections)
+			if err != nil {
+				return err
 			}
 
-			out, err := ignition.RenderButaneSnippet(asset, ignition.RenderOptions{IncludeSysupdateConfig: withConfig})
+			out, err := ignition.RenderButaneSnippet(assets, ignition.RenderOptions{IncludeSysupdateConfig: withConfig})
 			if err != nil {
 				return err
 			}
@@ -287,6 +271,128 @@ func newIgnitionCmd() *cobra.Command {
 	cmd.Flags().StringVar(&version, "version", "", "Specific version (default: latest)")
 	cmd.Flags().BoolVar(&withConfig, "with-config", true, "Include sysupdate config download")
 	return cmd
+}
+
+type extensionSelection struct {
+	Name    string
+	Version string
+}
+
+func parseExtensionSelections(args []string, fallbackVersion string) ([]extensionSelection, error) {
+	if fallbackVersion != "" && len(args) > 1 {
+		return nil, fmt.Errorf("--version may only be used with a single extension; use name@version syntax instead")
+	}
+
+	selections := make([]extensionSelection, 0, len(args))
+	seen := map[string]struct{}{}
+
+	for _, arg := range args {
+		name := arg
+		version := fallbackVersion
+
+		if idx := strings.IndexRune(arg, '@'); idx != -1 {
+			name = arg[:idx]
+			version = arg[idx+1:]
+		}
+
+		name = strings.TrimSpace(name)
+		version = strings.TrimSpace(version)
+
+		if name == "" {
+			return nil, fmt.Errorf("invalid extension specification %q", arg)
+		}
+		if _, ok := seen[name]; ok {
+			return nil, fmt.Errorf("extension %q specified multiple times", name)
+		}
+		seen[name] = struct{}{}
+		selections = append(selections, extensionSelection{
+			Name:    name,
+			Version: version,
+		})
+	}
+	return selections, nil
+}
+
+func resolveAssets(ctx context.Context, client *http.Client, arch string, selections []extensionSelection) ([]catalog.Asset, error) {
+	type cacheKey struct {
+		Extension string
+		Tag       string
+	}
+	cache := map[cacheKey]*catalog.Catalog{}
+	var assets []catalog.Asset
+
+	for _, sel := range selections {
+		releaseTag := sel.Name
+		if sel.Version != "" {
+			releaseTag = fmt.Sprintf("%s-%s", sel.Name, sel.Version)
+		}
+		key := cacheKey{Extension: sel.Name, Tag: releaseTag}
+		cat, ok := cache[key]
+		if !ok {
+			var err error
+			cat, err = catalog.BuildCatalog(ctx, client, catalog.Options{
+				ExtensionFilter: sel.Name,
+				ReleaseTag:      releaseTag,
+			})
+			if err != nil {
+				return nil, err
+			}
+			cache[key] = cat
+		}
+
+		var (
+			asset catalog.Asset
+			err   error
+		)
+		asset, err = selectAsset(cat, sel.Name, arch, sel.Version)
+		if err != nil {
+			return nil, err
+		}
+		assets = append(assets, asset)
+	}
+
+	return assets, nil
+}
+
+func selectAsset(cat *catalog.Catalog, extension, arch, version string) (catalog.Asset, error) {
+	if strings.EqualFold(version, "latest") || version == "" {
+		if asset, ok := cat.Latest(extension, arch); ok {
+			return asset, nil
+		}
+		return catalog.Asset{}, fmt.Errorf("no release found for %s arch %s", extension, arch)
+	}
+
+	if asset, ok := cat.Find(extension, version, arch); ok {
+		return asset, nil
+	}
+
+	releases, err := cat.ReleasesFor(extension)
+	if err != nil {
+		return catalog.Asset{}, err
+	}
+	for _, rel := range releases {
+		if versionMatches(rel.Version, version) {
+			if asset, ok := rel.Assets[arch]; ok {
+				return asset, nil
+			}
+		}
+	}
+
+	return catalog.Asset{}, fmt.Errorf("extension %s version %s arch %s not found", extension, version, arch)
+}
+
+func versionMatches(releaseVersion, query string) bool {
+	releaseLower := strings.ToLower(releaseVersion)
+	queryLower := strings.ToLower(query)
+	if strings.HasPrefix(releaseLower, queryLower) {
+		return true
+	}
+	if !strings.HasPrefix(queryLower, "v") && strings.HasPrefix(releaseLower, "v"+queryLower) {
+		return true
+	}
+	releaseTrim := strings.TrimPrefix(releaseLower, "v")
+	queryTrim := strings.TrimPrefix(queryLower, "v")
+	return strings.HasPrefix(releaseTrim, queryTrim)
 }
 
 func commandContext(cmd *cobra.Command) context.Context {
