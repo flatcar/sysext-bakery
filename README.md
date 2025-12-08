@@ -28,7 +28,7 @@ The repository ships a small Go-based CLI (`sysextctl`) that wraps the most comm
 
 - Enumerate available extensions and the versions/architectures published in the bakery by reading the `SHA256SUMS` metadata.
 - Download an extension directly into `/opt/extensions/<name>/` and manage the `/etc/extensions/<name>.raw` symlink. Use `--root` to stage content in an alternative root directory (for image builds or chroots). The `download` command accepts `name@version` and `name@latest` too (one extension at a time).
-- Emit a Butane Ignition snippet with checksum verification for provisioning-time downloads, optionally including the matching `systemd-sysupdate` configuration. Multiple extensions can be listed; use `name@version` to pin a specific release, `name@latest` for the newest build, or partial prefixes like `name@1.32` to match the most recent patch release.
+- Emit a Butane snippet with checksum verification for provisioning-time downloads, optionally including the matching `systemd-sysupdate` configuration. Multiple extensions can be listed; use `name@version` to pin a specific release, `name@latest` for the newest build, or partial prefixes like `name@1.32` to match the most recent patch release.
 - Pass `--debug` to print every HTTP request the tool performs together with GitHub rate limit headers, which helps when inspecting metadata downloads.
 
 Build the tool with:

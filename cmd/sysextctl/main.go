@@ -47,7 +47,7 @@ func newRootCmd() *cobra.Command {
 	cmd.AddCommand(
 		newListCmd(),
 		newDownloadCmd(),
-		newIgnitionCmd(),
+		newButaneCmd(),
 	)
 	return cmd
 }
@@ -235,14 +235,14 @@ func newDownloadCmd() *cobra.Command {
 	return cmd
 }
 
-func newIgnitionCmd() *cobra.Command {
+func newButaneCmd() *cobra.Command {
 	var (
 		arch       string
 		version    string
 		withConfig bool = true
 	)
 	cmd := &cobra.Command{
-		Use:   "ignition <extension[@version]> [extension[@version] ...]",
+		Use:   "butane <extension[@version]> [extension[@version] ...]",
 		Short: "Emit a Butane snippet to provision one or more extensions",
 		Args:  cobra.MinimumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
