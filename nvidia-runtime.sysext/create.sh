@@ -27,6 +27,8 @@ function populate_sysext_root() {
   git clone -b ${version} --depth 1 --recurse-submodules --shallow-submodules https://github.com/NVIDIA/nvidia-container-toolkit
   if [ "${version}" == v1.18.1 ]; then
     pushd nvidia-container-toolkit
+    git config --global user.name "github"
+    git config --global user.email "github@extensions.flatcar.org"
     git am "${scriptroot}/nvidia-runtime.sysext/0001-nvidia-runtime-1.18.1-go-dl.patch"
     git am "${scriptroot}/nvidia-runtime.sysext/0002-nvidia-runtime-1.18.1-submodule-update.patch"
     popd
