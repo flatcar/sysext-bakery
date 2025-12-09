@@ -13,15 +13,12 @@ apk --no-cache add dpkg
 
 cd /in
 
-for deb in \
-        libnvidia-container/dist/ubuntu18.04/${arch}/libnvidia-container1_*.deb \
-        libnvidia-container/dist/ubuntu18.04/${arch}/libnvidia-container-tools*.deb; do
-  dpkg-deb -x $deb /out/
-done
-
-for deb in nvidia-container-toolkit/dist/ubuntu18.04/${arch}/nvidia-container-toolkit*.deb; do
+for deb in nvidia-container-toolkit/dist/ubuntu18.04/${arch}/nvidia-container-toolkit*.deb \
+        nvidia-container-toolkit/dist/ubuntu18.04/${arch}/libnvidia-container1_*.deb \
+        nvidia-container-toolkit/dist/ubuntu18.04/${arch}/libnvidia-container-tools*.deb; do
   dpkg-deb -x $deb /out
 done
 
 chown -R "$export_user_group" /in
 chown -R "$export_user_group" /out
+chmod 0700 /in /out
