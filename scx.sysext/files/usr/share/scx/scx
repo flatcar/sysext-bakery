@@ -1,0 +1,25 @@
+# sched-ext (scx) scheduler configuration
+#
+# Available schedulers (run scx_<name> --help for options):
+#   scx_bpfland  - vruntime-based scheduler
+#   scx_lavd     - latency-aware virtual deadline scheduler
+#   scx_rusty    - multi-domain BPF + user space hybrid scheduler
+#   scx_rustland - BPF + user space rust scheduler
+#   scx_simple   - simple scheduler for demonstration purposes
+#
+# For more information, see: https://github.com/sched-ext/scx
+
+# Select the scheduler to use
+SCX_SCHEDULER=scx_bpfland
+
+# Set custom flags for the scheduler (run scx_<name> --help for available options)
+SCX_FLAGS=
+
+# Override variables (for temporary testing without modifying this file)
+# Set SCX_SCHEDULER_OVERRIDE and SCX_FLAGS_OVERRIDE environment variables
+# to temporarily use different settings without editing this file.
+#
+# To use overrides, create /etc/default/scx with:
+#   SCX_SCHEDULER_OVERRIDE=scx_lavd
+#   SCX_FLAGS_OVERRIDE=-a
+# Then restart the service: systemctl restart scx.service
