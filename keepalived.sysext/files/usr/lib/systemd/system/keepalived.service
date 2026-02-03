@@ -9,7 +9,7 @@ PIDFile=/run/keepalived.pid
 KillMode=process
 EnvironmentFile=-/usr/etc/sysconfig/keepalived
 EnvironmentFile=-/etc/sysconfig/keepalived
-ExecStart=/usr/sbin/keepalived $KEEPALIVED_OPTIONS
+ExecStart=/usr/bin/keepalived $KEEPALIVED_OPTIONS
 ExecReload=/bin/kill -HUP $MAINPID
 
 [Install]
