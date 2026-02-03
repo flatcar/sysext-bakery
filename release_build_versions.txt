@@ -17,6 +17,9 @@
 # to build the latest (i.e. highest version number) release(s).
 #
 
+chrony 4.8
+chrony latest
+
 consul 1.21.4
 consul latest
 
