@@ -90,7 +90,7 @@ A full list of all extensions and versions available can be found in our bakery 
 
 ## How do I use sysexts?
 
-Simply consume the extensions you need via Ignition, or use [`bake_flatcar_image.sh`](https://github.com/flatcar/sysext-bakery/blob/main/tools/bake_flatcar_image.sh) to create an OS image with the sysext(s) of your choice included.
+Simply consume the extensions you need via Ignition, or use [`bake_flatcar_image.sh`](../tools/bake_flatcar_image.sh) to create an OS image with the sysext(s) of your choice included.
 
 **BEFORE YOU CONTINUE:**
 If you already know what extension(s) you want to use please refer to the individual extensions' documentation at the navigation menu on the left.
