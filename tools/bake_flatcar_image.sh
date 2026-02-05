@@ -29,7 +29,7 @@ function print_help() {
     echo "  The script will need your 'sudo' password during its run."
     echo "  Options:"
     echo "       <name:file>        Sysext name (e.g. 'kubernetes') is used to create the extensions symlink,"
-    echo "                            file (e.g. 'kuibernetes-v1.29.1.raw') must be present in the local directory."
+    echo "                            file (e.g. 'kubernetes-v1.29.1.raw') must be present in the local directory."
     echo "                            If a '<name>.conf' sysupdate conf exists it will also be installed in the image."
     echo "       --fetch            Instead of using a local syysext, fetch sysext and sysupdate conf from the latest"
     echo "                            Bakery release (see https://github.com/flatcar/sysext-bakery/releases/tag/SHA256SUMS for a list)."
