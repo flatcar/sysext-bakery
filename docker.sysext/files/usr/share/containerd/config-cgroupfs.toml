@@ -1,8 +1,0 @@
-version = 2
-# set containerd's OOM score
-oom_score = -999
-[plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc]
-# setting runc.options unsets parent settings
-runtime_type = "io.containerd.runc.v2"
-[plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc.options]
-SystemdCgroup = false
