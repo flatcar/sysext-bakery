@@ -120,7 +120,7 @@ function _boot_help() {
   echo "Boot a local Flatcar VM and provision one or more extension(s) for interactive testing."
   echo
   echo "This command launches a local Flatcar test VM for interactively testing and exploring extension images."
-  echo "The latest stable OS image will be downloaded if no Flatcar image is present locally."
+  echo "The latest alpha OS image will be downloaded if no Flatcar image is present locally."
   echo
   echo " Positional (mandatory) arguments:"
   echo "  <sysext> [<sysext ...]: Extension image(s) to include. The extension image file(s) must be available (built)."
