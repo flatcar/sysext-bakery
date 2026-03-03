@@ -49,7 +49,7 @@ function _download_os_image() {
 
   rm -f "${_flatcar_image_files[@]}"
   curl -fL --retry-delay 1 --retry 60 --retry-connrefused --remote-name-all --parallel \
-    "${_flatcar_image_files[@]/#/https://stable.release.flatcar-linux.net/${arch}-usr/current/}"
+    "${_flatcar_image_files[@]/#/https://alpha.release.flatcar-linux.net/${arch}-usr/current/}"
 
   chmod 755 flatcar_production_qemu_uefi.sh
 }
