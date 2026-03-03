@@ -49,7 +49,7 @@ function _download_os_image() {
 
   rm -f "${_flatcar_image_files[@]}"
   curl -fL --retry-delay 1 --retry 60 --retry-connrefused --remote-name-all --parallel \
-    "${_flatcar_image_files[@]/#/https://stable.release.flatcar-linux.net/${arch}-usr/current/}"
+    "${_flatcar_image_files[@]/#/https://alpha.release.flatcar-linux.net/${arch}-usr/current/}"
 
   chmod 755 flatcar_production_qemu_uefi.sh
 }
@@ -120,7 +120,7 @@ function _boot_help() {
   echo "Boot a local Flatcar VM and provision one or more extension(s) for interactive testing."
   echo
   echo "This command launches a local Flatcar test VM for interactively testing and exploring extension images."
-  echo "The latest stable OS image will be downloaded if no Flatcar image is present locally."
+  echo "The latest alpha OS image will be downloaded if no Flatcar image is present locally."
   echo
   echo " Positional (mandatory) arguments:"
   echo "  <sysext> [<sysext ...]: Extension image(s) to include. The extension image file(s) must be available (built)."
