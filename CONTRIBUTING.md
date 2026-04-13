@@ -4,6 +4,8 @@ Whether you're fixing a bug, adding a feature, or improving docs — we apprecia
 
 For more detailed guidelines (finding issues, community meetings, PR lifecycle, commit message format, and more), check out the [main Flatcar CONTRIBUTING guide](https://github.com/flatcar/Flatcar/blob/main/CONTRIBUTING.md).
 
+If you want to file an issue for any Flatcar repository, please use the [central Flatcar issue tracker](https://github.com/flatcar/Flatcar/issues).
+
 ---
 
 ## Repository Specific Guidelines
