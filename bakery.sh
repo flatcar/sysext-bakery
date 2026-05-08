@@ -120,7 +120,7 @@ function create_sysext() {
 
   local workdir="$(mktemp -d)"
   local sysextroot_tmp="$(mktemp -d)"
-  trap "rm -rf '${workdir}' '${sysextroot_tmp}'" EXIT
+  trap "chmod -R a+w '${workdir}' '${sysextroot_tmp}'; rm -rf '${workdir}' '${sysextroot_tmp}'" EXIT
   local sysextroot="${sysextroot_tmp}/${extname}"
   mkdir -p "${sysextroot}"
 
