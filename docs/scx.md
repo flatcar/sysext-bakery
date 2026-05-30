@@ -19,6 +19,20 @@ Available schedulers include:
 - `scx_rusty` - multi-domain BPF + user space hybrid scheduler
 - `scx_rustland` - BPF + user space rust scheduler
 - `scx_simple` - simple scheduler for demonstration purposes
+- `scx_beerland`
+- `scx_flash`
+- `scx_layered`
+- `scx_rlfifo`
+- `scx_wd40`
+- `scx_chaos`
+- `scx_cosmos`
+- `scx_mitosis`
+- `scx_p2dq`
+- `scx_tickless`
+
+Tools include:
+- `scxtop` - top-like utility for scheduler telemetry
+- `scxcash` - cache usage analyser
 
 Run `scx_<name> --help` for scheduler-specific options.
 
