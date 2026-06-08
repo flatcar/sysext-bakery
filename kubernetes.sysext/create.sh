@@ -46,7 +46,7 @@ function populate_sysext_root() {
                    | jq -r .tag_name)"
   fi
 
-  announce "Using CNI version '${version}'"
+  announce "Using CNI version '${cni_version}'"
 
   mkdir -p "${sysextroot}/usr/bin"
 
