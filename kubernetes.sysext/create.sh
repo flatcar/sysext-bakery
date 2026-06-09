@@ -46,22 +46,34 @@ function populate_sysext_root() {
                    | jq -r .tag_name)"
   fi
 
-  announce "Using CNI version '${version}'"
+  announce "Using CNI version '${cni_version}'"
 
   mkdir -p "${sysextroot}/usr/bin"
 
   curl --parallel --fail --silent --show-error --location \
     --output "${sysextroot}/usr/bin/kubectl" "https://dl.k8s.io/${version}/bin/linux/${rel_arch}/kubectl" \
+    --output kubectl.sha256 "https://dl.k8s.io/${version}/bin/linux/${rel_arch}/kubectl.sha256" \
     --output "${sysextroot}/usr/bin/kubeadm" "https://dl.k8s.io/${version}/bin/linux/${rel_arch}/kubeadm" \
-    --output "${sysextroot}/usr/bin/kubelet" "https://dl.k8s.io/${version}/bin/linux/${rel_arch}/kubelet"
+    --output kubeadm.sha256 "https://dl.k8s.io/${version}/bin/linux/${rel_arch}/kubeadm.sha256" \
+    --output "${sysextroot}/usr/bin/kubelet" "https://dl.k8s.io/${version}/bin/linux/${rel_arch}/kubelet"\
+    --output kubelet.sha256 "https://dl.k8s.io/${version}/bin/linux/${rel_arch}/kubelet.sha256"
 
-  curl -o cni.tgz \
-       -fsSL "https://github.com/containernetworking/plugins/releases/download/${cni_version}/cni-plugins-linux-${rel_arch}-${cni_version}.tgz"
+  for bin in kubectl kubeadm kubelet; do
+    echo "Verifying ${bin} checksum..."
+    echo "$(cat "${bin}.sha256")  ${sysextroot}/usr/bin/${bin}" | shasum -a 256 --check
+  done
+
+  curl --parallel --fail --silent --show-error --location \
+    --output "cni-plugins-linux-${rel_arch}-${cni_version}.tgz" "https://github.com/containernetworking/plugins/releases/download/${cni_version}/cni-plugins-linux-${rel_arch}-${cni_version}.tgz" \
+    --output cni.sha256 "https://github.com/containernetworking/plugins/releases/download/${cni_version}/cni-plugins-linux-${rel_arch}-${cni_version}.tgz.sha256"
+
+  echo "Verifying CNI checksum..."
+  shasum -a 256 --check cni.sha256
 
   chmod +x "${sysextroot}/usr/bin/"*
 
   mkdir -p "${sysextroot}/usr/local/bin/cni"
-  tar --force-local -xf "cni.tgz" -C "${sysextroot}/usr/local/bin/cni"
+  tar --force-local -xf "cni-plugins-linux-${rel_arch}-${cni_version}.tgz" -C "${sysextroot}/usr/local/bin/cni"
 
   mkdir -p "${sysextroot}/usr/local/share/"
   echo "${version}" > "${sysextroot}/usr/local/share/kubernetes-version"
