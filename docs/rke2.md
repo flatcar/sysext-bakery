@@ -29,17 +29,18 @@ version: 1.0.0
 
 storage:
   files:
-    - path: /etc/extensions/rke2.raw
+    - path: /opt/extensions/rke2/rke2-v1.36.1+rke2r2-x86-64.raw
+      mode: 0644
       contents:
-        source: https://extensions.flatcar.org/extensions/rke2-v1.32.2+rke2r1-x86-64.raw
-    - path: /etc/sysupdate.rke2.d/rke2-v1.32.conf
+        source: https://extensions.flatcar.org/extensions/rke2-v1.36.1+rke2r2-x86-64.raw
+    - path: /etc/sysupdate.rke2.d/rke2-v1.36.conf
       contents:
-        source: https://extensions.flatcar.org/extensions/rke2/rke2-v1.32.conf
+        source: https://extensions.flatcar.org/extensions/rke2/rke2-v1.36.conf
     - path: /etc/sysupdate.d/noop.conf
       contents:
         source: https://extensions.flatcar.org/extensions/noop.conf
   links:
-    - target: /opt/extensions/rke2/rke2-v1.32.2+rke2r1-x86-64.raw
+    - target: /opt/extensions/rke2/rke2-v1.36.1+rke2r2-x86-64.raw
       path: /etc/extensions/rke2.raw
       hard: false
 
