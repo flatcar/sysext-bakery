@@ -4,25 +4,19 @@
 # Kubernetes system extension.
 #
 
+source "${scriptroot}/kubernetes.sysext/funcs.inc"
+
 RELOAD_SERVICES_ON_MERGE="true"
 
 # We overwrite this library function and return a list of all latest patch levels
 # of all supported release branches.
 function list_latest_release() {
-  curl -fsSL --retry-delay 1 --retry 60 --retry-connrefused \
-       --retry-max-time 60 --connect-timeout 20 \
-       https://raw.githubusercontent.com/kubernetes/website/main/data/releases/schedule.yaml \
-       | yq -r '.schedules[] | .previousPatches[0] // (.release = .release + ".0") | .release' \
-       | sed 's/^/v/'
+  kubernetes_list_latest_release "${@}"
 }
 # --
 
 function list_available_versions() {
-  curl -fsSL --retry-delay 1 --retry 60 --retry-connrefused \
-       --retry-max-time 60 --connect-timeout 20 \
-       https://raw.githubusercontent.com/kubernetes/website/main/data/releases/schedule.yaml \
-       | yq -r '.schedules[] | .previousPatches[] // (.release = .release + ".0") | .release' \
-       | sed 's/^/v/'
+  kubernetes_list_available_versions "${@}"
 }
 # --
 
