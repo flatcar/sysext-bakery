@@ -4,9 +4,31 @@
 # K3s system extension.
 #
 
+source "${scriptroot}/kubernetes.sysext/funcs.inc"
+
 RELOAD_SERVICES_ON_MERGE="true"
 EXTENSION_VERSION_MATCH_PATTERN='[.v0-9]+\+k3s[0-9]+'
 
+
+# Get the latest k3s release for all supported major Kubernetes versions.
+# Addresses https://github.com/flatcar/sysext-bakery/issues/213.
+function list_latest_release() {
+  local k8s_version
+  local relcache
+
+  relcache="$(mktemp)"
+  trap "rm -f '${relcache}'" EXIT
+  list_github_releases "k3s-io" "k3s" > "${relcache}"
+
+  for k8s_version in $(kubernetes_list_latest_release); do
+    cat "${relcache}" \
+      | grep -F "${k8s_version}+k3s" \
+      | sort -V \
+      | tail -n1
+  done
+}
+# --
+#
 function list_available_versions() {
   list_github_releases "k3s-io" "k3s"
 }
