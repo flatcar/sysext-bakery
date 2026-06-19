@@ -82,6 +82,7 @@ Check out documentation on specific extensions at the navigation menu on the lef
 | `ollama`         |  released    | [ollama versions](https://github.com/flatcar/sysext-bakery/releases/tag/ollama) |
 | `opkssh`         |  released    | [opkssh versions](https://github.com/flatcar/sysext-bakery/releases/tag/opkssh) |
 | `rke2`           |  released    | [rke2 versions](https://github.com/flatcar/sysext-bakery/releases/tag/rke2) |
+| `scx`            |  released    | [scx versions](https://github.com/flatcar/sysext-bakery/releases/tag/scx) |
 | `tailscale`      |  released    | [tailscale versions](https://github.com/flatcar/sysext-bakery/releases/tag/tailscale) |
 | `wasmcloud`      |  released    | [wasmcloud versions](https://github.com/flatcar/sysext-bakery/releases/tag/wasmcloud) |
 | `wasmedge`       |  released    | [wasmedge versions](https://github.com/flatcar/sysext-bakery/releases/tag/wasmedge) |
