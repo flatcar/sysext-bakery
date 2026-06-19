@@ -24,16 +24,26 @@ function populate_sysext_root() {
     nats="$(curl_api_wrapper https://api.github.com/repos/nats-io/nats-server/releases/latest | jq -r .tag_name)"
   fi
 
+  local wasm_bin="wasmcloud"
+  local major="${version#v}"
+  major="${major%%.*}"
+  if [[ "${major}" -ge 2 ]] ; then
+    wasm_bin="wash"
+    rm "${sysextroot}/usr/lib/systemd/system/wasmcloud.service"
+    rm "${sysextroot}/usr/lib/systemd/system/multi-user.target.d/10-wasmcloud-service.conf"
+  fi
+  local wasm_bin_arch="${wasm_bin}-${rel_arch}-unknown-linux-musl"
+
   echo "Using NATS server version '$nats'"
   curl --parallel --fail --silent --show-error --location \
-        --remote-name "https://github.com/wasmcloud/wasmcloud/releases/download/${version}/wasmcloud-${rel_arch}-unknown-linux-musl" \
+        --remote-name "https://github.com/wasmcloud/wasmcloud/releases/download/${version}/${wasm_bin_arch}" \
         --remote-name "https://github.com/nats-io/nats-server/releases/download/${nats}/nats-server-${nats}-linux-${go_arch}.tar.gz"
 
   tar --force-local -xf "nats-server-${nats}-linux-${go_arch}.tar.gz"
 
   mkdir -p "${sysextroot}/usr/bin"
-  cp -a "wasmcloud-${rel_arch}-unknown-linux-musl" "${sysextroot}/usr/bin/wasmcloud"
-  chmod +x "${sysextroot}/usr/bin/wasmcloud"
+  cp -a "${wasm_bin_arch}" "${sysextroot}/usr/bin/${wasm_bin}"
+  chmod +x "${sysextroot}/usr/bin/${wasm_bin}"
   cp -a "nats-server-${nats}-linux-${go_arch}/nats-server" "${sysextroot}/usr/bin/"
 }
 # --
