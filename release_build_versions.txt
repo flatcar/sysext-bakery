@@ -70,6 +70,8 @@ nvidia-runtime latest
 
 ollama latest
 
+podman latest
+
 rke2 v1.32.2+rke2r1
 rke2 latest
 
