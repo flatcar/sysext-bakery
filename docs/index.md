@@ -81,6 +81,7 @@ Check out documentation on specific extensions at the navigation menu on the lef
 | `nvidia-runtime` |  released    | [nvidia-runtime versions](https://github.com/flatcar/sysext-bakery/releases/tag/nvidia-runtime) |
 | `ollama`         |  released    | [ollama versions](https://github.com/flatcar/sysext-bakery/releases/tag/ollama) |
 | `opkssh`         |  released    | [opkssh versions](https://github.com/flatcar/sysext-bakery/releases/tag/opkssh) |
+| `podman`         |  released    | [podman versions](https://github.com/flatcar/sysext-bakery/releases/tag/podman) |
 | `rke2`           |  released    | [rke2 versions](https://github.com/flatcar/sysext-bakery/releases/tag/rke2) |
 | `scx`            |  released    | [scx versions](https://github.com/flatcar/sysext-bakery/releases/tag/scx) |
 | `tailscale`      |  released    | [tailscale versions](https://github.com/flatcar/sysext-bakery/releases/tag/tailscale) |
