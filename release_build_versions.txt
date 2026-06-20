@@ -92,9 +92,11 @@ wasmtime v13.0.0 # Used in Flatcar wasm OS demo
 wasmtime v24.0.0 # Used in README.md. Update readme when version changes.
 wasmtime latest
 
-cilium v0.16.24 
+cilium v0.16.24
 cilium v0.18.2
 cilium latest
+
+cloud-hypervisor latest
 
 bird 3.1.2
 bird latest
