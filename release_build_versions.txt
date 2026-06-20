@@ -46,6 +46,8 @@ ig latest
 k3s v1.32.2+k3s1
 k3s latest
 
+kata-containers latest
+
 keepalived v2.3.1
 keepalived latest
 
