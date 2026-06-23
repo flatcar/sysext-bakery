@@ -14,6 +14,31 @@ function list_available_versions() {
 }
 # --
 
+# Containerd supports multiple minor release branches in parallel, so we return
+# the latest patch level releases of the latest 5 minor release series.
+# The "5" is chosen arbitrarily and reflects the active release branches
+# at the time of writing (2026-06-23).
+function list_latest_release() {
+  local active_branches_count="5"
+  local rel_cache active_release_branches
+
+  rel_cache="$(mktemp)"
+  trap "rm -f '${rel_cache}'" EXIT
+
+  list_available_versions "${@}" > "${rel_cache}"
+  # Note this escapes the '.' between major and minor so we can safely use it with
+  # 'grep -E' below.
+  active_release_branches="$(sed 's/\([0-9]\+\)\.\([0-9]\+\)\..*/\1\\.\2/' "${rel_cache}" \
+                             | sort -rV \
+                             | uniq \
+                             | head -n "${active_branches_count}")"
+  local b
+  for b in ${active_release_branches}; do
+    grep -E "^${b}\." "${rel_cache}" | sort -rV | head -n 1
+  done
+}
+# --
+
 function populate_sysext_root() {
   local sysextroot="$1"
   local arch="$2"
