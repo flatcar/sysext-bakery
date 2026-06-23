@@ -1,0 +1,36 @@
+name: Report missing extension documentation
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - release_build_versions.txt
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: report-missing-extension-docs
+  cancel-in-progress: false
+
+jobs:
+  report-missing-extension-docs:
+    runs-on: ubuntu-24.04
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install prerequisites
+        run: |
+          set -euxo pipefail
+          sudo apt update -qq
+          sudo apt install -yqq jq
+
+      - name: Report missing extension documentation
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          ./tools/report_missing_extension_docs.sh --create-issues true
