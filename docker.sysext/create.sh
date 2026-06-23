@@ -17,12 +17,6 @@ function list_available_versions() {
 }
 # --
 
-function populate_sysext_root_options() {
-  echo "  --without <docker|containerd>  : Build the sysext without docker or"
-  echo "                                     containerd/runc, respectively."
-}
-# --
-
 function populate_sysext_root() {
   local sysextroot="$1"
   local arch="$2"
@@ -41,33 +35,38 @@ function populate_sysext_root() {
   mkdir -p "${sysextroot}"/usr/bin
   cp -R docker/* "${sysextroot}"/usr/bin/
 
-  if [[ "${without}" == docker ]] ; then
-    announce "Removing docker from sysext as requested (shipping containerd/runc only)"
+  announce "Removing containerd / runc from sysext as requested (shipping docker only)"
 
-    rm "${sysextroot}/usr/bin/docker" \
-       "${sysextroot}/usr/bin/dockerd" \
-       "${sysextroot}/usr/bin/docker-init" \
-       "${sysextroot}/usr/bin/docker-proxy" \
-       "${sysextroot}/usr/lib/systemd/system/docker.socket" \
-       "${sysextroot}/usr/lib/systemd/system/sockets.target.d/10-docker-socket.conf" \
-       "${sysextroot}/usr/lib/systemd/system/docker.service"
+  rm "${sysextroot}/usr/bin/containerd" \
+     "${sysextroot}/usr/bin/containerd-shim-runc-v2" \
+     "${sysextroot}/usr/bin/ctr" \
+     "${sysextroot}/usr/bin/runc"
 
-     rmdir "${sysextroot}/usr/lib/systemd/system/sockets.target.d"
-
-  elif [[ "${without}" == containerd ]] ; then
-    announce "Removing containerd / runc from sysext as requested (shipping docker only)"
-
-    rm "${sysextroot}/usr/bin/containerd" \
-       "${sysextroot}/usr/bin/containerd-shim-runc-v2" \
-       "${sysextroot}/usr/bin/ctr" \
-       "${sysextroot}/usr/bin/runc" \
-       "${sysextroot}/usr/lib/systemd/system/containerd.service" \
-       "${sysextroot}/usr/lib/systemd/system/multi-user.target.d/10-containerd-service.conf" \
-       "${sysextroot}/usr/share/containerd/config.toml" \
-       "${sysextroot}/usr/share/containerd/config-cgroups.toml"
-
-     rmdir "${sysextroot}/usr/share/containerd" \
-           "${sysextroot}/usr/lib/systemd/system/multi-user.target.d/"
+  # Always build the containerd-docker sysext
+  announce "Building containerd-docker sysext based on containerd from Docker"
+  
+  # Create a temporary directory for the containerd-docker sysext
+  local containerd_docker_root="$(mktemp -d)"
+  trap "rm -rf '${containerd_docker_root}'" EXIT
+  
+  mkdir -p "${containerd_docker_root}/usr/bin"
+  
+  # Copy only containerd and runc components
+  cp docker/containerd \
+     docker/containerd-shim-runc-v2 \
+     docker/ctr \
+     docker/runc \
+     "${containerd_docker_root}/usr/bin/"
+  
+  # Copy the static files from our containerd-docker.sysext/files directory
+  if [[ -d "${scriptroot}/containerd-docker.sysext/files" ]]; then
+    cp -R "${scriptroot}/containerd-docker.sysext/files/"* "${containerd_docker_root}/"
   fi
+  
+  # Generate the containerd-docker sysext
+  announce "Generating containerd-docker sysext file system image"
+  # Use the scriptroot variable to ensure the output file is created in the project root directory
+  cd "${scriptroot}"
+  generate_sysext "${containerd_docker_root}" "$arch" "${@}" --force-reload true --name "containerd-docker"
 }
 # --
