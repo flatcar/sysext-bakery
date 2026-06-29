@@ -13,7 +13,7 @@ ExecReload=/bin/kill -USR2 $MAINPID
 KillMode=mixed
 Restart=always
 SuccessExitStatus=143
-# Notify requires haproxy built with USE_SYSTEMD=1; this build is static musl.
+# Notify requires haproxy built with USE_SYSTEMD=1; we don't link libsystemd.
 Type=simple
 
 User=haproxy
