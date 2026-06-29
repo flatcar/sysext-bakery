@@ -7,8 +7,9 @@ The sysext is built from upstream source against Debian's glibc
 toolchain with OpenSSL (incl. QUIC compat for HTTP/3), PCRE2 (JIT),
 Lua 5.4, zlib, threading, Linux capabilities, transparent proxy,
 network namespaces, TCP Fast Open and the Prometheus exporter enabled.
-`tools/flix.sh` bundles the binary's library deps and pins them via
-RPATH, so the sysext is self-contained on any Flatcar host. The
+The binary is dynamically linked; `tools/flix.sh` bundles the
+shared-library deps under `/usr/local/haproxy/` and pins them via
+RPATH so the sysext is self-contained on any Flatcar host. The
 `haproxy` binary lands at `/usr/bin/haproxy`. Alongside it the sysext
 ships:
 
