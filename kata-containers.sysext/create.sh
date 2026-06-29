@@ -37,6 +37,21 @@ function populate_sysext_root() {
   curl --remote-name -fsSL \
     "https://github.com/kata-containers/kata-containers/releases/download/${rel_version}/${tarball}"
 
+  # Kata doesn't publish a separate checksum file, but recent releases
+  # carry a SHA-256 digest in the GitHub release asset metadata. Fetch
+  # and verify it; warn (don't fail) on older releases that pre-date the
+  # digest field.
+  local digest
+  digest="$(curl_api_wrapper \
+    "https://api.github.com/repos/kata-containers/kata-containers/releases/tags/${rel_version}" \
+    | jq -r --arg n "${tarball}" '.assets[] | select(.name == $n) | .digest // empty' \
+    | sed -n 's|^sha256:||p')"
+  if [[ -n "${digest}" ]] ; then
+    echo "${digest}  ${tarball}" | sha256sum -c -
+  else
+    echo "WARNING: upstream did not publish a SHA-256 digest for ${tarball}; skipping integrity check." >&2
+  fi
+
   # The tarball expands to ./opt/kata/{bin,libexec,share,...}.
   tar --force-local -xf "${tarball}"
 

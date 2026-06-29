@@ -67,8 +67,8 @@ systemd:
         - name: kata-containers.conf
           contents: |
             [Service]
-            ExecStartPre=/usr/bin/sh -c "readlink --canonicalize /etc/extensions/kata-containers.raw > /tmp/kata-containers"
+            ExecStartPre=/usr/bin/sh -c "readlink --canonicalize /etc/extensions/kata-containers.raw > /run/kata-containers"
             ExecStartPre=/usr/lib/systemd/systemd-sysupdate -C kata-containers update
-            ExecStartPost=/usr/bin/sh -c "readlink --canonicalize /etc/extensions/kata-containers.raw > /tmp/kata-containers-new"
-            ExecStartPost=/usr/bin/sh -c "if ! cmp --silent /tmp/kata-containers /tmp/kata-containers-new; then touch /run/reboot-required; fi"
+            ExecStartPost=/usr/bin/sh -c "readlink --canonicalize /etc/extensions/kata-containers.raw > /run/kata-containers-new"
+            ExecStartPost=/usr/bin/sh -c "if ! cmp --silent /run/kata-containers /run/kata-containers-new; then touch /run/reboot-required; fi"
 ```
