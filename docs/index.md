@@ -64,6 +64,7 @@ Check out documentation on specific extensions at the navigation menu on the lef
 | `chrony`         |  released    | [chrony versions](https://github.com/flatcar/sysext-bakery/releases/tag/chrony) |
 | `cilium`         |  released    | [cilium versions](https://github.com/flatcar/sysext-bakery/releases/tag/cilium) |
 | `cloud-hypervisor` |  released  | [cloud-hypervisor versions](https://github.com/flatcar/sysext-bakery/releases/tag/cloud-hypervisor) |
+| `coder`          |  released    | [coder versions](https://github.com/flatcar/sysext-bakery/releases/tag/coder) |
 | `consul`          |  released    | [consul versions](https://github.com/flatcar/sysext-bakery/releases/tag/consul) |
 | `containerd`     |  released    | [containerd versions](https://github.com/flatcar/sysext-bakery/releases/tag/containerd) |
 | `crio`           |  released    | [crio versions](https://github.com/flatcar/sysext-bakery/releases/tag/crio) |
@@ -71,6 +72,7 @@ Check out documentation on specific extensions at the navigation menu on the lef
 | `docker-compose` |  released    | [docker-compose versions](https://github.com/flatcar/sysext-bakery/releases/tag/docker-compose) |
 | `docker`         |  released    | [docker versions](https://github.com/flatcar/sysext-bakery/releases/tag/docker) |
 | `falco`          |  released    | [falco versions](https://github.com/flatcar/sysext-bakery/releases/tag/falco) |
+| `haproxy`        |  released    | [haproxy versions](https://github.com/flatcar/sysext-bakery/releases/tag/haproxy) |
 | `ig`             |  released    | [ig versions](https://github.com/flatcar/sysext-bakery/releases/tag/ig) |
 | `k3s`            |  released    | [k3s versions](https://github.com/flatcar/sysext-bakery/releases/tag/k3s) |
 | `keepalived`     |  released    | [keepalived versions](https://github.com/flatcar/sysext-bakery/releases/tag/keepalived) |
