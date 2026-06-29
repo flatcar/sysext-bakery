@@ -14,9 +14,9 @@ in `/usr/bin` expose `kata-runtime`, `containerd-shim-kata-v2` and
 
 This sysext only ships the Kata binaries and assets. To run pods with
 Kata, your container runtime needs to be configured to use it. With
-containerd, that means adding a runtime stanza pointing at
-`containerd-shim-kata-v2`, for example via a drop-in to
-`/etc/containerd/config.toml`:
+containerd, that means adding a Kata runtime stanza to
+`/etc/containerd/config.toml`. containerd discovers `containerd-shim-kata-v2`
+on `$PATH` from the `runtime_type`:
 
 ```toml
 [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.kata]

@@ -26,7 +26,14 @@ function populate_sysext_root() {
   # Strip a leading "v" if present: kata tags are "3.21.0" not "v3.21.0".
   local rel_version="${version#v}"
 
-  local tarball="kata-static-${rel_version}-${rel_arch}.tar.xz"
+  # Upstream switched the release tarball compression from xz to zstd
+  # starting with 3.21.0.
+  local sufx="tar.xz"
+  if semver_equals_or_higher "${rel_version}" "3.21.0" ; then
+    sufx="tar.zst"
+  fi
+
+  local tarball="kata-static-${rel_version}-${rel_arch}.${sufx}"
   curl --remote-name -fsSL \
     "https://github.com/kata-containers/kata-containers/releases/download/${rel_version}/${tarball}"
 
