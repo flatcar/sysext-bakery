@@ -63,10 +63,16 @@ function populate_sysext_root() {
   # to work regardless of where the sysext is mounted.
   mkdir -p "${sysextroot}/usr/bin"
   local bin
-  for bin in kata-runtime kata-collect-data.sh containerd-shim-kata-v2 ; do
-    if [[ -e "${sysextroot}/opt/kata/bin/${bin}" ]] ; then
-      ln -sf "../../opt/kata/bin/${bin}" "${sysextroot}/usr/bin/${bin}"
+  for bin in kata-runtime containerd-shim-kata-v2 ; do
+    if [[ ! -e "${sysextroot}/opt/kata/bin/${bin}" ]] ; then
+      echo "ERROR: expected binary ${bin} missing from kata-static ${rel_version}." >&2
+      return 1
     fi
+    ln -sf "../../opt/kata/bin/${bin}" "${sysextroot}/usr/bin/${bin}"
   done
+  if [[ -e "${sysextroot}/opt/kata/bin/kata-collect-data.sh" ]] ; then
+    ln -sf "../../opt/kata/bin/kata-collect-data.sh" \
+      "${sysextroot}/usr/bin/kata-collect-data.sh"
+  fi
 }
 # --
