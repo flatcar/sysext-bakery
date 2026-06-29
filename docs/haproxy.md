@@ -61,7 +61,6 @@ storage:
         inline: |
           global
               log         stdout format raw local0
-              chroot      /var/lib/haproxy
               user        haproxy
               group       haproxy
               maxconn     4096
