@@ -31,8 +31,15 @@ function populate_sysext_root() {
     --remote-name "${base_url}/${tarball}" \
     --remote-name "${base_url}/coder_${rel_version}_checksums.txt"
 
-  awk -v t="${tarball}" '$2 == t' "coder_${rel_version}_checksums.txt" \
-    | sha256sum -c -
+  local expected
+  expected="$(awk -v t="${tarball}" \
+    '$2 == t || $2 == "*"t {print $1; exit}' \
+    "coder_${rel_version}_checksums.txt")"
+  if [[ -z "${expected}" ]] ; then
+    echo "ERROR: ${tarball} not listed in upstream checksums file." >&2
+    return 1
+  fi
+  echo "${expected}  ${tarball}" | sha256sum -c -
 
   mkdir -p "${sysextroot}/usr/bin" extract
   tar --force-local -xf "${tarball}" -C extract
