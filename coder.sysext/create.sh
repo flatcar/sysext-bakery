@@ -31,7 +31,8 @@ function populate_sysext_root() {
     --remote-name "${base_url}/${tarball}" \
     --remote-name "${base_url}/coder_${rel_version}_checksums.txt"
 
-  grep -F "${tarball}" "coder_${rel_version}_checksums.txt" | sha256sum -c -
+  awk -v t="${tarball}" '$2 == t' "coder_${rel_version}_checksums.txt" \
+    | sha256sum -c -
 
   mkdir -p "${sysextroot}/usr/bin" extract
   tar --force-local -xf "${tarball}" -C extract
