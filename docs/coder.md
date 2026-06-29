@@ -9,11 +9,14 @@ The sysext installs:
 - `coder.service` and `coder-workspace-proxy.service` units, taken
   unmodified from the upstream Coder Debian package
 - `sysusers.d` entry to create the `coder` system user the units run as
-- `tmpfiles.d` entry that seeds `/etc/coder.d/coder.env` and
-  `/etc/coder.d/coder-workspace-proxy.env` on first boot
+- `tmpfiles.d` entry that creates empty `0600 root:root` env files at
+  `/etc/coder.d/coder.env` and `/etc/coder.d/coder-workspace-proxy.env`
+  on first boot
 
-At a minimum, set `CODER_ACCESS_URL` and `CODER_PG_CONNECTION_URL` in
-`/etc/coder.d/coder.env` before enabling `coder.service`.
+The units carry `ConditionFileNotEmpty` on their env files, so
+`coder.service` only starts once `/etc/coder.d/coder.env` has been
+populated with at least `CODER_ACCESS_URL` and `CODER_PG_CONNECTION_URL`
+(same for the workspace-proxy unit).
 
 ## Usage
 
@@ -49,7 +52,7 @@ storage:
       contents:
         source: https://extensions.flatcar.org/extensions/noop.conf
     - path: /etc/coder.d/coder.env
-      mode: 0644
+      mode: 0600
       contents:
         inline: |
           CODER_ACCESS_URL=https://coder.example.com

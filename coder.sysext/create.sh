@@ -33,12 +33,9 @@ function populate_sysext_root() {
 
   grep -F "${tarball}" "coder_${rel_version}_checksums.txt" | sha256sum -c -
 
-  mkdir -p "${sysextroot}/usr/bin"
-  # The release tarball is small (binary + LICENSE + README); extract
-  # everything and pull the binary out. Avoid naming the member
-  # explicitly so the script works whether upstream packs it as "./coder"
-  # or "coder".
-  tar --force-local -xf "${tarball}"
-  install -m 0755 coder "${sysextroot}/usr/bin/coder"
+  mkdir -p "${sysextroot}/usr/bin" extract
+  tar --force-local -xf "${tarball}" -C extract
+  install -m 0755 "$(find extract -type f -name coder -print -quit)" \
+    "${sysextroot}/usr/bin/coder"
 }
 # --
