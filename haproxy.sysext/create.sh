@@ -31,8 +31,8 @@ function list_available_versions() {
     curl -fsSL --retry-delay 1 --retry 60 --retry-connrefused \
       --retry-max-time 60 --connect-timeout 20 \
       "https://www.haproxy.org/download/${branch}/src/releases.json" \
-      | jq -r '.releases | keys[]' 2>/dev/null \
-      | grep -vE -- '-(dev|rc)' || true
+      | jq -r '.releases | keys[]' \
+      | { grep -vE -- '-(dev|rc)' || true; }
   done | sort -Vr
 }
 # --
@@ -65,8 +65,9 @@ function populate_sysext_root() {
 
   rm "${sysextroot}/build.sh"
 
-  # flix.sh emits its tree under ${SYSEXTNAME}/; lift /usr out to the root.
-  mv "${sysextroot}/haproxy/usr" "${sysextroot}/usr"
-  rmdir "${sysextroot}/haproxy"
+  # flix.sh emits its tree under ${SYSEXTNAME}/; merge its /usr into the
+  # existing sysextroot/usr populated by _copy_static_files.
+  cp -a "${sysextroot}/haproxy/usr/." "${sysextroot}/usr/"
+  rm -rf "${sysextroot}/haproxy"
 }
 # --

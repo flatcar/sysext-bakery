@@ -22,6 +22,32 @@ ships:
   minimal default on first boot, exposing the stats page at
   `127.0.0.1:8404`
 
+## Custom configuration
+
+The sysext ships a default config at `/usr/share/haproxy/haproxy.cfg`.
+The `tmpfiles.d` rule uses `C /etc/haproxy/haproxy.cfg` semantics, so
+it copies the default in only when `/etc/haproxy/haproxy.cfg` does not
+already exist. Any file placed there by Ignition, Terraform,
+config-management, or by hand wins — the default is not applied on top
+of it and later sysext updates will not overwrite it.
+
+Two common patterns:
+
+- **Provisioning-time config.** Write `/etc/haproxy/haproxy.cfg` from
+  the Ignition/butane snippet (as in the [Usage](#usage) example
+  below). The seed default is skipped and the service starts on your
+  config on first boot.
+- **Runtime-managed config.** Leave `/etc/haproxy/haproxy.cfg` off the
+  snippet, let the default seed in, then have your config-management
+  tool (or a dataplane API) rewrite it and `systemctl reload
+  haproxy.service`. The unit's `ExecReload` runs `haproxy -c` first,
+  so a syntactically bad rewrite will not take effect.
+
+The unit also honours `EnvironmentFile=-/etc/default/haproxy` and
+`EnvironmentFile=-/etc/sysconfig/haproxy` (both optional). Override
+`CONFIG` there to point `-f` at a different file, or `EXTRAOPTS` to
+add flags without editing the unit.
+
 ## Usage
 
 Download and merge the sysext at provisioning time using the below
