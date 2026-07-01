@@ -1,0 +1,39 @@
+[Unit]
+Description=HAProxy Data Plane API
+Documentation=https://www.haproxy.com/documentation/dataplaneapi/
+After=network-online.target
+Wants=network-online.target
+After=haproxy.service
+
+[Service]
+Type=simple
+EnvironmentFile=-/etc/default/dataplaneapi
+EnvironmentFile=-/etc/sysconfig/dataplaneapi
+Environment="SYSD_OPTIONS=-f /etc/dataplaneapi/dataplaneapi.yml"
+ExecStart=/usr/bin/dataplaneapi $SYSD_OPTIONS
+ExecReload=/bin/kill -s SIGUSR1 $MAINPID
+Restart=on-failure
+RestartSec=5
+
+# Dataplane API needs to invoke `systemctl reload haproxy.service`
+# (reload_strategy: systemd in dataplaneapi.yml), so it runs as root.
+# Drop-ins can trim this if you switch to a socket-based reload
+# strategy and grant the coordinating user access to the HAProxy
+# master socket.
+User=root
+Group=root
+
+RuntimeDirectory=dataplaneapi
+StateDirectory=dataplaneapi
+NoNewPrivileges=true
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6 AF_NETLINK
+RestrictNamespaces=true
+RestrictRealtime=true
+LockPersonality=true
+
+[Install]
+WantedBy=multi-user.target

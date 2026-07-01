@@ -1,0 +1,37 @@
+# Minimal HAProxy Data Plane API configuration shipped with the sysext.
+# Replace /etc/dataplaneapi/dataplaneapi.yml to customise.
+#
+# The haproxy_bin path targets the location used by the haproxy sysext
+# (/usr/bin/haproxy) rather than the upstream deb default
+# (/usr/sbin/haproxy).
+#
+# A "userlist dataplaneapi" section with at least one user must exist
+# in haproxy.cfg for the API to accept requests; see docs/dataplaneapi.md.
+
+dataplaneapi:
+  host: 0.0.0.0
+  port: 5555
+  userlist:
+    userlist: dataplaneapi
+  resources:
+    maps_dir: /etc/haproxy/maps
+    ssl_certs_dir: /etc/haproxy/ssl
+    general_storage_dir: /etc/haproxy/general
+    spoe_dir: /etc/haproxy/spoe
+  transaction:
+    transaction_dir: /var/lib/dataplaneapi/transactions
+    backups_number: 10
+    backups_dir: /var/lib/dataplaneapi/backups
+haproxy:
+  config_file: /etc/haproxy/haproxy.cfg
+  haproxy_bin: /usr/bin/haproxy
+  reload:
+    reload_delay: 5
+    service_name: haproxy
+    reload_strategy: systemd
+log_targets:
+- log_to: stdout
+  log_level: info
+  log_types:
+  - access
+  - app
