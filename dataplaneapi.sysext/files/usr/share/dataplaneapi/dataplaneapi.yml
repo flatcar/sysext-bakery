@@ -9,7 +9,11 @@
 # in haproxy.cfg for the API to accept requests; see docs/dataplaneapi.md.
 
 dataplaneapi:
-  host: 0.0.0.0
+  # Bound to loopback by default — the API accepts writes and shell-outs
+  # against haproxy, so exposing it on all interfaces without deliberate
+  # network policy is unsafe. Override in /etc/dataplaneapi/dataplaneapi.yml
+  # (or via a drop-in) if you need remote access.
+  host: 127.0.0.1
   port: 5555
   userlist:
     userlist: dataplaneapi

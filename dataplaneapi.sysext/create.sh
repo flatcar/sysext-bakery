@@ -44,7 +44,12 @@ function populate_sysext_root() {
 
   mkdir -p "${sysextroot}/usr/bin" extract
   tar --force-local -xf "${tarball}" -C extract
-  install -m 0755 "$(find extract -type f -name dataplaneapi -print -quit)" \
-    "${sysextroot}/usr/bin/dataplaneapi"
+  local binary
+  binary="$(find extract -type f -name dataplaneapi -print -quit)"
+  if [[ -z "${binary}" ]] ; then
+    echo "ERROR: dataplaneapi binary not found in ${tarball}." >&2
+    return 1
+  fi
+  install -m 0755 "${binary}" "${sysextroot}/usr/bin/dataplaneapi"
 }
 # --

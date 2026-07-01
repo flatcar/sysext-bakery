@@ -4,6 +4,7 @@ Documentation=https://www.haproxy.com/documentation/dataplaneapi/
 After=network-online.target
 Wants=network-online.target
 After=haproxy.service
+Requires=haproxy.service
 
 [Service]
 Type=simple
@@ -24,7 +25,8 @@ User=root
 Group=root
 
 RuntimeDirectory=dataplaneapi
-StateDirectory=dataplaneapi
+StateDirectory=dataplaneapi dataplaneapi/transactions dataplaneapi/backups
+StateDirectoryMode=0750
 NoNewPrivileges=true
 ProtectHome=true
 ProtectKernelTunables=true

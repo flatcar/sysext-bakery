@@ -46,6 +46,16 @@ The unit also honours `EnvironmentFile=-/etc/default/dataplaneapi` and
 there to point `-f` at a different file or add flags without editing
 the unit.
 
+## Network exposure
+
+The shipped default binds the API to `127.0.0.1:5555`, which is a
+deliberately conservative default given the API can rewrite HAProxy
+config and shell out to reload it. To expose it on other interfaces,
+override `dataplaneapi.host` in your own
+`/etc/dataplaneapi/dataplaneapi.yml` and put the port behind an
+appropriately restricted network policy (a firewall, an HAProxy
+frontend with mTLS, etc.).
+
 ## Privileges
 
 The unit runs as `root` because the default `reload_strategy: systemd`
@@ -57,8 +67,8 @@ and grant that user access to the master socket.
 
 ## Usage
 
-Download and merge the sysext at provisioning time using the below
-butane snippet.
+Download and merge the sysext at provisioning time using the Butane
+snippet below.
 
 The snippet includes automated updates via systemd-sysupdate.
 Sysupdate will stage updates and request a reboot by creating a flag
