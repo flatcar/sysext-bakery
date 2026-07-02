@@ -1,0 +1,76 @@
+name: Report missing extension documentation
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - release_build_versions.txt
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: report-missing-extension-docs
+  cancel-in-progress: false
+
+jobs:
+  report-missing-extension-docs:
+    runs-on: ubuntu-24.04
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install prerequisites
+        run: |
+          set -euxo pipefail
+          sudo apt update -qq
+          sudo apt install -yqq jq
+
+      - name: Report missing extension documentation
+        run: |
+          ./tools/report_missing_extension_docs.sh \
+            --output-json missing-extension-docs.json
+
+      - name: Create missing documentation issues
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const missingIssues = JSON.parse(
+              fs.readFileSync('missing-extension-docs.json', 'utf8'),
+            );
+
+            if (missingIssues.length === 0) {
+              core.info('No missing extension documentation issues to create.');
+              return;
+            }
+
+            const { owner, repo } = context.repo;
+            const openIssues = await github.paginate(
+              github.rest.issues.listForRepo,
+              {
+                owner,
+                repo,
+                state: 'open',
+                per_page: 100,
+              },
+            );
+            const openTitles = new Set(openIssues.filter(issue => !issue.pull_request).map(issue => issue.title));
+
+            for (const issue of missingIssues) {
+              if (openTitles.has(issue.title)) {
+                core.info(`Open issue already exists: ${issue.title}`);
+                continue;
+              }
+
+              await github.rest.issues.create({
+                owner,
+                repo,
+                title: issue.title,
+                body: issue.body,
+              });
+              core.info(`Created issue: ${issue.title}`);
+            }
