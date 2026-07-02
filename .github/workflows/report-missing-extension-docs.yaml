@@ -58,7 +58,7 @@ jobs:
                 per_page: 100,
               },
             );
-            const openTitles = new Set(openIssues.map(issue => issue.title));
+            const openTitles = new Set(openIssues.filter(issue => !issue.pull_request).map(issue => issue.title));
 
             for (const issue of missingIssues) {
               if (openTitles.has(issue.title)) {

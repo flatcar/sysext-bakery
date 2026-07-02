@@ -11,7 +11,7 @@ source "${scriptroot}/lib/helpers.sh"
 output_json="$(get_optional_param "output-json" "" "${@}")"
 
 function list_release_extensions() {
-  sed -e 's:\s*#.*::' -e 's/[[:space:]]*$//' -e '/^$/d' \
+  sed -e 's/[[:space:]]*#.*$//' -e 's/[[:space:]]*$//' -e '/^$/d' \
     "${scriptroot}/release_build_versions.txt" \
   | awk '{print $1}' \
   | sort -u
