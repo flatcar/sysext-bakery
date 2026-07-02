@@ -64,6 +64,7 @@ Check out documentation on specific extensions at the navigation menu on the lef
 | `chrony`         |  released    | [chrony versions](https://github.com/flatcar/sysext-bakery/releases/tag/chrony) |
 | `cilium`         |  released    | [cilium versions](https://github.com/flatcar/sysext-bakery/releases/tag/cilium) |
 | `cloud-hypervisor` |  released  | [cloud-hypervisor versions](https://github.com/flatcar/sysext-bakery/releases/tag/cloud-hypervisor) |
+| `coder`          |  released    | [coder versions](https://github.com/flatcar/sysext-bakery/releases/tag/coder) |
 | `consul`          |  released    | [consul versions](https://github.com/flatcar/sysext-bakery/releases/tag/consul) |
 | `containerd`     |  released    | [containerd versions](https://github.com/flatcar/sysext-bakery/releases/tag/containerd) |
 | `crio`           |  released    | [crio versions](https://github.com/flatcar/sysext-bakery/releases/tag/crio) |
