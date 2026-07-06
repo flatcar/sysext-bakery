@@ -3,9 +3,9 @@
 #
 # HAProxy system extension.
 #
-# Builds haproxy from upstream source against Debian's glibc/openssl/lua
-# toolchain, then uses tools/flix.sh to bundle the binary's runtime
-# library deps and patch RPATH so the sysext is self-contained.
+# Builds a static musl-linked haproxy from upstream source inside an
+# ephemeral alpine container, so the sysext has no runtime library
+# dependencies on the host.
 #
 
 RELOAD_SERVICES_ON_MERGE="true"
@@ -46,28 +46,26 @@ function populate_sysext_root() {
   img_arch="$(arch_transform 'x86-64' 'amd64' "$arch")"
   img_arch="$(arch_transform 'arm64' 'arm64/v8' "$img_arch")"
 
-  local image="docker.io/debian:bookworm-slim"
+  local image="docker.io/alpine:3.21"
 
   announce "Building haproxy $version for $arch"
 
   local user_group="$(id -u):$(id -g)"
 
-  cp "${scriptroot}/haproxy.sysext/build.sh" "${sysextroot}/build.sh"
+  cp "${scriptroot}/haproxy.sysext/build.sh" .
   docker run --rm \
     -i \
-    -v "${scriptroot}/tools":/tools \
-    -v "${sysextroot}":/install_root \
+    -v "$(pwd)":/install_root \
     --platform "linux/${img_arch}" \
     --pull always \
     --network host \
     "${image}" \
         /install_root/build.sh "${version}" "$user_group"
 
-  rm "${sysextroot}/build.sh"
-
-  # flix.sh emits its tree under ${SYSEXTNAME}/; merge its /usr into the
-  # existing sysextroot/usr populated by _copy_static_files.
-  cp -a "${sysextroot}/haproxy/usr/." "${sysextroot}/usr/"
-  rm -rf "${sysextroot}/haproxy"
+  # build.sh installs to /install_root/usr; merge that on top of the
+  # static files already staged in ${sysextroot}/usr. Use the /. trick
+  # so cp merges into an existing directory instead of nesting.
+  mkdir -p "${sysextroot}/usr"
+  cp -a usr/. "${sysextroot}/usr/"
 }
 # --

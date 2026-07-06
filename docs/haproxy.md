@@ -3,15 +3,13 @@
 This sysext ships [HAProxy](https://www.haproxy.org/), a reliable
 high-performance TCP/HTTP load balancer.
 
-The sysext is built from upstream source against Debian's glibc
-toolchain with OpenSSL (incl. QUIC compat for HTTP/3), PCRE2 (JIT),
-Lua 5.4, zlib, threading, Linux capabilities, transparent proxy,
-network namespaces, TCP Fast Open and the Prometheus exporter enabled.
-The binary is dynamically linked; `tools/flix.sh` bundles the
-shared-library deps under `/usr/local/haproxy/` and pins them via
-RPATH so the sysext is self-contained on any Flatcar host. The
-`haproxy` binary lands at `/usr/bin/haproxy`. Alongside it the sysext
-ships:
+The sysext is built from upstream source inside an ephemeral Alpine
+container as a statically linked musl binary with OpenSSL (incl. QUIC
+compat for HTTP/3), PCRE2 (JIT), Lua 5.4, zlib, threading, Linux
+capabilities, transparent proxy, network namespaces, TCP Fast Open and
+the Prometheus exporter enabled. The binary has no runtime library
+dependencies on the host and lands at `/usr/bin/haproxy`. Alongside it
+the sysext ships:
 
 - `haproxy.service` based on the upstream
   `admin/systemd/haproxy.service.in`, with sandboxing/`ProtectSystem`
