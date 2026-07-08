@@ -72,6 +72,7 @@ Check out documentation on specific extensions at the navigation menu on the lef
 | `docker-compose` |  released    | [docker-compose versions](https://github.com/flatcar/sysext-bakery/releases/tag/docker-compose) |
 | `docker`         |  released    | [docker versions](https://github.com/flatcar/sysext-bakery/releases/tag/docker) |
 | `falco`          |  released    | [falco versions](https://github.com/flatcar/sysext-bakery/releases/tag/falco) |
+| `haproxy`        |  released    | [haproxy versions](https://github.com/flatcar/sysext-bakery/releases/tag/haproxy) |
 | `ig`             |  released    | [ig versions](https://github.com/flatcar/sysext-bakery/releases/tag/ig) |
 | `k3s`            |  released    | [k3s versions](https://github.com/flatcar/sysext-bakery/releases/tag/k3s) |
 | `kata-containers` |  released  | [kata-containers versions](https://github.com/flatcar/sysext-bakery/releases/tag/kata-containers) |
