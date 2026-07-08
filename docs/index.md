@@ -60,6 +60,7 @@ Check out documentation on specific extensions at the navigation menu on the lef
 
 |    Extension     | Availability | Versions available |
 | ---------------- | ------------ | ------------- |
+| `bcachefs-tools` |  released    | [bcachefs-tools versions](https://github.com/flatcar/sysext-bakery/releases/tag/bcachefs-tools) |
 | `bird`           |  released    | [bird versions](https://github.com/flatcar/sysext-bakery/releases/tag/bird) |
 | `chrony`         |  released    | [chrony versions](https://github.com/flatcar/sysext-bakery/releases/tag/chrony) |
 | `cilium`         |  released    | [cilium versions](https://github.com/flatcar/sysext-bakery/releases/tag/cilium) |

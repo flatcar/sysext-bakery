@@ -17,6 +17,8 @@
 # to build the latest (i.e. highest version number) release(s).
 #
 
+bcachefs-tools latest
+
 chrony 4.8
 chrony latest
 
