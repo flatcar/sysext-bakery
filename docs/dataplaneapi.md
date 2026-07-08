@@ -76,11 +76,17 @@ file at `/run/reboot-required`.
 You can deactivate updates by changing `enabled: true` to
 `enabled: false` in `systemd-sysupdate.timer`.
 
-Note that the snippet is for the x86-64 version of Data Plane API
-v3.3.5.
+The snippet bundles the [`haproxy` sysext](haproxy.md) alongside
+`dataplaneapi` because the API is only useful against a running HAProxy
+instance. It ships an `haproxy.cfg` with the `userlist dataplaneapi`
+block the API needs to accept requests.
 
-Check out the metadata release at
-https://github.com/flatcar/sysext-bakery/releases/tag/dataplaneapi for a
+Note that the snippet is for the x86-64 version of Data Plane API
+v3.3.5 and HAProxy 3.2.5.
+
+Check out the metadata releases at
+https://github.com/flatcar/sysext-bakery/releases/tag/dataplaneapi and
+https://github.com/flatcar/sysext-bakery/releases/tag/haproxy for a
 list of all versions available in the bakery.
 
 ```yaml
@@ -96,16 +102,54 @@ storage:
     - path: /etc/sysupdate.dataplaneapi.d/dataplaneapi.conf
       contents:
         source: https://extensions.flatcar.org/extensions/dataplaneapi.conf
+    - path: /opt/extensions/haproxy/haproxy-3.2.5-x86-64.raw
+      mode: 0644
+      contents:
+        source: https://extensions.flatcar.org/extensions/haproxy-3.2.5-x86-64.raw
+    - path: /etc/sysupdate.haproxy.d/haproxy.conf
+      contents:
+        source: https://extensions.flatcar.org/extensions/haproxy.conf
     - path: /etc/sysupdate.d/noop.conf
       contents:
         source: https://extensions.flatcar.org/extensions/noop.conf
+    - path: /etc/haproxy/haproxy.cfg
+      mode: 0644
+      contents:
+        inline: |
+          global
+              log     stdout format raw local0
+              user    haproxy
+              group   haproxy
+              maxconn 4096
+
+          defaults
+              log     global
+              mode    http
+              option  httplog
+              timeout connect 5s
+              timeout client  50s
+              timeout server  50s
+
+          userlist dataplaneapi
+              user admin insecure-password change-me
+
+          frontend stats
+              bind 127.0.0.1:8404
+              stats enable
+              stats uri /
+              stats refresh 10s
   links:
     - target: /opt/extensions/dataplaneapi/dataplaneapi-v3.3.5-x86-64.raw
       path: /etc/extensions/dataplaneapi.raw
       hard: false
+    - target: /opt/extensions/haproxy/haproxy-3.2.5-x86-64.raw
+      path: /etc/extensions/haproxy.raw
+      hard: false
 systemd:
   units:
     - name: dataplaneapi.service
+      enabled: true
+    - name: haproxy.service
       enabled: true
     - name: systemd-sysupdate.timer
       enabled: true
@@ -118,4 +162,11 @@ systemd:
             ExecStartPre=/usr/lib/systemd/systemd-sysupdate -C dataplaneapi update
             ExecStartPost=/usr/bin/sh -c "readlink --canonicalize /etc/extensions/dataplaneapi.raw > /run/dataplaneapi-sysext-new"
             ExecStartPost=/usr/bin/sh -c "if ! cmp --silent /run/dataplaneapi-sysext /run/dataplaneapi-sysext-new; then touch /run/reboot-required; fi"
+        - name: haproxy.conf
+          contents: |
+            [Service]
+            ExecStartPre=/usr/bin/sh -c "readlink --canonicalize /etc/extensions/haproxy.raw > /run/haproxy-sysext"
+            ExecStartPre=/usr/lib/systemd/systemd-sysupdate -C haproxy update
+            ExecStartPost=/usr/bin/sh -c "readlink --canonicalize /etc/extensions/haproxy.raw > /run/haproxy-sysext-new"
+            ExecStartPost=/usr/bin/sh -c "if ! cmp --silent /run/haproxy-sysext /run/haproxy-sysext-new; then touch /run/reboot-required; fi"
 ```
