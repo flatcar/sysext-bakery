@@ -16,6 +16,11 @@ EXTENSION_VERSION_MATCH_PATTERN='[0-9.]+'
 # HAProxy publishes one /download/<X.Y>/src/ directory per branch with a
 # releases.json index. Iterate every branch and collect stable releases
 # (skip "X.Y-devN", "X.Y-dev0", etc.) across all of them.
+#
+# Branches prior to 3.0 are excluded: they expect older library headers
+# (most notably OpenSSL) that Alpine no longer provides, so those builds
+# fail or produce noisy output. As a side benefit this skips 1.0, whose
+# releases.json is almost empty and would make jq error out.
 function list_available_versions() {
   local listing branches branch
   listing="$(curl -fsSL --retry-delay 1 --retry 60 --retry-connrefused \
@@ -28,6 +33,9 @@ function list_available_versions() {
     | sort -uV)"
 
   for branch in ${branches} ; do
+    if semver_lower "${branch}" "3.0" ; then
+      continue
+    fi
     curl -fsSL --retry-delay 1 --retry 60 --retry-connrefused \
       --retry-max-time 60 --connect-timeout 20 \
       "https://www.haproxy.org/download/${branch}/src/releases.json" \
