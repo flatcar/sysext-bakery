@@ -68,6 +68,7 @@ Check out documentation on specific extensions at the navigation menu on the lef
 | `consul`          |  released    | [consul versions](https://github.com/flatcar/sysext-bakery/releases/tag/consul) |
 | `containerd`     |  released    | [containerd versions](https://github.com/flatcar/sysext-bakery/releases/tag/containerd) |
 | `crio`           |  released    | [crio versions](https://github.com/flatcar/sysext-bakery/releases/tag/crio) |
+| `dataplaneapi`   |  released    | [dataplaneapi versions](https://github.com/flatcar/sysext-bakery/releases/tag/dataplaneapi) |
 | `docker-buildx`  |  released    | [docker-buildx versions](https://github.com/flatcar/sysext-bakery/releases/tag/docker-buildx) |
 | `docker-compose` |  released    | [docker-compose versions](https://github.com/flatcar/sysext-bakery/releases/tag/docker-compose) |
 | `docker`         |  released    | [docker versions](https://github.com/flatcar/sysext-bakery/releases/tag/docker) |

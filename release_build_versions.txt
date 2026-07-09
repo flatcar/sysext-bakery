@@ -116,3 +116,5 @@ tilde 1.1.2
 tilde latest
 
 opkssh latest
+
+dataplaneapi latest
