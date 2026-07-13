@@ -23,6 +23,8 @@ apk add --no-cache \
   zstd-dev \
   zstd-static \
   libseccomp-dev \
+  openssl-dev \
+  openssl-libs-static \
   cargo \
   rust \
   pkgconf \
