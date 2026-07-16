@@ -118,3 +118,6 @@ tilde latest
 opkssh latest
 
 dataplaneapi latest
+
+vault 1.20.0
+vault latest
