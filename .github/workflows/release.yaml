@@ -59,6 +59,7 @@ jobs:
     permissions:
       # allow the action to create a release
       contents: write
+      id-token: write
     steps:
       - name: Set up qemu / binmft misc for cross-platform builds
         uses: docker/setup-qemu-action@v3
@@ -78,15 +79,30 @@ jobs:
             jq \
             squashfs-tools \
             xz-utils \
-            erofs-utils
+            erofs-utils \
+            skopeo
 
       - name: build
         id: build
+        shell: bash
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          KEYVAULT_CERT_NAME: ${{ secrets.KEYVAULT_CERT_NAME }}
+          AZURE_KEYVAULT_URL: https://${{ secrets.KEYVAULT_NAME }}.vault.azure.net/
+
+          AZURE_FEDERATED_TOKEN_FILE: /tmp/azure-oidc-token
+          AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+          AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          AZURE_LOG_LEVEL: verbose
+          AZURE_KEYVAULT_PKCS11_DEBUG: 1
+          PKCS11_MODULE_PATH: /usr/lib64/pkcs11/azure-keyvault-pkcs11.so
         run: |
           pushd bakery
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
           ./release.sh ${{ matrix.release }}
+          ./flatcar-container-wrap.sh \
+            "sudo -E ./sign_sysext_keyvault.sh ${{ matrix.release }} ${{ secrets.KEYVAULT_CERT_NAME }}"
 
       - name: create a new release
         uses: softprops/action-gh-release@v2
