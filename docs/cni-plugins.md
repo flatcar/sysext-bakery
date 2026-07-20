@@ -24,6 +24,12 @@ merged, and Nomad's `bridge` network mode works with no extra configuration.
 Download and merge the sysext at provisioning time using the Butane snippet
 below (x86-64 shown; see the release metadata for available versions/arches).
 
+The snippet also enables automated updates via systemd-sysupdate. There is no
+service to restart, so a new version is simply staged and the merged sysext is
+refreshed in place — CNI consumers pick up the updated binaries on their next
+invocation, with no reboot required. You can deactivate updates by changing
+`enabled: true` to `enabled: false` in `systemd-sysupdate.timer`.
+
 ```yaml
 variant: flatcar
 version: 1.0.0
@@ -43,6 +49,20 @@ storage:
   links:
     - path: /etc/extensions/cni-plugins.raw
       target: /opt/extensions/cni-plugins/cni-plugins-v1.9.1-x86-64.raw
+      hard: false
+systemd:
+  units:
+    - name: systemd-sysupdate.timer
+      enabled: true
+    - name: systemd-sysupdate.service
+      dropins:
+        - name: cni-plugins.conf
+          contents: |
+            [Service]
+            ExecStartPre=/usr/bin/sh -c "readlink --canonicalize /etc/extensions/cni-plugins.raw > /run/cni-plugins"
+            ExecStartPre=/usr/lib/systemd/systemd-sysupdate -C cni-plugins update
+            ExecStartPost=/usr/bin/sh -c "readlink --canonicalize /etc/extensions/cni-plugins.raw > /run/cni-plugins-new"
+            ExecStartPost=/usr/bin/sh -c "if ! cmp --silent /run/cni-plugins /run/cni-plugins-new; then systemd-sysext refresh; fi"
 ```
 
 Check the metadata releases at
