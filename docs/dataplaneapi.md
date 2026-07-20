@@ -58,12 +58,15 @@ frontend with mTLS, etc.).
 
 ## Privileges
 
-The unit runs as `root` because the default `reload_strategy: systemd`
-requires the API process to invoke `systemctl reload
-haproxy.service`. If you switch to a socket-based strategy (talking to
-`/run/haproxy/haproxy-master.sock` directly), drop-in a lower-privilege
-`User=`/`Group=` under `/etc/systemd/system/dataplaneapi.service.d/`
-and grant that user access to the master socket.
+The unit runs as `root` so it can invoke `systemctl reload
+haproxy.service`. The shipped config therefore uses a `custom` reload
+strategy that calls `systemctl` directly, rather than the `systemd`
+strategy's `sudo -n systemctl reload` (sudo is pointless for a root
+process and fails without a passwordless sudoers entry). If you switch to
+a socket-based strategy (talking to `/run/haproxy/haproxy-master.sock`
+directly), drop-in a lower-privilege `User=`/`Group=` under
+`/etc/systemd/system/dataplaneapi.service.d/` and grant that user access
+to the master socket.
 
 ## Usage
 
