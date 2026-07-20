@@ -34,8 +34,8 @@ haproxy:
     # Root unit: reload via systemctl directly. The "systemd" strategy's
     # `sudo -n systemctl reload` fails without passwordless sudo.
     reload_strategy: custom
-    reload_cmd: systemctl reload haproxy
-    restart_cmd: systemctl restart haproxy
+    reload_cmd: systemctl reload haproxy.service
+    restart_cmd: systemctl restart haproxy.service
 log_targets:
 - log_to: stdout
   log_level: info
