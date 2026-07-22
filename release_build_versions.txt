@@ -121,3 +121,6 @@ dataplaneapi latest
 
 vault 1.20.0
 vault latest
+
+blackbox_exporter v0.28.0
+blackbox_exporter latest
