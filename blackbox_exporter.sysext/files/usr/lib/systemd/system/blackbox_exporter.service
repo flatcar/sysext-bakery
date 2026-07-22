@@ -1,0 +1,26 @@
+[Unit]
+Description=Prometheus Blackbox Exporter
+Documentation=https://github.com/prometheus/blackbox_exporter
+Wants=network-online.target
+After=network-online.target
+# Don't start until the config has been seeded into /etc (via tmpfiles).
+ConditionFileNotEmpty=/etc/blackbox_exporter/blackbox.yml
+
+[Service]
+Type=simple
+DynamicUser=yes
+# CAP_NET_RAW is required for the ICMP prober; restrict the bounding set to it.
+AmbientCapabilities=CAP_NET_RAW
+CapabilityBoundingSet=CAP_NET_RAW
+EnvironmentFile=-/etc/blackbox_exporter/blackbox_exporter.env
+ExecStart=/usr/bin/blackbox_exporter --config.file=/etc/blackbox_exporter/blackbox.yml $BLACKBOX_EXPORTER_OPTS
+ExecReload=/bin/kill -HUP $MAINPID
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+SyslogIdentifier=blackbox_exporter
+
+[Install]
+UpheldBy=multi-user.target
