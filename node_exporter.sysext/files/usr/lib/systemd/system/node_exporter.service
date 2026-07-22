@@ -1,0 +1,24 @@
+[Unit]
+Description=Prometheus Node Exporter
+Documentation=https://github.com/prometheus/node_exporter
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+DynamicUser=yes
+EnvironmentFile=-/etc/node_exporter/node_exporter.env
+ExecStart=/usr/bin/node_exporter $NODE_EXPORTER_OPTS
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+ProtectKernelTunables=yes
+ProtectControlGroups=yes
+# AF_NETLINK is needed by the netdev/netclass/arp collectors (netlink mode).
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX AF_NETLINK
+SyslogIdentifier=node_exporter
+
+[Install]
+UpheldBy=multi-user.target
