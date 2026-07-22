@@ -121,3 +121,5 @@ dataplaneapi latest
 
 vault 1.20.0
 vault latest
+
+cni-plugins latest
