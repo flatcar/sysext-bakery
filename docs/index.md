@@ -81,6 +81,7 @@ Check out documentation on specific extensions at the navigation menu on the lef
 | `kubernetes`     |  released    | [kubernetes versions](https://github.com/flatcar/sysext-bakery/releases/tag/kubernetes) |
 | `llamaedge`      |  released    | [llamaedge versions](https://github.com/flatcar/sysext-bakery/releases/tag/llamaedge) |
 | `nebula`         |  released    | [nebula versions](https://github.com/flatcar/sysext-bakery/releases/tag/nebula) |
+| `netbird`        |  released    | [netbird versions](https://github.com/flatcar/sysext-bakery/releases/tag/netbird) |
 | `nerdctl`        |  released    | [nerdctl versions](https://github.com/flatcar/sysext-bakery/releases/tag/nerdctl) |
 | `nomad`          |  released    | [nomad versions](https://github.com/flatcar/sysext-bakery/releases/tag/nomad) |
 | `nvidia-runtime` |  released    | [nvidia-runtime versions](https://github.com/flatcar/sysext-bakery/releases/tag/nvidia-runtime) |
