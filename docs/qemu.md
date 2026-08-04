@@ -53,9 +53,8 @@ systemd:
         - name: qemu.conf
           contents: |
             [Service]
+            ExecStartPre=/usr/bin/sh -c "readlink --canonicalize /etc/extensions/qemu.raw > /run/qemu"
             ExecStartPre=/usr/lib/systemd/systemd-sysupdate -C qemu update
-            ExecStartPost=/usr/bin/sh -c "readlink --canonicalize /etc/extensions/qemu.raw > /tmp/qemu-old"
-            ExecStartPost=/usr/lib/systemd/systemd-sysupdate -C qemu update
-            ExecStartPost=/usr/bin/sh -c "readlink --canonicalize /etc/extensions/qemu.raw > /tmp/qemu-new"
-            ExecStartPost=/usr/bin/sh -c "if ! cmp --silent /tmp/qemu-old /tmp/qemu-new; then touch /run/reboot-required; fi"
+            ExecStartPost=/usr/bin/sh -c "readlink --canonicalize /etc/extensions/qemu.raw > /run/qemu-new"
+            ExecStartPost=/usr/bin/sh -c "if ! cmp --silent /run/qemu /run/qemu-new; then touch /run/reboot-required; fi"
 ```

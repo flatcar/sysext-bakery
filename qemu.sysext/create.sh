@@ -15,23 +15,53 @@ RELOAD_SERVICES_ON_MERGE="false"
 
 DEBIAN_QEMU_API="https://sources.debian.org/api/src/qemu/"
 
-# Print the x.y.z versions Debian stable/testing ship, newest first, from a
-# Debian sources API response passed on stdin.
-function _qemu_debian_versions() {
-  jq -r '.versions[]? | select((.suites // []) | any(. == "stable" or . == "testing")) | .version' \
+# Resolve a Debian suite alias (stable/testing) to its codename from the archive
+# Release file, e.g. stable -> trixie. The sources API tags versions by codename
+# only, so we need this mapping. Fails if the lookup can't be made.
+function _debian_codename() {
+  local alias="$1" codename
+  codename="$(curl -fsSL "https://deb.debian.org/debian/dists/${alias}/Release" 2>/dev/null \
+    | sed -nE 's/^Codename:[[:space:]]*([^[:space:]]+).*/\1/p')" || return 1
+  [[ -n "${codename}" ]] || return 1
+  printf '%s\n' "${codename}"
+}
+# --
+
+# Read a Debian sources API response on stdin and print the x.y.z QEMU versions
+# shipped by the given suite codenames (args), newest first.
+function _qemu_versions_in() {
+  jq -r --args '
+      ($ARGS.positional) as $cn
+      | .versions[]?
+      | select((.suites // []) | any(. as $s | $cn | index($s)))
+      | .version' "$@" \
     | sed -nE 's/^[0-9]+:([0-9]+\.[0-9]+\.[0-9]+).*/\1/p' \
     | sort -Vru
 }
 # --
 
+# Return 0 if the given Debian codename ships the requested x.y.z QEMU version.
+function _qemu_version_in() {
+  local api="$1" ver="$2" codename="$3"
+  echo "${api}" | jq -e --arg v "${ver}" --arg c "${codename}" '
+      .versions[]?
+      | select((.suites // []) | index($c))
+      | select(.version | test("^[0-9]+:" + ($v | gsub("\\.";"\\.")) + "([-+~]|$)"))
+    ' >/dev/null
+}
+# --
+
 function list_available_versions() {
-  # Fail hard rather than emit a partial/empty list if the query fails.
-  local api_json
-  api_json="$(curl -fsSL "${DEBIAN_QEMU_API}")" || {
+  local api stable testing
+  stable="$(_debian_codename stable)" && testing="$(_debian_codename testing)" || {
+    echo "ERROR: failed to resolve Debian stable/testing codenames." >&2
+    return 1
+  }
+  api="$(curl -fsSL "${DEBIAN_QEMU_API}")" || {
     echo "ERROR: failed to query the Debian sources API (${DEBIAN_QEMU_API})." >&2
     return 1
   }
-  echo "${api_json}" | _qemu_debian_versions
+  echo "${api}" | _qemu_versions_in "${stable}" "${testing}"
 }
 # --
 
@@ -45,44 +75,43 @@ function populate_sysext_root() {
     return 1
   fi
 
-  # Fetch the Debian sources API ONCE and fail hard if it can't be retrieved or
-  # parsed. A transient failure must not silently change which suite (and thus
+  # Map the stable/testing aliases to codenames (the sources API only tags by
+  # codename) and fetch the version list ONCE. Fail hard on any lookup/parse
+  # error so a transient failure can't silently change which suite (and thus
   # which QEMU version) we build against.
-  local api_json
-  api_json="$(curl -fsSL "${DEBIAN_QEMU_API}")" || {
+  local stable testing api
+  stable="$(_debian_codename stable)" && testing="$(_debian_codename testing)" || {
+    echo "ERROR: failed to resolve Debian stable/testing codenames." >&2
+    return 1
+  }
+  api="$(curl -fsSL "${DEBIAN_QEMU_API}")" || {
     echo "ERROR: failed to query the Debian sources API (${DEBIAN_QEMU_API})." >&2
     return 1
   }
-  echo "${api_json}" | jq -e '.versions' >/dev/null 2>&1 || {
+  echo "${api}" | jq -e '.versions' >/dev/null 2>&1 || {
     echo "ERROR: unexpected response from the Debian sources API." >&2
     return 1
   }
 
-  # 'latest' resolves to the newest version Debian currently ships, so the suite
-  # selection and version check below have a concrete target.
+  # 'latest' resolves to the newest version in stable/testing so the checks below
+  # have a concrete target.
   if [[ "${version}" == "latest" ]]; then
-    version="$(echo "${api_json}" | _qemu_debian_versions | head -1)"
-    if [[ -z "${version}" ]]; then
+    version="$(echo "${api}" | _qemu_versions_in "${stable}" "${testing}" | head -1)"
+    [[ -n "${version}" ]] || {
       echo "ERROR: could not determine the latest qemu version from Debian." >&2
       return 1
-    fi
+    }
   fi
 
-  # Pick the suite that ships the requested version: prefer stable, else
-  # testing, else fail. Never fall back blindly.
-  local suite="" s
-  for s in stable testing; do
-    if echo "${api_json}" | jq -e --arg v "${version}" --arg s "${s}" '
-        .versions[]?
-        | select((.suites // []) | index($s))
-        | select(.version | test("^[0-9]+:" + ($v | gsub("\\.";"\\.")) + "([-+~]|$)"))
-      ' >/dev/null; then
-      suite="${s}"
-      break
-    fi
-  done
-  if [[ -z "${suite}" ]]; then
-    echo "ERROR: qemu ${version} is not available in Debian stable or testing." >&2
+  # Choose the suite that actually ships the requested version: prefer stable,
+  # else testing, else fail. Never fall back blindly.
+  local suite=""
+  if _qemu_version_in "${api}" "${version}" "${stable}"; then
+    suite="stable"
+  elif _qemu_version_in "${api}" "${version}" "${testing}"; then
+    suite="testing"
+  else
+    echo "ERROR: qemu ${version} is not in Debian stable (${stable}) or testing (${testing})." >&2
     return 1
   fi
 
