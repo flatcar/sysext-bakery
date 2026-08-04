@@ -7,10 +7,11 @@ hypervisor for Nomad's `qemu` task driver.
 QEMU has no upstream static/portable release, so the extension bundles the
 `qemu-system-x86_64` binary with its full shared-library closure (including
 glibc and the dynamic loader) plus firmware (SeaBIOS, iPXE option ROMs, OVMF),
-extracted from a Debian container. A `/usr/bin/qemu-system-x86_64` wrapper runs
-the binary through the bundled loader, isolating it from the host's libraries,
-and points QEMU at the bundled firmware with `-L`. User-mode (SLIRP) networking
-is included, so VMs get NAT egress with no host bridge setup.
+extracted from a Debian container via `tools/flix.sh`. flix resolves the library
+closure and patchelf's the binary onto a private loader and rpath, isolating it
+from the host's libraries; QEMU finds the bundled firmware through its
+compiled-in data directory. User-mode (SLIRP) networking is included, so VMs get
+NAT egress with no host bridge setup.
 
 Only `x86-64` is supported for now.
 
