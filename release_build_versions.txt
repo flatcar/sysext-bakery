@@ -66,11 +66,11 @@ nebula latest
 
 nerdctl latest
 
-nomad 1.10.0
-nomad latest
-
 node_exporter v1.12.1
 node_exporter latest
+
+nomad 1.10.0
+nomad latest
 
 nvidia-runtime v1.18.1
 nvidia-runtime latest

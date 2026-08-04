@@ -12,7 +12,7 @@ The snippet includes automated updates via systemd-sysupdate.
 When a new version is released, sysupdate stages it, refreshes the merged sysext, and restarts `node_exporter.service` (see the `systemd-sysupdate.service` drop-in below).
 You can deactivate updates by changing `enabled: true` to `enabled: false` in `systemd-sysupdate.timer`.
 
-Note that the snippet is for the x86-64 version of node_exporter 1.12.1.
+Note that the snippet is for the x86-64 version of node_exporter v1.12.1.
 
 Check out the metadata release at https://github.com/flatcar/sysext-bakery/releases/tag/node_exporter for a list of all versions available in the bakery.
 
@@ -22,10 +22,10 @@ version: 1.0.0
 
 storage:
   files:
-    - path: /opt/extensions/node_exporter/node_exporter-1.12.1-x86-64.raw
+    - path: /opt/extensions/node_exporter/node_exporter-v1.12.1-x86-64.raw
       mode: 0644
       contents:
-        source: https://extensions.flatcar.org/extensions/node_exporter-1.12.1-x86-64.raw
+        source: https://extensions.flatcar.org/extensions/node_exporter-v1.12.1-x86-64.raw
     - path: /etc/sysupdate.node_exporter.d/node_exporter.conf
       contents:
         source: https://extensions.flatcar.org/extensions/node_exporter.conf
@@ -33,7 +33,7 @@ storage:
     - path: /etc/systemd/system/multi-user.target.wants/node_exporter.service
       target: /usr/lib/systemd/system/node_exporter.service
       overwrite: true
-    - target: /opt/extensions/node_exporter/node_exporter-1.12.1-x86-64.raw
+    - target: /opt/extensions/node_exporter/node_exporter-v1.12.1-x86-64.raw
       path: /etc/extensions/node_exporter.raw
       hard: false
 systemd:
