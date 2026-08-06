@@ -99,6 +99,53 @@ to display these; e.g.
 ./bakery.sh create docker help
 ```
 
+### Validate extension images
+
+Built extension images can be validated with
+
+```sh
+./bakery.sh test <extension>
+```
+
+, e.g.
+```sh
+./bakery.sh test kubernetes
+```
+
+The command checks the image for everything that makes `systemd-sysext` merge it, and makes
+ the merged extension work:
+- the extension release metadata is present, names the extension, and matches the target OS
+  and architecture,
+- all files are shipped below `usr/` or `opt/` - files anywhere else are dropped on merge,
+- the image ships no `usr/sbin` directory, which would replace Flatcar's `/usr/sbin` symlink
+  and hide all host binaries in it,
+- all files are owned by `root`,
+- all shipped binaries are built for the target architecture,
+- all commands the shipped systemd units run exist, either in the extension or in the OS image.
+
+The command exits non-zero if any check fails, so it can be used in scripts and CI.
+It takes an extension name, or the path of an image built with `--output-file`:
+
+```sh
+./bakery.sh test kubernetes-v1.32.0-arm64.raw --arch arm64
+```
+
+Pull requests that change an extension are built and validated automatically; see
+ [`.github/workflows/test-extensions.yaml`](.github/workflows/test-extensions.yaml).
+
+Extensions can additionally implement smoke tests in `<extension>.sysext/test.sh` that run
+ on a booted system with the extension merged:
+
+```sh
+./bakery.sh test <extension> --vm true
+```
+
+This boots a local Flatcar VM (see below), merges the extension, runs the extension's
+ `run_tests()` hook, and reports the result.
+See [`_skel.sysext/test.sh`](_skel.sysext/test.sh) for the hook contract, and
+ [tailscale](/tailscale.sysext/test.sh), [btop](/btop.sysext/test.sh), and
+ [docker-compose](/docker-compose.sysext/test.sh) for examples.
+
 ### Interactively test extension images in a local VM
 
 Extension images can be tested and explored interactively in a local Flatcar VM.
@@ -156,9 +203,18 @@ To add an extension:
    - `populate_sysext_root` populates the system extension root directory (available via `$sysextroot`).
       This function runs in a temporary directory; stuff can be downloaded / built in `./` and then moved to `$sysextroot`.
       The temporary directory will be removed when the extension build is complete (or when it errors out); no need to clean up manually.
-4. Add `docs/<my-extension-name>.md` with documentation and example configuration for the new extension, and reference the new file from the list of extensions in `docs/index.md`.
-5. Optionally add the new extension name to [release_build_versions.txt](https://github.com/flatcar/sysext-bakery/blob/main/release_build_versions.txt) to automatically build it when new upstream versions are released.
-6. File a PR.
+4. Build the extension and validate the image:
+  ```sh
+  ./bakery.sh create <my-extension-name> <version>
+  ./bakery.sh test <my-extension-name>
+  ```
+   The same validation runs on every pull request.
+5. Optionally implement the `run_tests` stub in `test.sh` to smoke test the extension on a
+   running system, and try it out with `./bakery.sh test <my-extension-name> --vm true`.
+   Delete `test.sh` if there is nothing to test.
+6. Add `docs/<my-extension-name>.md` with documentation and example configuration for the new extension, and reference the new file from the list of extensions in `docs/index.md`.
+7. Optionally add the new extension name to [release_build_versions.txt](https://github.com/flatcar/sysext-bakery/blob/main/release_build_versions.txt) to automatically build it when new upstream versions are released.
+8. File a PR.
 
 Done!
 
