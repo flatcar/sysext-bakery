@@ -1,0 +1,133 @@
+name: Sysext smoke tests
+
+on:
+  pull_request:
+    paths:
+      - '**.sysext/**'
+      - 'lib/test.sh'
+      - 'bakery.sh'
+      - '.github/workflows/smoke-test.yml'
+  push:
+    branches:
+      - main
+    paths:
+      - '**.sysext/**'
+      - 'lib/test.sh'
+      - 'bakery.sh'
+
+jobs:
+  detect-changed-extensions:
+    runs-on: ubuntu-24.04
+    outputs:
+      extensions: ${{ steps.detect.outputs.extensions }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect changed extensions
+        id: detect
+        run: |
+          set -euo pipefail
+
+          # On a PR, compare against the base branch.
+          # On a push to main, compare against the previous commit.
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            base="${{ github.event.pull_request.base.sha }}"
+          else
+            base="${{ github.event.before }}"
+          fi
+
+          changed="$(git diff --name-only "${base}" HEAD \
+                     | grep -oE '^[^/]+\.sysext' \
+                     | sed 's/\.sysext$//' \
+                     | sort -u || true)"
+
+          # Also always run if lib/test.sh or bakery.sh changed.
+          core_changed="$(git diff --name-only "${base}" HEAD \
+                          | grep -qE '^(lib/test\.sh|bakery\.sh)$' \
+                          && echo 'true' || echo 'false')"
+
+          if [[ "${core_changed}" == 'true' ]]; then
+            # Run tests for every extension that has a non-empty test.sh
+            changed="$(find . -maxdepth 2 -name 'test.sh' -size +0c \
+                        | sed 's|\./\(.*\)\.sysext/test\.sh|\1|' \
+                        | sort -u)"
+          fi
+
+          if [[ -z "${changed}" ]]; then
+            echo "No extensions with changes detected — skipping tests."
+            echo 'extensions=[]' >> "${GITHUB_OUTPUT}"
+          else
+            json="$(echo "${changed}" | jq -R . | jq -sc .)"
+            echo "Extensions to test: ${json}"
+            echo "extensions=${json}" >> "${GITHUB_OUTPUT}"
+          fi
+
+  smoke-test:
+    needs: detect-changed-extensions
+    if: ${{ needs.detect-changed-extensions.outputs.extensions != '[]' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        extension: ${{ fromJson(needs.detect-changed-extensions.outputs.extensions) }}
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install prerequisites
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -yqq \
+            curl \
+            jq \
+            squashfs-tools \
+            xz-utils \
+            erofs-utils
+
+      - name: Build sysext — ${{ matrix.extension }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          version="$(./bakery.sh list "${{ matrix.extension }}" --latest true \
+                     | head -n 1 | awk '{print $1}')"
+
+          if [[ -z "${version}" ]]; then
+            echo "Could not determine latest version for '${{ matrix.extension }}' — skipping build."
+            echo "SKIP_TEST=true" >> "${GITHUB_ENV}"
+            exit 0
+          fi
+
+          echo "Building ${{ matrix.extension }} version ${version}"
+          ./bakery.sh create "${{ matrix.extension }}" "${version}"
+
+      - name: Extract sysext root — ${{ matrix.extension }}
+        if: env.SKIP_TEST != 'true'
+        run: |
+          set -euo pipefail
+
+          imgfile="$(ls ${{ matrix.extension }}-*.raw 2>/dev/null | head -n 1)"
+          if [[ -z "${imgfile}" ]]; then
+            echo "No .raw image found for '${{ matrix.extension }}' — skipping test."
+            echo "SKIP_TEST=true" >> "${GITHUB_ENV}"
+            exit 0
+          fi
+
+          mkdir -p sysext-root
+          # Try unsquashfs first, fall back to mount loop for ext4/erofs images.
+          if file "${imgfile}" | grep -q squashfs; then
+            unsquashfs -d sysext-root "${imgfile}"
+          else
+            sudo mount -o loop,ro "${imgfile}" /mnt
+            sudo cp -a /mnt/. sysext-root/
+            sudo umount /mnt
+            sudo chown -R "$(id -u):$(id -g)" sysext-root
+          fi
+
+      - name: Run smoke tests — ${{ matrix.extension }}
+        if: env.SKIP_TEST != 'true'
+        run: |
+          set -euo pipefail
+          ./bakery.sh test sysext-root "${{ matrix.extension }}"

@@ -26,6 +26,8 @@ function usage() {
   echo "  create <sysext> help          - List sysext specific parameters. Rarely used."
   echo "  boot <sysext> [<sysext> ...]  - Boot a local Flatcar VM (qemu) with sysext(s) merged."
   echo "                                  Great for testing and interactively exploring sysexts."
+  echo "  test <sysext-root> <sysext>   - Run smoke tests for <sysext> against a populated sysext"
+  echo "                                  root directory. Does not require a live VM."
   echo
   echo "Use '$0 <command> help' to print help for a specific command."
   echo
@@ -144,10 +146,14 @@ function create_sysext() {
 # --
 
 case "${1:-}" in
-  list|list-bakery|create|boot|test)
+  list|list-bakery|create|boot)
     cmd="${1}"
     shift
     "${cmd}"_sysext "${@}"
+    ;;
+  test)
+    shift
+    test_sysext "${@}"
     ;;
   *) usage;
   ;;
