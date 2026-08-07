@@ -212,14 +212,30 @@ function _image_path_exists() {
   local path="$(_merged_path "$2")"
 
   local hops=0 target=""
-  while [[ -L "${root}${path}" ]] && [[ ${hops} -lt 10 ]] ; do
+  while true ; do
+    # A path holding '..' components, or a symlink pointing out of the image,
+    #  resolves to a file on the build host rather than to one the extension
+    #  ships. Stop before the check consults the host's file system.
+    if [[ "$(realpath -m -s --relative-base="${root}" "${root}${path}")" == /* ]] ; then
+      return 1
+    fi
+
+    if [[ ! -L "${root}${path}" ]] ; then
+      break
+    fi
+
+    # Give up on implausibly long symlink chains rather than spinning on a loop.
+    if [[ ${hops} -ge 10 ]] ; then
+      return 1
+    fi
+    hops=$((hops + 1))
+
     target="$(readlink "${root}${path}")"
     if [[ ${target} == /* ]] ; then
       path="$(_merged_path "${target}")"
     else
       path="$(dirname "${path}")/${target}"
     fi
-    hops=$((hops + 1))
   done
 
   [[ -e "${root}${path}" ]]
@@ -452,7 +468,7 @@ function _check_units() {
     return
   fi
 
-  local failures_before=${_test_failures}
+  local failures_before=${_test_failures} warnings_before=${_test_warnings}
   local unit="" setting="" exec_path="" exec_name="" shipped="" units=0
 
   while read -r unit; do
@@ -491,7 +507,8 @@ function _check_units() {
 
   if [[ ${units} -eq 0 ]] ; then
     _test_skip "the extension ships no systemd units."
-  elif [[ ${_test_failures} -eq ${failures_before} ]] ; then
+  elif [[ ${_test_failures} -eq ${failures_before} ]] \
+    && [[ ${_test_warnings} -eq ${warnings_before} ]] ; then
     _test_ok "all commands of the ${units} systemd unit file(s) shipped are available."
   fi
 }

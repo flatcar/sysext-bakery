@@ -121,9 +121,14 @@ The command checks the image for everything that makes `systemd-sysext` merge it
   and hide all host binaries in it,
 - all files are owned by `root`,
 - all shipped binaries are built for the target architecture,
-- all commands the shipped systemd units run exist, either in the extension or in the OS image.
+- the commands the shipped systemd units run are shipped at the path the unit uses.
+  A unit running a binary the extension ships somewhere else fails the check; a command the
+  extension does not ship at all is reported as a warning, as it has to come with the OS image
+  and cannot be verified from the extension alone.
 
 The command exits non-zero if any check fails, so it can be used in scripts and CI.
+Images built with `--format ext2`, `--format ext4`, or `--format btrfs` cannot be validated;
+ only the default `squashfs` and `erofs` images can be read without root privileges.
 It takes an extension name, or the path of an image built with `--output-file`:
 
 ```sh

@@ -24,8 +24,11 @@ Build the extension and validate the resulting image:
 ```
 
 `bakery.sh test` checks the image for the metadata, layout, and file ownership
-`systemd-sysext` requires, for binaries built for the wrong architecture, and for systemd
-units running commands that are not shipped. It exits non-zero if any check fails.
+`systemd-sysext` requires, and for binaries built for the wrong architecture. It also checks
+the systemd units the extension ships: a unit running a binary the extension ships at a
+different path fails the check, and a command the extension does not ship at all is reported
+as a warning, since it has to be provided by the OS image. It exits non-zero if any check
+fails.
 
 Please validate both architectures when you change how an extension is built:
 
