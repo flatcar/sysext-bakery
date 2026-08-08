@@ -8,8 +8,9 @@
 
 set -euo pipefail
 
-rundir="$(pwd)"
-scriptroot="$(dirname "$(readlink -f "$0")")"
+# rundir="$(pwd)"
+scriptroot="$(dirname "$(readlink -f "$0")")" || exit 1
+# shellcheck disable=SC1090,SC1091
 source "${scriptroot}/lib/libbakery.sh"
 
 function usage() {
@@ -26,6 +27,7 @@ function usage() {
   echo "  create <sysext> help          - List sysext specific parameters. Rarely used."
   echo "  boot <sysext> [<sysext> ...]  - Boot a local Flatcar VM (qemu) with sysext(s) merged."
   echo "                                  Great for testing and interactively exploring sysexts."
+  echo "  test <sysext>                 - Run offline validation and automated VM testing for a built sysext."
   echo
   echo "Use '$0 <command> help' to print help for a specific command."
   echo
@@ -83,7 +85,8 @@ function _copy_static_files() {
 # --
 
 function create_sysext() {
-  local extname="$(extension_name "$(get_positional_param "1" "${@}")")"
+  local extname
+  extname="$(extension_name "$(get_positional_param "1" "${@}")")"
 
   if [[ -z ${extname} ]] || [[ ${extname} == help ]] ; then
     _create_sysext_help
@@ -101,12 +104,15 @@ function create_sysext() {
   function populate_sysext_root() {
       announce "Nothing to do, static files only."
   }
+  # shellcheck disable=SC1090
   source "${createscript}"
 
-  local arch="$(get_optional_param 'arch' 'x86-64' "${@}")"
+  local arch
+  arch="$(get_optional_param 'arch' 'x86-64' "${@}")"
   check_arch "$arch"
 
-  local version="$(get_positional_param "2" "${@}")"
+  local version
+  version="$(get_positional_param "2" "${@}")"
   if [[ -z ${version} ]] ; then
     echo "ERROR: missing mandatory <version> parameter"
     _create_sysext_help
@@ -118,9 +124,11 @@ function create_sysext() {
     return 1
   fi
 
-  local workdir="$(mktemp -d)"
-  local sysextroot_tmp="$(mktemp -d)"
-  trap "rm -rf '${workdir}' '${sysextroot_tmp}'" EXIT
+  local workdir
+  workdir="$(mktemp -d)"
+  local sysextroot_tmp
+  sysextroot_tmp="$(mktemp -d)"
+  trap 'rm -rf "${workdir:-}" "${sysextroot_tmp:-}"' EXIT
   local sysextroot="${sysextroot_tmp}/${extname}"
   mkdir -p "${sysextroot}"
 
@@ -139,7 +147,7 @@ function create_sysext() {
   if [[ ${RELOAD_SERVICES_ON_MERGE} == true ]] ; then
       force_reload="--force-reload true"
   fi
-  generate_sysext "$sysextroot" "$arch" "${@}" $force_reload
+  generate_sysext "$sysextroot" "$arch" "${@}" "$force_reload"
 }
 # --
 

@@ -119,6 +119,19 @@ Users can then run commands to validate the extension.
 Note that the shell is started for the unprivileged `core` user.
 The user has passwordless `sudo` access set up.
 
+### Validate and Test extension images
+
+The bakery provides an automated testing command to validate built extension images:
+
+```sh
+./bakery.sh test <extension.raw>
+```
+
+This command performs two stages of testing:
+1. **In-VM Static Analysis**: Validates that the image only contains `/usr` and `/opt`, files are root-owned, and `extension-release` exists.
+2. **Dynamic Testing**: Executes the `test.sh` script provided in the extension's folder (e.g., `docker.sysext/test.sh`) inside a temporary VM after the extension is merged.
+
+This testing command is automatically executed in CI for pull requests modifying extensions.
 
 ### Build all sysext images in this repository
 

@@ -1,0 +1,92 @@
+---
+name: Validate Sysext Changes
+
+"on": [pull_request]
+
+jobs:
+  dispatch:
+    runs-on: ubuntu-24.04
+    outputs:
+      tests: ${{ steps.filter.outputs.tests }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Determine changed extensions
+        id: filter
+        run: |
+          set -euo pipefail
+          changed_exts=$(git diff --name-only origin/${{ github.base_ref }} \
+            | grep '\.sysext/' | cut -d/ -f1 | sort -u | sed 's/\.sysext//' \
+            || true)
+          if [[ -z "${changed_exts}" ]]; then
+            echo "tests=[]" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          filtered_builds=()
+          for ext in ${changed_exts}; do
+            ver=$(awk -v e="${ext}" \
+              '$1 == e && $0 !~ /^#/ {print $2; exit}' \
+              release_build_versions.txt || true)
+            if [[ -n "${ver}" ]]; then
+              if [[ "${ver}" == "latest" ]]; then
+                ver=$(./bakery.sh list "${ext}" --latest true | head -n1)
+              fi
+              filtered_builds+=("${ext}:${ver}")
+            fi
+          done
+          if [[ ${#filtered_builds[@]} -eq 0 ]]; then
+            echo "tests=[]" >> $GITHUB_OUTPUT
+          else
+            json_arr=$(printf '%s\n' "${filtered_builds[@]}" \
+              | jq -R -s -c 'split("\n")[:-1]')
+            echo "tests=${json_arr}" >> $GITHUB_OUTPUT
+          fi
+
+  test:
+    needs: dispatch
+    if: >-
+      ${{ needs.dispatch.outputs.tests != '[]' &&
+      needs.dispatch.outputs.tests != '' }}
+    strategy:
+      matrix:
+        test: ${{ fromJson(needs.dispatch.outputs.tests) }}
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Set up qemu for cross-platform builds
+        uses: docker/setup-qemu-action@v3
+
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install prerequisites
+        run: |
+          set -euxo pipefail
+          sudo apt update -qq
+          sudo apt install -yqq curl jq squashfs-tools xz-utils erofs-utils
+
+      - name: Extract target
+        id: target
+        run: |
+          echo "ext=${{ matrix.test }}" | cut -d: -f1 >> $GITHUB_OUTPUT
+          echo "ver=${{ matrix.test }}" | cut -d: -f2 >> $GITHUB_OUTPUT
+
+      - name: Build and Test extension (x86-64)
+        run: |
+          set -euo pipefail
+          ./bakery.sh create ${{ steps.target.outputs.ext }} \
+            ${{ steps.target.outputs.ver }} --arch x86-64 \
+            --output-file ${{ steps.target.outputs.ext }}-x86-64.raw
+          timeout 5m ./bakery.sh test \
+            ${{ steps.target.outputs.ext }}-x86-64.raw --arch x86-64
+
+      - name: Build and Test extension (arm64)
+        run: |
+          set -euo pipefail
+          ./bakery.sh create ${{ steps.target.outputs.ext }} \
+            ${{ steps.target.outputs.ver }} --arch arm64 \
+            --output-file ${{ steps.target.outputs.ext }}-arm64.raw
+          timeout 5m ./bakery.sh test \
+            ${{ steps.target.outputs.ext }}-arm64.raw --arch arm64
