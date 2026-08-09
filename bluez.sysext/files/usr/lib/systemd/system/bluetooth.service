@@ -1,0 +1,27 @@
+[Unit]
+Description=Bluetooth service
+Documentation=man:bluetoothd(8)
+# Only present once a Bluetooth controller has been detected and its driver
+# (btusb, hci_uart, ...) has loaded. Without an adapter the unit is skipped
+# rather than failed, so the Upholds= drop-in does not retry in a loop.
+ConditionPathIsDirectory=/sys/class/bluetooth
+After=dbus.service
+Requires=dbus.service
+
+[Service]
+Type=dbus
+BusName=org.bluez
+# The sysext drops a new D-Bus policy into /usr/share/dbus-1/system.d, which a
+# running dbus-daemon has not read yet. Without this reload bluetoothd cannot
+# take its name on the system bus on first merge. busctl ships with systemd, so
+# it is always present on Flatcar.
+ExecStartPre=-/usr/bin/busctl call org.freedesktop.DBus /org/freedesktop/DBus org.freedesktop.DBus ReloadConfig
+ExecStart=/usr/libexec/bluetooth/bluetoothd
+NotifyAccess=main
+LimitNPROC=1
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=bluetooth.target
+Alias=dbus-org.bluez.service
