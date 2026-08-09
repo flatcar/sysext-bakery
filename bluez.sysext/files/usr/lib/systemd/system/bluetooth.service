@@ -23,5 +23,9 @@ Restart=on-failure
 RestartSec=2
 
 [Install]
-WantedBy=bluetooth.target
+# Upstream BlueZ uses bluetooth.target here. systemd does ship that target, but
+# nothing pulls it in by default, so 'systemctl enable bluetooth.service' would
+# leave the service unstarted. multi-user.target matches what the other sysexts
+# in this repo do and makes enabling behave as expected.
+WantedBy=multi-user.target
 Alias=dbus-org.bluez.service

@@ -36,7 +36,7 @@ storage:
         source: https://extensions.flatcar.org/extensions/bluez-5.82-x86-64.raw
     - path: /etc/sysupdate.bluez.d/bluez.conf
       contents:
-        source: https://extensions.flatcar.org/extensions/bluez/bluez.conf
+        source: https://extensions.flatcar.org/extensions/bluez.conf
     - path: /etc/sysupdate.d/noop.conf
       contents:
         source: https://extensions.flatcar.org/extensions/noop.conf
