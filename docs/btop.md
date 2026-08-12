@@ -1,4 +1,4 @@
----
+ ---
 title: Btop sysext
 ---
 
@@ -17,8 +17,8 @@ shipped or needs to be restarted on update. Running `systemd-sysext refresh`
 
 Download and merge the sysext at provisioning time using the below butane snippet.
 
-The snippet includes automated updates via systemd-sysupdate. Sysupdate will stage
-updates and request a reboot by creating a flag file at `/run/reboot-required`. You
+The snippet includes automated updates via systemd-sysupdate. You
+The config below does a live update.
 can deactivate updates by changing `enabled: true` to `enabled: false` in
 `systemd-sysupdate.timer`.
 
@@ -57,8 +57,6 @@ systemd:
         - name: btop.conf
           contents: |
             [Service]
-            ExecStartPre=/usr/bin/sh -c "readlink --canonicalize /etc/extensions/btop.raw > /tmp/btop"
             ExecStartPre=/usr/lib/systemd/systemd-sysupdate -C btop update
-            ExecStartPost=/usr/bin/sh -c "readlink --canonicalize /etc/extensions/btop.raw > /tmp/btop-new"
-            ExecStartPost=/usr/bin/sh -c "if ! cmp --silent /tmp/btop /tmp/btop-new; then systemd-sysext refresh; fi"
+            ExecStartPost=systemd-sysext refresh
 ```
