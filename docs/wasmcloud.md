@@ -37,12 +37,12 @@ storage:
     - path: /opt/extensions/wasmcloud/wasmcloud-v1.7.0-x86-64.raw
       contents:
         source: https://extensions.flatcar.org/extensions/wasmcloud-v1.7.0-x86-64.raw
-    - path: /etc/sysupdate.wasmcloud.d/wasmcloud.conf
+    - path: /etc/sysupdate.wasmcloud.d/wasmcloud.transfer
       contents:
-        source: https://extensions.flatcar.org/extensions/wasmcloud.conf
-    - path: /etc/sysupdate.d/noop.conf
+        source: https://extensions.flatcar.org/extensions/wasmcloud.transfer
+    - path: /etc/sysupdate.d/noop.transfer
       contents:
-      source: https://extensions.flatcar.org/extensions/noop.conf
+      source: https://extensions.flatcar.org/extensions/noop.transfer
   #
   # Custom WasmCloud Config
   #

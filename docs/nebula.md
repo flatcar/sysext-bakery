@@ -20,12 +20,12 @@ storage:
       mode: 0644
       contents:
         source: https://extensions.flatcar.org/extensions/nebula-v1.9.5-x86-64.raw
-    - path: /etc/sysupdate.nebula.d/nebula.conf
+    - path: /etc/sysupdate.nebula.d/nebula.transfer
       contents:
-        source: https://extensions.flatcar.org/extensions/nebula.conf
-    - path: /etc/sysupdate.d/noop.conf
+        source: https://extensions.flatcar.org/extensions/nebula.transfer
+    - path: /etc/sysupdate.d/noop.transfer
       contents:
-        source: https://extensions.flatcar.org/extensions/noop.conf
+        source: https://extensions.flatcar.org/extensions/noop.transfer
   links:
     - path: /etc/systemd/system/multi-user.target.wants/nebula.service
       target: /usr/lib/systemd/system/nebula.service

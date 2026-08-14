@@ -26,9 +26,9 @@ storage:
       mode: 0644
       contents:
         source: https://extensions.flatcar.org/extensions/nomad-1.10.0-x86-64.raw
-    - path: /etc/sysupdate.nomad.d/nomad.conf
+    - path: /etc/sysupdate.nomad.d/nomad.transfer
       contents:
-        source: https://extensions.flatcar.org/extensions/nomad.conf
+        source: https://extensions.flatcar.org/extensions/nomad.transfer
   links:
     - path: /etc/systemd/system/multi-user.target.wants/nomad.service
       target: /usr/local/lib/systemd/system/nomad.service

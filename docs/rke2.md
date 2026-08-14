@@ -33,12 +33,12 @@ storage:
       mode: 0644
       contents:
         source: https://extensions.flatcar.org/extensions/rke2-v1.36.1+rke2r2-x86-64.raw
-    - path: /etc/sysupdate.rke2.d/rke2-v1.36.conf
+    - path: /etc/sysupdate.rke2.d/rke2-v1.36.transfer
       contents:
-        source: https://extensions.flatcar.org/extensions/rke2/rke2-v1.36.conf
-    - path: /etc/sysupdate.d/noop.conf
+        source: https://extensions.flatcar.org/extensions/rke2/rke2-v1.36.transfer
+    - path: /etc/sysupdate.d/noop.transfer
       contents:
-        source: https://extensions.flatcar.org/extensions/noop.conf
+        source: https://extensions.flatcar.org/extensions/noop.transfer
   links:
     - target: /opt/extensions/rke2/rke2-v1.36.1+rke2r2-x86-64.raw
       path: /etc/extensions/rke2.raw

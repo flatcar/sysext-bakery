@@ -24,12 +24,12 @@ storage:
       mode: 0644
       contents:
         source: https://extensions.flatcar.org/extensions/docker-buildx-0.25.0-x86-64.raw
-    - path: /etc/sysupdate.docker-buildx.d/docker-buildx.conf
+    - path: /etc/sysupdate.docker-buildx.d/docker-buildx.transfer
       contents:
-        source: https://extensions.flatcar.org/extensions/docker-buildx.conf
-    - path: /etc/sysupdate.d/noop.conf
+        source: https://extensions.flatcar.org/extensions/docker-buildx.transfer
+    - path: /etc/sysupdate.d/noop.transfer
       contents:
-        source: https://extensions.flatcar.org/extensions/noop.conf
+        source: https://extensions.flatcar.org/extensions/noop.transfer
   links:
     - target: /opt/extensions/docker-buildx/docker-buildx-0.25.0-x86-64.raw
       path: /etc/extensions/docker-buildx.raw

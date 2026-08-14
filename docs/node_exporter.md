@@ -25,9 +25,9 @@ storage:
       mode: 0644
       contents:
         source: https://extensions.flatcar.org/extensions/node-exporter-v1.12.1-x86-64.raw
-    - path: /etc/sysupdate.node-exporter.d/node-exporter.conf
+    - path: /etc/sysupdate.node-exporter.d/node-exporter.transfer
       contents:
-        source: https://extensions.flatcar.org/extensions/node-exporter.conf
+        source: https://extensions.flatcar.org/extensions/node-exporter.transfer
   links:
     - path: /etc/systemd/system/multi-user.target.wants/node-exporter.service
       target: /usr/lib/systemd/system/node-exporter.service

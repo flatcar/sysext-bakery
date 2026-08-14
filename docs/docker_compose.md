@@ -24,12 +24,12 @@ storage:
       mode: 0644
       contents:
         source: https://extensions.flatcar.org/extensions/docker-compose-2.34.0-x86-64.raw
-    - path: /etc/sysupdate.docker-compose.d/docker-compose.conf
+    - path: /etc/sysupdate.docker-compose.d/docker-compose.transfer
       contents:
-        source: https://extensions.flatcar.org/extensions/docker-compose.conf
-    - path: /etc/sysupdate.d/noop.conf
+        source: https://extensions.flatcar.org/extensions/docker-compose.transfer
+    - path: /etc/sysupdate.d/noop.transfer
       contents:
-        source: https://extensions.flatcar.org/extensions/noop.conf
+        source: https://extensions.flatcar.org/extensions/noop.transfer
   links:
     - target: /opt/extensions/docker-compose/docker-compose-2.34.0-x86-64.raw
       path: /etc/extensions/docker-compose.raw

@@ -41,15 +41,15 @@ storage:
       mode: 0420
       contents:
         source: https://extensions.flatcar.org/extensions/llamaedge-0.14.16-x86-64.raw
-    - path: /etc/sysupdate.wasmedge.d/wasmedge.conf
+    - path: /etc/sysupdate.wasmedge.d/wasmedge.transfer
       contents:
-        source: https://extensions.flatcar.org/extensions/wasmedge.conf
-    - path: /etc/sysupdate.wasmedge.d/llamaedge.conf
+        source: https://extensions.flatcar.org/extensions/wasmedge.transfer
+    - path: /etc/sysupdate.wasmedge.d/llamaedge.transfer
       contents:
-        source: https://extensions.flatcar.org/extensions/llamaedge.conf
-    - path: /etc/sysupdate.d/noop.conf
+        source: https://extensions.flatcar.org/extensions/llamaedge.transfer
+    - path: /etc/sysupdate.d/noop.transfer
       contents:
-        source: https://extensions.flatcar.org/extensions/noop.conf
+        source: https://extensions.flatcar.org/extensions/noop.transfer
   links:
     - target: /opt/extensions/wasmedge-0.14.1-x86-64.raw
       path: /etc/extensions/wasmedge.raw
