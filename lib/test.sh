@@ -584,7 +584,12 @@ check "extension '${extension}' is merged into the running system" \
       test -e "/usr/lib/extension-release.d/extension-release.${extension}"
 
 if [[ -s "${testdir}/test.sh" ]] ; then
-  source "${testdir}/test.sh"
+  # A hook that fails to load leaves run_tests() undefined, which would be
+  #  reported as "no hook implemented" and quietly pass the whole run.
+  if ! source "${testdir}/test.sh" ; then
+    echo "   FAIL | the extension's test hook failed to load"
+    failures+=1
+  fi
 fi
 
 if [[ $(type -t run_tests) == function ]] ; then
@@ -679,6 +684,10 @@ function _run_vm_tests() {
     _test_warn "extension '${extname}' implements no test hook in" \
                "'${extname}.sysext/test.sh'; only checking that it merges."
     hook="/dev/null"
+  elif ! bash -n "${hook}" ; then
+    # Catch this before spending a VM boot on a hook that cannot run.
+    _test_fail "the test hook '${extname}.sysext/test.sh' does not parse."
+    return 1
   fi
 
   # Run in a sub-shell b/c we will change into a temporary working directory

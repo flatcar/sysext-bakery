@@ -119,7 +119,8 @@ The command checks the image for everything that makes `systemd-sysext` merge it
 - all files are shipped below `usr/` or `opt/` - files anywhere else are dropped on merge,
 - the image ships no `usr/sbin` directory, which would replace Flatcar's `/usr/sbin` symlink
   and hide all host binaries in it,
-- all files are owned by `root`,
+- all files are owned by `root`, read from the image itself. This is reported as skipped for
+  `erofs` images, whose ownership the bakery fixes to `root` at build time anyway,
 - all shipped binaries are built for the target architecture,
 - the commands the shipped systemd units run are shipped at the path the unit uses.
   A unit running a binary the extension ships somewhere else fails the check; a command the
