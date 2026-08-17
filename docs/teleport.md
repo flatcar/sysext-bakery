@@ -2,9 +2,12 @@
 
 This sysext ships [Teleport](https://github.com/gravitational/teleport) binaries (`teleport`, `tctl`, `tsh`).
 
+The sysext includes a service unit file to start teleport at boot.
+The Teleport configuration must be provided at `/etc/teleport/teleport.yaml` via a custom Butane config.
+
 # Usage
 
-Deploy the sysext raw image to `/opt/extensions/teleport/` and link it:
+Note that the snippet is for the x86-64 version of Teleport v18.9.2.
 
 ```yaml
 variant: flatcar
@@ -16,12 +19,17 @@ storage:
       mode: 0644
       contents:
         source: https://example.com/teleport-v18.9.2-x86-64.raw
+    - path: /etc/teleport/teleport.yaml
+      mode: 0640
+      contents:
+        source: data:text/plain;charset=utf-8,<url-encoded-config>
   links:
     - target: /opt/extensions/teleport/teleport-v18.9.2-x86-64.raw
       path: /etc/extensions/teleport.raw
       hard: false
+    - path: /etc/systemd/system/multi-user.target.wants/teleport.service
+      target: /usr/lib/systemd/system/teleport.service
+      overwrite: true
 ```
 
-After merging, the `teleport`, `tctl`, and `tsh` binaries will be available in `/usr/bin/`.
-
-You must provide your own systemd service unit and Teleport configuration. See the [Teleport documentation](https://goteleport.com/docs/) for details.
+See the [Teleport documentation](https://goteleport.com/docs/) for configuration details.

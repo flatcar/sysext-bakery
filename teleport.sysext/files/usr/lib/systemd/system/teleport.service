@@ -1,0 +1,15 @@
+[Unit]
+Description=Teleport Service
+Documentation=https://goteleport.com/docs/
+Requires=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/teleport start --config=/etc/teleport/teleport.yaml
+Restart=on-failure
+RestartSec=5
+LimitNOFILE=65536
+
+[Install]
+UpheldBy=multi-user.target
