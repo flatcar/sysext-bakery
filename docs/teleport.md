@@ -52,22 +52,4 @@ systemd:
             ExecStartPost=/usr/bin/sh -c "if ! cmp --silent /tmp/teleport /tmp/teleport-new; then systemd-sysext refresh && systemctl restart teleport.service; fi"
 ```
 
-The `teleport.conf` sysupdate transfer config should contain:
-
-```ini
-[Transfer]
-Verify=false
-
-[Source]
-Type=url-file
-Path=https://extensions.flatcar.org/extensions/teleport/
-MatchPattern=teleport-@v-%a.raw
-
-[Target]
-InstancesMax=3
-Type=regular-file
-Path=/opt/extensions/teleport
-CurrentSymlink=/etc/extensions/teleport.raw
-```
-
 See the [Teleport documentation](https://goteleport.com/docs/) for configuration details.
