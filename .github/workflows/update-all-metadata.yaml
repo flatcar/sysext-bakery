@@ -35,8 +35,10 @@ jobs:
   update-extension-metadata:
     needs: [ list-extensions ]
     strategy:
+      fail-fast: false
       matrix:
         extension: ${{ fromJson(needs.list-extensions.outputs.extensions) }}
+    continue-on-error: true
     runs-on: ubuntu-24.04
     permissions:
       # allow the action to create a release
@@ -74,6 +76,7 @@ jobs:
 
   update-global-metadata:
     needs: update-extension-metadata
+    if: ${{ !cancelled() }}
     runs-on: ubuntu-24.04
     permissions:
       # allow the action to create a release

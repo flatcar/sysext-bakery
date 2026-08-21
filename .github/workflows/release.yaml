@@ -47,6 +47,7 @@ jobs:
     needs: list-builds
     if: ${{ needs.list-builds.outputs.builds != '[]' && needs.list-builds.outputs.builds != '' }}
     strategy:
+      fail-fast: false
       matrix:
         release: ${{ fromJson(needs.list-builds.outputs.builds) }}
     # Try to finish all jobs even if one fails.
@@ -102,7 +103,7 @@ jobs:
 
   update-extension-metadata:
     needs: [ list-builds, create-release ]
-    if: ${{ needs.list-builds.outputs.extensions != '[]' && needs.list-builds.outputs.extensions != '' }}
+    if: ${{ !cancelled() && needs.list-builds.outputs.extensions != '[]' && needs.list-builds.outputs.extensions != '' }}
     strategy:
       fail-fast: false
       matrix:
@@ -147,8 +148,8 @@ jobs:
             bakery/*.conf
 
   update-global-metadata:
-    needs: update-extension-metadata
-    if: ${{ needs.list-builds.outputs.extensions != '[]' && needs.list-builds.outputs.extensions != '' }}
+    needs: [ list-builds, update-extension-metadata ]
+    if: ${{ !cancelled() && needs.list-builds.outputs.extensions != '[]' && needs.list-builds.outputs.extensions != '' }}
     runs-on: ubuntu-24.04
     permissions:
       # allow the action to create a release
