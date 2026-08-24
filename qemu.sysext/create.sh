@@ -8,8 +8,9 @@
 # glibc + the dynamic loader) and firmware, extracted from a Debian container.
 # tools/flix.sh resolves the closure and patchelf's the binary onto a private
 # loader/rpath, isolating it from the host's libraries (same approach as
-# tilde.sysext). Debian packages QEMU, so the version parameter selects the
-# Debian suite (stable/testing) that ships it. Only x86-64 is supported for now.
+# tilde.sysext). The version parameter is a QEMU x.y.z release (or "latest");
+# the recipe then picks whichever Debian suite currently ships that version.
+# Only x86-64 is supported for now.
 
 RELOAD_SERVICES_ON_MERGE="false"
 
