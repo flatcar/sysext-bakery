@@ -36,10 +36,10 @@ storage:
         source: https://extensions.flatcar.org/extensions/qemu-10.0.11-x86-64.raw
     - path: /etc/sysupdate.qemu.d/qemu.conf
       contents:
-        source: https://github.com/flatcar/sysext-bakery/releases/download/qemu/qemu.conf
+        source: https://extensions.flatcar.org/extensions/qemu.conf
     - path: /etc/sysupdate.d/noop.conf
       contents:
-        source: https://github.com/flatcar/sysext-bakery/releases/download/qemu/noop.conf
+        source: https://extensions.flatcar.org/extensions/noop.conf
   links:
     - target: /opt/extensions/qemu/qemu-10.0.11-x86-64.raw
       path: /etc/extensions/qemu.raw
