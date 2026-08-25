@@ -26,6 +26,9 @@ function usage() {
   echo "  create <sysext> help          - List sysext specific parameters. Rarely used."
   echo "  boot <sysext> [<sysext> ...]  - Boot a local Flatcar VM (qemu) with sysext(s) merged."
   echo "                                  Great for testing and interactively exploring sysexts."
+  echo "  test <sysext>                 - Validate a built system extension image."
+  echo "                                  Add '--vm true' to also run the extension's smoke"
+  echo "                                  tests in a local Flatcar VM."
   echo
   echo "Use '$0 <command> help' to print help for a specific command."
   echo
