@@ -29,12 +29,12 @@ storage:
       mode: 0644
       contents:
         source: https://extensions.flatcar.org/extensions/docker-28.0.4-x86-64.raw
-    - path: /etc/sysupdate.docker.d/docker.conf
+    - path: /etc/sysupdate.docker.d/docker.transfer
       contents:
-        source: https://extensions.flatcar.org/extensions/docker.conf
-    - path: /etc/sysupdate.d/noop.conf
+        source: https://extensions.flatcar.org/extensions/docker.transfer
+    - path: /etc/sysupdate.d/noop.transfer
       contents:
-        source: https://extensions.flatcar.org/extensions/noop.conf
+        source: https://extensions.flatcar.org/extensions/noop.transfer
   links:
     - target: /opt/extensions/docker/docker-28.0.4-x86-64.raw
       path: /etc/extensions/docker.raw

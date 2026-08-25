@@ -39,12 +39,12 @@ storage:
       mode: 0644
       contents:
         source: https://extensions.flatcar.org/extensions/falco-0.40.0-x86-64.raw
-    - path: /etc/sysupdate.falco.d/falco.conf
+    - path: /etc/sysupdate.falco.d/falco.transfer
       contents:
-        source: https://extensions.flatcar.org/extensions/falco.conf
-    - path: /etc/sysupdate.d/noop.conf
+        source: https://extensions.flatcar.org/extensions/falco.transfer
+    - path: /etc/sysupdate.d/noop.transfer
       contents:
-        source: https://extensions.flatcar.org/extensions/noop.conf
+        source: https://extensions.flatcar.org/extensions/noop.transfer
   links:
     - target: /opt/extensions/falco/falco-0.40.0-x86-64.raw
       path: /etc/extensions/falco.raw

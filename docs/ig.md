@@ -28,12 +28,12 @@ storage:
       mode: 0644
       contents:
         source: https://extensions.flatcar.org/extensions/ig-v0.43.0-x86-64.raw
-    - path: /etc/sysupdate.ig.d/ig.conf
+    - path: /etc/sysupdate.ig.d/ig.transfer
       contents:
-        source: https://extensions.flatcar.org/extensions/ig.conf
-    - path: /etc/sysupdate.d/noop.conf
+        source: https://extensions.flatcar.org/extensions/ig.transfer
+    - path: /etc/sysupdate.d/noop.transfer
       contents:
-        source: https://extensions.flatcar.org/extensions/noop.conf
+        source: https://extensions.flatcar.org/extensions/noop.transfer
   links:
     - target: /opt/extensions/ig/ig-v0.43.0-x86-64.raw
       path: /etc/extensions/ig.raw

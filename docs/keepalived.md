@@ -23,12 +23,12 @@ storage:
     - path: /opt/extensions/keepalived/keepalived-v2.3.1-x86-64.raw
       mode: 0644
       contents:
-    - path: /etc/sysupdate.keepalived.d/keepalived.conf
+    - path: /etc/sysupdate.keepalived.d/keepalived.transfer
       contents:
-        source: https://extensions.flatcar.org/extensions/keepalived.conf
-    - path: /etc/sysupdate.d/noop.conf
+        source: https://extensions.flatcar.org/extensions/keepalived.transfer
+    - path: /etc/sysupdate.d/noop.transfer
       contents:
-        source: https://extensions.flatcar.org/extensions/noop.conf
+        source: https://extensions.flatcar.org/extensions/noop.transfer
         source: https://extensions.flatcar.org/extensions/keepalived-v2.3.1-x86-64.raw
 
   links:

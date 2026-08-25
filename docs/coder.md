@@ -45,12 +45,12 @@ storage:
       mode: 0644
       contents:
         source: https://extensions.flatcar.org/extensions/coder-v2.34.4-x86-64.raw
-    - path: /etc/sysupdate.coder.d/coder.conf
+    - path: /etc/sysupdate.coder.d/coder.transfer
       contents:
-        source: https://extensions.flatcar.org/extensions/coder.conf
-    - path: /etc/sysupdate.d/noop.conf
+        source: https://extensions.flatcar.org/extensions/coder.transfer
+    - path: /etc/sysupdate.d/noop.transfer
       contents:
-        source: https://extensions.flatcar.org/extensions/noop.conf
+        source: https://extensions.flatcar.org/extensions/noop.transfer
     - path: /etc/coder.d/coder.env
       mode: 0600
       contents:
