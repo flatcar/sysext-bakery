@@ -17,7 +17,7 @@ Restart=on-failure
 RestartSec=5
 
 # Dataplane API needs to invoke `systemctl reload haproxy.service`
-# (reload_strategy: systemd in dataplaneapi.yml), so it runs as root.
+# (reload_strategy: custom in dataplaneapi.yml), so it runs as root.
 # Drop-ins can trim this if you switch to a socket-based reload
 # strategy and grant the coordinating user access to the HAProxy
 # master socket.
