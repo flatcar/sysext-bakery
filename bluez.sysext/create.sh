@@ -20,12 +20,17 @@ RELOAD_SERVICES_ON_MERGE="true"
 
 DEBIAN_BLUEZ_API="https://sources.debian.org/api/src/bluez/"
 
+# A transient network hiccup should not fail a build; same retry policy the
+# other recipes in this repo use (consul, haproxy, nomad, vault).
+CURL_RETRY=(--retry-delay 1 --retry 60 --retry-connrefused
+            --retry-max-time 60 --connect-timeout 20)
+
 # Resolve a Debian suite alias (stable/testing) to its codename from the archive
 # Release file, e.g. stable -> trixie. The sources API tags versions by codename
 # only, so we need this mapping. Fails if the lookup can't be made.
 function _debian_codename() {
   local alias="$1" codename
-  codename="$(curl -fsSL "https://deb.debian.org/debian/dists/${alias}/Release" 2>/dev/null \
+  codename="$(curl -fsSL "${CURL_RETRY[@]}" "https://deb.debian.org/debian/dists/${alias}/Release" 2>/dev/null \
     | sed -nE 's/^Codename:[[:space:]]*([^[:space:]]+).*/\1/p')" || return 1
   [[ -n "${codename}" ]] || return 1
   printf '%s\n' "${codename}"
@@ -62,7 +67,7 @@ function list_available_versions() {
     echo "ERROR: failed to resolve Debian stable/testing codenames." >&2
     return 1
   }
-  api="$(curl -fsSL "${DEBIAN_BLUEZ_API}")" || {
+  api="$(curl -fsSL "${CURL_RETRY[@]}" "${DEBIAN_BLUEZ_API}")" || {
     echo "ERROR: failed to query the Debian sources API (${DEBIAN_BLUEZ_API})." >&2
     return 1
   }
@@ -88,7 +93,7 @@ function populate_sysext_root() {
     echo "ERROR: failed to resolve Debian stable/testing codenames." >&2
     return 1
   }
-  api="$(curl -fsSL "${DEBIAN_BLUEZ_API}")" || {
+  api="$(curl -fsSL "${CURL_RETRY[@]}" "${DEBIAN_BLUEZ_API}")" || {
     echo "ERROR: failed to query the Debian sources API (${DEBIAN_BLUEZ_API})." >&2
     return 1
   }
@@ -154,13 +159,15 @@ function populate_sysext_root() {
         exit 1
       fi
 
-      # bluetoothd plus whichever CLI tools this suite still ships. The legacy
-      # tools (hciconfig, hcitool, ...) are deprecated upstream and are absent
-      # from newer Debian releases, so probe rather than hardcode.
+      # bluetoothd plus every CLI tool this suite's bluez package ships. Take
+      # the list from the package rather than hardcoding it: the tool set drifts
+      # across Debian releases (the legacy hciconfig/hcitool/... tools are
+      # deprecated upstream and already gone from newer ones), and a hardcoded
+      # subset silently drops tools that are still shipped -- hciattach in
+      # particular, which is what attaches a UART controller.
       paths="${bluetoothd}"
-      for b in bluetoothctl btmon btmgmt btattach bluemoon hciconfig hcitool \
-               sdptool l2ping rctest; do
-        [ -x "/usr/bin/${b}" ] && paths="${paths} /usr/bin/${b}"
+      for b in $(dpkg -L bluez | sed -nE 's|^(/usr/s?bin/[^/]+)$|\1|p' | sort -u); do
+        [ -f "${b}" ] && [ -x "${b}" ] && paths="${paths} ${b}"
       done
 
       # bluetoothd will not take its name on the system bus without this policy.

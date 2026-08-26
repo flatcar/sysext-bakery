@@ -3,7 +3,9 @@ Description=Bluetooth service
 Documentation=man:bluetoothd(8)
 # Only present once a Bluetooth controller has been detected and its driver
 # (btusb, hci_uart, ...) has loaded. Without an adapter the unit is skipped
-# rather than failed, so the Upholds= drop-in does not retry in a loop.
+# rather than failed, so the Upholds= drop-in does not retry in a loop. A
+# controller that shows up later is caught by the udev rule this sysext ships,
+# since a Condition= is only evaluated when the unit is queued.
 ConditionPathIsDirectory=/sys/class/bluetooth
 After=dbus.service
 Requires=dbus.service
@@ -21,6 +23,23 @@ NotifyAccess=main
 LimitNPROC=1
 Restart=on-failure
 RestartSec=2
+
+# Adapter settings and pairing keys. Replaces a tmpfiles.d rule: systemd creates
+# the directory before the daemon starts, and ProtectSystem=strict below needs
+# it declared here to leave it writable.
+StateDirectory=bluetooth
+StateDirectoryMode=0700
+
+# Sandboxing, as shipped by upstream BlueZ in src/bluetooth.service.in.
+CapabilityBoundingSet=CAP_NET_RAW CAP_NET_ADMIN CAP_NET_BIND_SERVICE
+NoNewPrivileges=true
+ProtectHome=true
+ProtectSystem=strict
+PrivateTmp=true
+ProtectKernelTunables=true
+ProtectControlGroups=true
+MemoryDenyWriteExecute=true
+RestrictRealtime=true
 
 [Install]
 # Upstream BlueZ uses bluetooth.target here. systemd does ship that target, but

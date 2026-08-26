@@ -65,7 +65,9 @@ systemd:
 
 The extension drops a D-Bus policy file into `/usr/share/dbus-1/system.d/`, which a *running* `dbus-daemon` has not read yet. The unit therefore asks D-Bus to reload its configuration before starting `bluetoothd`; without that, `bluetoothd` cannot take its name on the system bus until the next reboot.
 
-Adapter settings and pairing keys are stored under `/var/lib/bluetooth`, created by the shipped tmpfiles snippet.
+Adapter settings and pairing keys are stored under `/var/lib/bluetooth`, created by the unit's `StateDirectory=`.
+
+The unit is guarded by `ConditionPathIsDirectory=/sys/class/bluetooth`, so on a host without a controller it is skipped rather than restarted in a loop. A controller that appears later — a hot-plugged USB dongle, or `btusb` loading after boot — is picked up by the udev rule the extension ships, which pulls the unit in from the device event.
 
 ## Configuration
 
