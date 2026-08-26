@@ -1,0 +1,5 @@
+[Match]
+Name=wt*
+
+[Link]
+Unmanaged=yes
