@@ -1,0 +1,8 @@
+# A controller can appear long after multi-user.target has been reached: a USB
+# dongle gets hot-plugged, or btusb/hci_uart loads late. bluetooth.service is
+# guarded by ConditionPathIsDirectory=/sys/class/bluetooth, and a Condition= is
+# only evaluated when the unit is queued -- nothing re-queues it when the
+# directory finally shows up, so the daemon would stay stopped indefinitely.
+# Pulling the unit in from the device event closes that gap; starting an
+# already-running service is a no-op, so this is safe to fire per controller.
+ACTION=="add", SUBSYSTEM=="bluetooth", TAG+="systemd", ENV{SYSTEMD_WANTS}+="bluetooth.service"
