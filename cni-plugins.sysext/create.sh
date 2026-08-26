@@ -4,10 +4,12 @@
 # CNI reference plugins system extension.
 #
 # Ships the upstream containernetworking/plugins binaries (bridge, host-local,
-# portmap, firewall, loopback, macvlan, ptp, …) under /opt/cni/bin — the
-# default plugin directory searched by Nomad (cni_path) and usable by any CNI
-# runtime (Consul Connect, container runtimes, …). There is no service; the
-# binaries are invoked by the CNI consumer.
+# portmap, firewall, loopback, macvlan, ptp, …) under /usr/libexec/cni, the
+# same location nerdctl.sysext uses for its bundled copy. Upstream's de-facto
+# default is /opt/cni/bin, but on Flatcar /opt is expected to be writable and a
+# sysext would make it read-only, so consumers are pointed at /usr instead (see
+# docs/cni-plugins.md). There is no service; the binaries are invoked by the
+# CNI consumer.
 #
 
 RELOAD_SERVICES_ON_MERGE="false"
@@ -35,7 +37,7 @@ function populate_sysext_root() {
   sha256sum -c "${tarball}.sha256"
 
   # The tarball expands flat (bridge, host-local, portmap, …) into the target.
-  mkdir -p "${sysextroot}/opt/cni/bin"
-  tar --force-local -xzf "${tarball}" -C "${sysextroot}/opt/cni/bin"
+  mkdir -p "${sysextroot}/usr/libexec/cni"
+  tar --force-local -xzf "${tarball}" -C "${sysextroot}/usr/libexec/cni"
 }
 # --

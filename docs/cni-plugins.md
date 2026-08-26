@@ -3,21 +3,45 @@
 This sysext ships the upstream
 [containernetworking/plugins](https://github.com/containernetworking/plugins)
 reference CNI plugins (`bridge`, `host-local`, `portmap`, `firewall`,
-`loopback`, `macvlan`, `ptp`, `vlan`, `bandwidth`, …) under **`/opt/cni/bin`** —
-the default plugin directory searched by Nomad's `cni_path`, and usable by any
-CNI consumer (Consul Connect, container runtimes, …).
+`loopback`, `macvlan`, `ptp`, `vlan`, `bandwidth`, …) under
+**`/usr/libexec/cni`**, for use by any CNI consumer (Nomad, Consul Connect,
+container runtimes, …).
 
 The binaries are downloaded from the upstream release tarball and their
 published `.sha256` is verified during the build. There is no service unit; the
 plugins are invoked by whatever CNI runtime is configured on the host.
 
-## Why `/opt/cni/bin`
+## Why `/usr/libexec/cni` and not `/opt/cni/bin`
 
-`/opt/cni/bin` is the de-facto default CNI plugin directory (e.g. Nomad's
-`cni_path` default). On Flatcar `/opt` is a read-only sysext overlay, so a
-sysext is a natural way to provide these binaries there without a writable-path
-workaround — the plugins simply appear at `/opt/cni/bin` once the sysext is
-merged, and Nomad's `bridge` network mode works with no extra configuration.
+`/opt/cni/bin` is the de-facto upstream default, but on Flatcar `/opt` is
+expected to be writable and shipping a sysext into it would silently turn it
+read-only. The plugins therefore go under `/usr`, which is already read-only on
+Flatcar, so no expectation is violated. This matches `nerdctl.sysext`, which
+puts its optional bundled copy in the same place.
+
+Consumers that default to `/opt/cni/bin` need to be pointed at the new path.
+For Nomad, set `cni_path` in the client block:
+
+```hcl
+client {
+  cni_path = "/usr/libexec/cni"
+}
+```
+
+containerd takes it as `bin_dir` in the CNI section of `config.toml`, and
+CRI-O as `plugin_dirs` in `crio.network`.
+
+If you would rather keep the upstream default working unchanged, create the
+symlink yourself at provisioning time — `/opt` stays writable, so this does not
+need a sysext:
+
+```yaml
+storage:
+  links:
+    - path: /opt/cni/bin
+      target: /usr/libexec/cni
+      hard: false
+```
 
 ## Usage
 
