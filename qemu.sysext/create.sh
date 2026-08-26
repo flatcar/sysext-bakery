@@ -16,12 +16,17 @@ RELOAD_SERVICES_ON_MERGE="false"
 
 DEBIAN_QEMU_API="https://sources.debian.org/api/src/qemu/"
 
+# A transient network hiccup should not fail a build; same retry policy the
+# other recipes in this repo use (consul, haproxy, nomad, vault).
+CURL_RETRY=(--retry-delay 1 --retry 60 --retry-connrefused
+            --retry-max-time 60 --connect-timeout 20)
+
 # Resolve a Debian suite alias (stable/testing) to its codename from the archive
 # Release file, e.g. stable -> trixie. The sources API tags versions by codename
 # only, so we need this mapping. Fails if the lookup can't be made.
 function _debian_codename() {
   local alias="$1" codename
-  codename="$(curl -fsSL "https://deb.debian.org/debian/dists/${alias}/Release" 2>/dev/null \
+  codename="$(curl -fsSL "${CURL_RETRY[@]}" "https://deb.debian.org/debian/dists/${alias}/Release" 2>/dev/null \
     | sed -nE 's/^Codename:[[:space:]]*([^[:space:]]+).*/\1/p')" || return 1
   [[ -n "${codename}" ]] || return 1
   printf '%s\n' "${codename}"
@@ -58,7 +63,7 @@ function list_available_versions() {
     echo "ERROR: failed to resolve Debian stable/testing codenames." >&2
     return 1
   }
-  api="$(curl -fsSL "${DEBIAN_QEMU_API}")" || {
+  api="$(curl -fsSL "${CURL_RETRY[@]}" "${DEBIAN_QEMU_API}")" || {
     echo "ERROR: failed to query the Debian sources API (${DEBIAN_QEMU_API})." >&2
     return 1
   }
@@ -85,7 +90,7 @@ function populate_sysext_root() {
     echo "ERROR: failed to resolve Debian stable/testing codenames." >&2
     return 1
   }
-  api="$(curl -fsSL "${DEBIAN_QEMU_API}")" || {
+  api="$(curl -fsSL "${CURL_RETRY[@]}" "${DEBIAN_QEMU_API}")" || {
     echo "ERROR: failed to query the Debian sources API (${DEBIAN_QEMU_API})." >&2
     return 1
   }
@@ -117,8 +122,10 @@ function populate_sysext_root() {
   fi
 
   # Build the sysext inside a Debian container of the chosen suite: install QEMU,
-  # verify it actually matches the requested version (a moved suite must not
-  # silently produce a different build), then hand the binary + firmware to
+  # check the installed binary reports the requested upstream x.y.z (a suite that
+  # moved under us must not silently produce a different QEMU release; note this
+  # does not pin the Debian package revision, so the same x.y.z can still be a
+  # different build), then hand the binary + firmware to
   # tools/flix.sh, which resolves the library closure and patchelf's the binary
   # onto a private loader/rpath. No -L wrapper is needed: QEMU finds firmware in
   # its compiled-in data dir (/usr/share/qemu), which we ship.
