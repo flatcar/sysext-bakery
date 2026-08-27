@@ -56,9 +56,23 @@ function _download_os_image() {
 # --
 
 _generate_butane() {
- cat <<EOF
+  local sshkey="${SSH_AUTH_KEY:-}"
+  cat <<EOF
 version: 1.0.0
 variant: flatcar
+EOF
+
+  if [[ -n "${sshkey}" ]]; then
+    cat <<EOF
+passwd:
+  users:
+    - name: core
+      ssh_authorized_keys:
+        - "${sshkey}"
+EOF
+  fi
+
+  cat <<EOF
 
 storage:
   files:
