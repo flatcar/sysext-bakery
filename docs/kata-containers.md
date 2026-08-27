@@ -6,9 +6,12 @@ for hardware-enforced isolation.
 
 The sysext unpacks the upstream `kata-static` release tarball, which
 bundles the Kata runtime, agent, containerd shim, guest kernel, initrd
-and a hypervisor (QEMU and Cloud Hypervisor) under `/opt/kata`. Symlinks
-in `/usr/bin` expose `kata-runtime`, `containerd-shim-kata-v2` and
+and a hypervisor (QEMU and Cloud Hypervisor). Symlinks in `/usr/bin`
+expose `kata-runtime`, `containerd-shim-kata-v2` and
 `kata-collect-data.sh` on `$PATH` after the sysext is merged.
+
+The tree is installed at `/usr/lib/kata`, with `/opt/kata` kept as a
+symlink to it.
 
 ## Usage
 
