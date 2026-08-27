@@ -97,6 +97,48 @@ function _cleanup_harness() {
 }
 # --
 
+function _run_sysext_checks() {
+  local key="$1"
+  local port="$2"
+  local ext_file="$3"
+
+  local ext_name="${ext_file%.raw}"
+  ext_name="$(basename "${ext_name}")"
+
+  echo "Verifying extension '${ext_name}'..."
+
+  if ! _test_ssh "${key}" "${port}" "systemctl is-active systemd-sysext.service" >/dev/null 2>&1; then
+    echo "ERROR: systemd-sysext service is not active."
+    _test_ssh "${key}" "${port}" "systemctl status systemd-sysext.service --no-pager" || true
+    return 1
+  fi
+  echo "  -> systemd-sysext is active"
+
+  local bin_check="which ${ext_name} 2>/dev/null || ls -d /usr/bin/${ext_name}* /opt/bin/${ext_name}* /usr/lib/${ext_name}* 2>/dev/null | head -n 1"
+  local found_bin
+  found_bin="$(_test_ssh "${key}" "${port}" "${bin_check}" 2>/dev/null || true)"
+
+  if [[ -n "${found_bin}" ]]; then
+    echo "  -> Found extension target: ${found_bin}"
+  else
+    echo "  -> Note: No matching binary in PATH; checking /etc/extensions..."
+    _test_ssh "${key}" "${port}" "ls -la /etc/extensions/" || true
+  fi
+
+  local custom_test="${scriptroot}/${ext_name}.sysext/test.sh"
+  if [[ -f "${custom_test}" ]]; then
+    echo "  -> Running extension test script: ${custom_test}"
+    if ! cat "${custom_test}" | _test_ssh "${key}" "${port}" "bash -s"; then
+      echo "ERROR: Custom test script failed for '${ext_name}'."
+      return 1
+    fi
+    echo "  -> Custom test passed"
+  fi
+
+  return 0
+}
+# --
+
 function test_sysext() {
   local extensions=() extension_files=() extension=""
 
@@ -207,15 +249,13 @@ function test_sysext() {
   fi
 
   echo "VM online via SSH (${elapsed}s elapsed)."
-  echo "Checking systemd-sysext merge service..."
 
-  if ! _test_ssh "${_harness_workdir}/id_ed25519" "${ssh_port}" "systemctl is-active systemd-sysext.service" >/dev/null 2>&1; then
-    echo "ERROR: systemd-sysext service failed to activate."
-    _test_ssh "${_harness_workdir}/id_ed25519" "${ssh_port}" "systemctl status systemd-sysext.service --no-pager" || true
-    return 1
-  fi
+  for extension in "${extensions[@]}"; do
+    if ! _run_sysext_checks "${_harness_workdir}/id_ed25519" "${ssh_port}" "${extension}"; then
+      return 1
+    fi
+  done
 
-  echo "systemd-sysext is active."
   return 0
 }
 # --
