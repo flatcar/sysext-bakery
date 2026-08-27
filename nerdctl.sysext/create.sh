@@ -22,28 +22,23 @@ function populate_sysext_root() {
   curl --remote-name -fsSL \
     "https://github.com/containerd/nerdctl/releases/download/${version}/nerdctl-${version#v}-linux-${rel_arch}.tar.gz"
 
-  if [[ -n $cni ]] ; then
-    curl --remote-name -fsSL \
-        "https://github.com/containernetworking/plugins/releases/download/${cni}/cni-plugins-linux-${rel_arch}-${cni}.tgz"
-  fi
-
   mkdir -p "${sysextroot}/usr/bin"
   tar --force-local -xzf "nerdctl-${version#v}-linux-${rel_arch}.tar.gz" -C "${sysextroot}/usr/bin"
 
   if [[ -n $cni ]] ; then
-    mkdir -p "${sysextroot}/usr/libexec/cni"
-    tar --force-local -xzf "cni-plugins-linux-${rel_arch}-${cni}.tgz" -C "${sysextroot}/usr/libexec/cni"
-    echo "${cni}"> "${sysextroot}/usr/share/nerdctl/nerdctl-cni-version"
+    install_cni_plugins "${sysextroot}" "${arch}" "${cni}" "usr/libexec/cni"
+    echo "${CNI_PLUGINS_VERSION}" > "${sysextroot}/usr/share/nerdctl/nerdctl-cni-version"
   else
     # Remove CNI config files and systemd tmpfiles generators
     rm -rf "${sysextroot}/usr/share/nerdctl/" \
-           "${sysextroot}usr/lib/tmpfiles.d"
+           "${sysextroot}/usr/lib/tmpfiles.d"
   fi
 }
 # --
 
 function populate_sysext_root_options() {
-  echo "  --with-cni <version> : Also ship CNI plugin <version in the sysext."
+  echo "  --with-cni <version> : Also ship CNI plugin <version> in the sysext."
+  echo "                  Pass 'latest' for the newest upstream release."
   echo "                  For a list of CNI plugin versions, please refer to"
   echo "                  https://github.com/containernetworking/plugins/releases"
 }
