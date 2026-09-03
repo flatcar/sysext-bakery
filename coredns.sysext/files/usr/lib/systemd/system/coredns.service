@@ -1,0 +1,42 @@
+[Unit]
+Description=CoreDNS DNS server
+Documentation=https://coredns.io/manual/toc/
+Wants=network-online.target
+After=network-online.target
+# The extension ships /usr/lib/sysusers.d/coredns.conf; order after the
+# generator that turns it into the "coredns" user this unit runs as.
+After=systemd-sysusers.service
+# CoreDNS exits when an address in a "bind" directive is not up yet. Do not
+# rate limit restarts, so a node recovers on its own once the address appears.
+StartLimitIntervalSec=0
+
+[Service]
+# Site policy decides the config. The extension ships no Corefile, and cannot:
+# a sysext merges /usr and /opt only, never /etc. See
+# /usr/share/doc/coredns/Corefile.example for a starting point.
+ExecStart=/usr/bin/coredns -conf /etc/coredns/Corefile
+ExecReload=/bin/kill -SIGUSR1 $MAINPID
+WorkingDirectory=-/etc/coredns
+
+User=coredns
+Group=coredns
+AmbientCapabilities=CAP_NET_BIND_SERVICE
+CapabilityBoundingSet=CAP_NET_BIND_SERVICE
+NoNewPrivileges=yes
+
+Restart=on-failure
+RestartSec=2s
+LimitNOFILE=65536
+
+ProtectSystem=full
+ProtectHome=yes
+PrivateTmp=yes
+ProtectControlGroups=yes
+ProtectKernelModules=yes
+ProtectKernelTunables=yes
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX AF_NETLINK
+RestrictRealtime=yes
+LockPersonality=yes
+
+[Install]
+WantedBy=multi-user.target

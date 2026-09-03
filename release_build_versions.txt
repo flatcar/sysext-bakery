@@ -29,6 +29,9 @@ containerd 2.0.0
 containerd 1.7.29
 containerd latest
 
+coredns v1.14.7
+coredns latest
+
 crio latest
 
 docker-buildx 0.25.0

@@ -67,6 +67,7 @@ Check out documentation on specific extensions at the navigation menu on the lef
 | `coder`          |  released    | [coder versions](https://github.com/flatcar/sysext-bakery/releases/tag/coder) |
 | `consul`          |  released    | [consul versions](https://github.com/flatcar/sysext-bakery/releases/tag/consul) |
 | `containerd`     |  released    | [containerd versions](https://github.com/flatcar/sysext-bakery/releases/tag/containerd) |
+| `coredns`        |  released    | [coredns versions](https://github.com/flatcar/sysext-bakery/releases/tag/coredns) |
 | `crio`           |  released    | [crio versions](https://github.com/flatcar/sysext-bakery/releases/tag/crio) |
 | `dataplaneapi`   |  released    | [dataplaneapi versions](https://github.com/flatcar/sysext-bakery/releases/tag/dataplaneapi) |
 | `docker-buildx`  |  released    | [docker-buildx versions](https://github.com/flatcar/sysext-bakery/releases/tag/docker-buildx) |
