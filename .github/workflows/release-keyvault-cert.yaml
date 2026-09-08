@@ -1,0 +1,64 @@
+name: Download certificate from keyvault and publish it as release
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'branch to build'
+        type: string
+        required: false
+        default: 'main'
+  schedule:
+    # Each day at 5am UTC
+    - cron:  '0 5 * * *'
+
+jobs:
+  create-cert-release:
+    runs-on: ubuntu-24.04
+    permissions:
+      # allow the action to create a release
+      contents: write
+      id-token: write
+    steps:
+      - name: Check out the bakery repo
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.branch != '' && inputs.branch || 'main' }}
+          path: bakery
+      - name: build
+        id: build
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          bakery: ${{ github.repository }}
+
+          KEYVAULT_CERT_NAME: ${{ secrets.KEYVAULT_CERT_NAME }}
+          AZURE_KEYVAULT_URL: https://${{ secrets.KEYVAULT_NAME }}.vault.azure.net/
+
+          AZURE_FEDERATED_TOKEN_FILE: /tmp/azure-oidc-token
+          AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+          AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          AZURE_LOG_LEVEL: verbose
+          AZURE_KEYVAULT_PKCS11_DEBUG: 1
+          PKCS11_MODULE_PATH: /usr/lib64/pkcs11/azure-keyvault-pkcs11.so
+        run: |
+          cd bakery
+          ./flatcar-container-wrap.sh \
+            'cert_name="${bakery//\//-}.crt" && \
+            curl -sSL \
+                -H "Authorization: Bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
+                "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=api://AzureADTokenExchange" \
+                | jq -r '.value' | sudo tee "$AZURE_FEDERATED_TOKEN_FILE" && \
+            p11-kit export-object "pkcs11:token=$KEYVAULT_CERT_NAME;type=cert" | sudo tee "$cert_name"'
+      - name: create a new release
+        uses: softprops/action-gh-release@v2
+        with:
+          make_latest: true
+          tag_name: signing_cert
+          body: |
+            The public key used for verification of sysexts produced and signed
+            in sysext-bakery. You should place this key to one of the verity.d
+            directories (e.g. /etc/verity.d/) to trust this key on your system.
+          files: |
+            bakery/*.crt
