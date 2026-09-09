@@ -80,6 +80,8 @@ rke2 latest
 scx v1.1.1
 scx latest
 
+teleport latest
+
 tailscale v1.76.6
 tailscale latest
 
