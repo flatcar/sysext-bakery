@@ -61,6 +61,7 @@ Check out documentation on specific extensions at the navigation menu on the lef
 |    Extension     | Availability | Versions available |
 | ---------------- | ------------ | ------------- |
 | `bird`           |  released    | [bird versions](https://github.com/flatcar/sysext-bakery/releases/tag/bird) |
+| `bluez`          |  released    | [bluez versions](https://github.com/flatcar/sysext-bakery/releases/tag/bluez) |
 | `chrony`         |  released    | [chrony versions](https://github.com/flatcar/sysext-bakery/releases/tag/chrony) |
 | `cilium`         |  released    | [cilium versions](https://github.com/flatcar/sysext-bakery/releases/tag/cilium) |
 | `cloud-hypervisor` |  released  | [cloud-hypervisor versions](https://github.com/flatcar/sysext-bakery/releases/tag/cloud-hypervisor) |
