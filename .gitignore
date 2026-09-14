@@ -16,4 +16,5 @@ tags
 
 *test.json
 *test.yaml
+*-vm-test.log
 *flatcar_production_*
