@@ -226,3 +226,51 @@ function semver_lower() {
 
   return 0
 }
+
+# --
+
+# Download the upstream containernetworking/plugins release for ${arch} and
+# unpack the binaries into ${destdir} below ${sysextroot}, verifying the
+# published checksum. An empty ${version} (or "latest") resolves to the newest
+# upstream release. The resolved version is returned in ${CNI_PLUGINS_VERSION},
+# which callers need when they record the bundled version.
+#
+# Several extensions bundle CNI for their own runtime (nerdctl, kubernetes,
+# nomad); they differ only in where the binaries go, so keep the download,
+# verification and unpacking here rather than in each recipe.
+function install_cni_plugins() {
+  local sysextroot="$1"
+  local arch="$2"
+  local version="$3"
+  local destdir="$4"
+
+  if [[ -z "${version}" ]] || [[ "${version}" == "latest" ]] ; then
+    version="$(curl_api_wrapper \
+                 https://api.github.com/repos/containernetworking/plugins/releases/latest \
+               | jq -r .tag_name)"
+  fi
+  if [[ -z "${version}" ]] || [[ "${version}" == "null" ]] ; then
+    echo "ERROR: could not determine the CNI plugins version." >&2
+    return 1
+  fi
+
+  local rel_arch
+  rel_arch="$(arch_transform 'x86-64' 'amd64' "${arch}")"
+
+  local tarball="cni-plugins-linux-${rel_arch}-${version}.tgz"
+  local base_url="https://github.com/containernetworking/plugins/releases/download/${version}"
+
+  curl --remote-name -fsSL --retry-delay 1 --retry 60 \
+    --retry-connrefused --retry-max-time 60 --connect-timeout 20 \
+    "${base_url}/${tarball}"
+  curl --remote-name -fsSL --retry-delay 1 --retry 60 \
+    --retry-connrefused --retry-max-time 60 --connect-timeout 20 \
+    "${base_url}/${tarball}.sha256"
+  sha256sum -c "${tarball}.sha256"
+
+  # The tarball expands flat (bridge, host-local, portmap, …) into the target.
+  mkdir -p "${sysextroot}/${destdir}"
+  tar --force-local -xzf "${tarball}" -C "${sysextroot}/${destdir}"
+
+  CNI_PLUGINS_VERSION="${version}"
+}

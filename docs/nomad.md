@@ -6,6 +6,19 @@ The sysext includes a service unit file to start nomad at boot.
 Nomad is configured as a server by default.
 The default configuration can be modified or replaced via a custom Butane config.
 
+## CNI plugins
+
+Nomad's `bridge` network mode needs the CNI reference plugins, which Flatcar does not ship. The sysext build can
+optionally be instructed to include them:
+
+```
+./bakery.sh create nomad 1.10.0 --with-cni v1.9.1
+```
+
+Pass `--with-cni latest` for the newest upstream release. The plugins are installed to `/usr/libexec/cni` and a
+`/etc/nomad.d/cni.hcl` drop-in points Nomad's `cni_path` at them, so `bridge` works with no further configuration.
+Builds without `--with-cni` are unchanged and ship neither the plugins nor the drop-in.
+
 # Usage
 
 The snippet includes automated updates via systemd-sysupdate.
