@@ -64,6 +64,9 @@ kubernetes latest
 nebula v1.9.5
 nebula latest
 
+netbird v0.75.0
+netbird latest
+
 nerdctl latest
 
 nomad 1.10.0
