@@ -102,8 +102,6 @@ cilium latest
 
 cloud-hypervisor latest
 
-coder latest
-
 haproxy latest
 
 bird 3.1.2
