@@ -23,12 +23,12 @@ storage:
     - path: /opt/extensions/cilium/cilium-v0.18.2-x86-64.raw
       contents:
         source: https://extensions.flatcar.org/extensions/cilium-v0.18.2-x86-64.raw
-    - path: /etc/sysupdate.cilium.d/cilium.conf
+    - path: /etc/sysupdate.cilium.d/cilium.transfer
       contents:
-        source: https://extensions.flatcar.org/extensions/cilium.conf
-    - path: /etc/sysupdate.d/noop.conf
+        source: https://extensions.flatcar.org/extensions/cilium.transfer
+    - path: /etc/sysupdate.d/noop.transfer
       contents:
-        source: https://extensions.flatcar.org/extensions/noop.conf
+        source: https://extensions.flatcar.org/extensions/noop.transfer
   links:
     - target: /opt/extensions/cilium/cilium-v0.18.2-x86-64.raw
       path: /etc/extensions/cilium.raw

@@ -36,12 +36,12 @@ storage:
       mode: 0644
       contents:
         source: https://extensions.flatcar.org/extensions/cloud-hypervisor-v44.0-x86-64.raw
-    - path: /etc/sysupdate.cloud-hypervisor.d/cloud-hypervisor.conf
+    - path: /etc/sysupdate.cloud-hypervisor.d/cloud-hypervisor.transfer
       contents:
-        source: https://extensions.flatcar.org/extensions/cloud-hypervisor.conf
-    - path: /etc/sysupdate.d/noop.conf
+        source: https://extensions.flatcar.org/extensions/cloud-hypervisor.transfer
+    - path: /etc/sysupdate.d/noop.transfer
       contents:
-        source: https://extensions.flatcar.org/extensions/noop.conf
+        source: https://extensions.flatcar.org/extensions/noop.transfer
   links:
     - target: /opt/extensions/cloud-hypervisor/cloud-hypervisor-v44.0-x86-64.raw
       path: /etc/extensions/cloud-hypervisor.raw

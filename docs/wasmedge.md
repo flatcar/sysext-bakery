@@ -26,9 +26,9 @@ storage:
       mode: 0420
       contents:
         source: https://github.com/flatcar/sysext-bakery/releases/download/wasmedge-0.14.1-x86-64.raw
-    - path: /etc/sysupdate.wasmedge.d/wasmedge.conf
+    - path: /etc/sysupdate.wasmedge.d/wasmedge.transfer
       contents:
-        source: https://extensions.flatcar.org/extensions/wasmedge.conf
+        source: https://extensions.flatcar.org/extensions/wasmedge.transfer
   links:
     - target: /opt/extensions/wasmedge-0.14.1-x86-64.raw
       path: /etc/extensions/wasmedge.raw

@@ -30,8 +30,8 @@ function print_help() {
     echo "  Options:"
     echo "       <name:file>        Sysext name (e.g. 'kubernetes') is used to create the extensions symlink,"
     echo "                            file (e.g. 'kubernetes-v1.29.1.raw') must be present in the local directory."
-    echo "                            If a '<name>.conf' sysupdate conf exists it will also be installed in the image."
-    echo "       --fetch            Instead of using a local syysext, fetch sysext and sysupdate conf from the latest"
+    echo "                            If a '<name>.transfer' or '<name>.conf' sysupdate config exists it will also be installed in the image."
+    echo "       --fetch            Instead of using a local syysext, fetch sysext and sysupdate config from the latest"
     echo "                            Bakery release (see https://github.com/flatcar/sysext-bakery/releases/tag/SHA256SUMS for a list)."
     echo "       --vendor <vendor>  Create cloud vendor image from generic image after embedding."
     echo "                            By default, only a generic image is produced."
@@ -220,11 +220,18 @@ function install_sysexts() {
         sudo mkdir -p "flatcar-root/etc/extensions/"
         sudo ln -s "${os_destpath}" "flatcar-root${symlink}"
 
-        if [ -f "../${name}.conf" ] ; then
+        local sysupdate_file=""
+        if [ -f "../${name}.transfer" ] ; then
+            sysupdate_file="${name}.transfer"
+        elif [ -f "../${name}.conf" ] ; then
+            sysupdate_file="${name}.conf"
+        fi
+
+        if [ -n "${sysupdate_file}" ] ; then
             local cpath="/etc/sysupdate.${name}.d/"
-            echo "    ## Sysext '${name}': installing sysupdate config '${name}.conf' to 'root' -> '${cpath}'"
+            echo "    ## Sysext '${name}': installing sysupdate config '${sysupdate_file}' to 'root' -> '${cpath}'"
             sudo mkdir -p "flatcar-root${cpath}"
-            sudo cp "../${name}.conf" "flatcar-root${cpath}"
+            sudo cp "../${sysupdate_file}" "flatcar-root${cpath}"
         fi
     done
 
@@ -287,10 +294,15 @@ for sysext in "${sysexts[@]}"; do
         curl -fLO --progress-bar --retry-delay 1 --retry 60 --retry-connrefused \
              --retry-max-time 60 --connect-timeout 20 \
              "${bakery_base_url}/${file}"
-        echo "    ## Fetching sysupdate '${name}': '${name}.conf'"
-        curl -fLO --progress-bar --retry-delay 1 --retry 60 --retry-connrefused \
+        echo "    ## Fetching sysupdate '${name}' (.transfer or .conf)"
+        if ! curl -fLO --progress-bar --retry-delay 1 --retry 60 --retry-connrefused \
              --retry-max-time 60 --connect-timeout 20 \
-             "${bakery_base_url}/${name}.conf"
+             "${bakery_base_url}/${name}.transfer"; then
+            echo "    ## Fetching sysupdate '${name}': falling back to '${name}.conf'"
+            curl -fLO --progress-bar --retry-delay 1 --retry 60 --retry-connrefused \
+                 --retry-max-time 60 --connect-timeout 20 \
+                 "${bakery_base_url}/${name}.conf"
+        fi
     elif ! [ -f "${file}" ] ; then
         echo "ERROR: Sysext file '${file}' for sysext '${sysext}' not found."
         exit 1

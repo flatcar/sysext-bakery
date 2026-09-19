@@ -73,7 +73,7 @@ To build e.g. an extension shipping Kubernetes release v1.29.8, run:
 This creates `kubernetes.raw` for x86-64 targets along with `SHA256SUMS.kubernetes` to be
  used in combination with systemd-sysupdate.
 
-Speaking of sysupdate, you can generate a matching `sysupdate.conf` via
+Speaking of sysupdate, you can generate a matching `sysupdate.transfer` via
 ```sh
 ./bakery.sh create kubernetes v1.29.8 --sysupdate true
 ```
@@ -229,11 +229,11 @@ Simplified, this looks like:
 * `.../SHA256SUMS` => `/releases/SHA256SUMS/SHA256SUMS` - index file
 * `.../<extension>-<version>-<arch>.raw` => `/releases/<extension>-<version>/<extension>-<version>-<arch>.raw` -
   The actual extension image.
-* `.../<extension>.conf` => `/releases/<extension>/<extension>.conf` - sysupdate configuration for that extension
+* `.../<extension>.transfer` => `/releases/<extension>/<extension>.transfer` - sysupdate configuration for that extension
 
 Lastly, for extensions that do not support unattended in-place updates across major releases (like Kubernetes, rke2, etc.)
 we support an additional `<release>` sub-path in the source URL to select a specific release and not have it deduced from the filename:
-* `.../<release>/<extension>.conf` => `/releases/<release>/<extension>.conf`
+* `.../<release>/<extension>.transfer` => `/releases/<release>/<extension>.transfer`
 
 This requires self-hosting, but is low traffic and low CPU load, as the only task this service has is to re-write HTTP URLs.
 Usually the smallest instance type of your favourite hoster suffices.
@@ -342,7 +342,7 @@ To scan for new releases:
 A new release build is started.
 1. Artefacts are genreated using `./bakery.sh create <extension> <version> --sysupdate true`
    a. x86-64 and arm64 sysexts
-   b. `<extension>.conf` sysupdate
+   b. `<extension>.transfer` sysupdate
    c. `SHA256SUMS` for extension images
 2. A new tag is created and pushed, to serve as release tag.
 3. A new release `<extension>-<version>` is generated, containing:

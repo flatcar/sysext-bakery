@@ -23,12 +23,12 @@ storage:
       mode: 0644
       contents:
         source: https://extensions.flatcar.org/extensions/bird-3.1.2-x86-64.raw
-    - path: /etc/sysupdate.bird.d/bird.conf
+    - path: /etc/sysupdate.bird.d/bird.transfer
       contents:
-        source: https://extensions.flatcar.org/extensions/bird/bird.conf
-    - path: /etc/sysupdate.d/noop.conf
+        source: https://extensions.flatcar.org/extensions/bird/bird.transfer
+    - path: /etc/sysupdate.d/noop.transfer
       contents:
-        source: https://extensions.flatcar.org/extensions/noop.conf
+        source: https://extensions.flatcar.org/extensions/noop.transfer
   links:
     - target: /opt/extensions/bird/bird-3.1.2-x86-64.raw
       path: /etc/extensions/bird.raw

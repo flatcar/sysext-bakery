@@ -31,12 +31,12 @@ storage:
       mode: 0644
       contents:
         source: https://extensions.flatcar.org/extensions/crio-v1.32.2-x86-64.raw
-    - path: /etc/sysupdate.crio.d/crio.conf
+    - path: /etc/sysupdate.crio.d/crio.transfer
       contents:
-        source: https://extensions.flatcar.org/extensions/crio.conf
-    - path: /etc/sysupdate.d/noop.conf
+        source: https://extensions.flatcar.org/extensions/crio.transfer
+    - path: /etc/sysupdate.d/noop.transfer
       contents:
-        source: https://extensions.flatcar.org/extensions/noop.conf
+        source: https://extensions.flatcar.org/extensions/noop.transfer
   links:
     - target: /opt/extensions/crio/crio-v1.32.2-x86-64.raw
       path: /etc/extensions/crio.raw

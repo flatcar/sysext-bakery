@@ -73,12 +73,12 @@ storage:
       mode: 0644
       contents:
         source: https://extensions.flatcar.org/extensions/haproxy-3.2.5-x86-64.raw
-    - path: /etc/sysupdate.haproxy.d/haproxy.conf
+    - path: /etc/sysupdate.haproxy.d/haproxy.transfer
       contents:
-        source: https://extensions.flatcar.org/extensions/haproxy.conf
-    - path: /etc/sysupdate.d/noop.conf
+        source: https://extensions.flatcar.org/extensions/haproxy.transfer
+    - path: /etc/sysupdate.d/noop.transfer
       contents:
-        source: https://extensions.flatcar.org/extensions/noop.conf
+        source: https://extensions.flatcar.org/extensions/noop.transfer
     - path: /etc/haproxy/haproxy.cfg
       mode: 0644
       contents:

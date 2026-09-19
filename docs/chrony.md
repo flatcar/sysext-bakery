@@ -21,12 +21,12 @@ storage:
       mode: 0644
       contents:
         source: https://extensions.flatcar.org/extensions/chrony-4.8-x86-64.raw
-    - path: /etc/sysupdate.chrony.d/chrony.conf
+    - path: /etc/sysupdate.chrony.d/chrony.transfer
       contents:
-        source: https://extensions.flatcar.org/extensions/chrony/chrony.conf
-    - path: /etc/sysupdate.d/noop.conf
+        source: https://extensions.flatcar.org/extensions/chrony/chrony.transfer
+    - path: /etc/sysupdate.d/noop.transfer
       contents:
-        source: https://extensions.flatcar.org/extensions/noop.conf
+        source: https://extensions.flatcar.org/extensions/noop.transfer
     - path: /etc/chrony/chrony.conf
       mode: 0644
       contents:

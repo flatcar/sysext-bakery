@@ -13,7 +13,7 @@ set -euo pipefail
 cd "$(dirname "$0")"
 source "lib/libbakery.sh"
 
-rm -f *.raw SHA256SUMS.* SHA256SUMS *.conf Release.md
+rm -f *.raw SHA256SUMS.* SHA256SUMS *.conf *.transfer Release.md
 
 extension="$(extension_name "${@:-}")"
 tag="${extension:-SHA256SUMS}"
@@ -28,7 +28,7 @@ function fetch_artefacts() {
 
   { curl_api_wrapper \
          "https://api.github.com/repos/${bakery}/releases/tags/${release}" \
-  | jq -r '.assets[] | "\(.name)\t\(.browser_download_url)"' | grep -E '(\bSHA256SUMS|\.conf)$' || true; } \
+  | jq -r '.assets[] | "\(.name)\t\(.browser_download_url)"' | grep -E '(\bSHA256SUMS|\.conf|\.transfer)$' || true; } \
   > downloads.txt
 
   while IFS=$'\t' read -r name url; do
@@ -73,9 +73,9 @@ if [[ -n $extension ]] ; then
     out "No releases available at this time."
   else
     out ""
-    out "## Sysupdate confs:"
+    out "## Sysupdate configs:"
     out '```'
-    ls -1 *.conf | tee -a Release.md
+    find . -maxdepth 1 -name '*.conf' -o -name '*.transfer' | sed 's|^\./||' | sort | tee -a Release.md
     out '```'
   fi
 

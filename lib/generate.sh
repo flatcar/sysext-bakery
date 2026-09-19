@@ -85,17 +85,17 @@ function _create_sysupdate() {
   local match_pattern="${2:-${extname}-@v-%a.raw}"
   local source_rel="${3:-${extname}}"
   local target_file="${4:-${source_rel}}"
-  local sysupdate_file="${5:-${extname}.conf}"
+  local sysupdate_file="${5:-${extname}.transfer}"
 
   sed -e "s/{EXTNAME}/${extname}/g" \
       -e "s/{MATCH_PATTERN}/${match_pattern}/g" \
       -e "s,{BAKERY_HUB},${bakery_hub},g" \
       -e "s,{SOURCE_REL},${source_rel},g" \
       -e "s,{TARGET_FILE},${target_file},g" \
-      "${libroot}/sysupdate.conf.tmpl" \
+      "${libroot}/sysupdate.transfer.tmpl" \
     >"${sysupdate_file}"
 
-  echo "Generated sysupdate configuration '${extname}.conf'"
+  echo "Generated sysupdate configuration '${sysupdate_file}'"
 }
 # --
 
@@ -159,7 +159,7 @@ function _generate_sysext_options() {
   echo "                         Helpful if the sysext ships service units that should be started"
   echo "                         at merge."
   echo " --sysupdate <true|false>:"
-  echo "                       Generate a suitable sysupdate .conf file alongside the extension image."
+  echo "                       Generate a suitable sysupdate .transfer file alongside the extension image."
   echo " --format <format>:    Sysext file system format. Defaults to 'squashfs'."
   echo " --ext-fs-size <size>: File system size when using --format ext2|ext4."
   echo "                       Defaults to 1G."

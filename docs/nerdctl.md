@@ -22,12 +22,12 @@ storage:
       mode: 0420
       contents:
         source: https://extensions.flatcar.org/extensions/nerdctl-v2.0.4-x86-64.raw
-    - path: /etc/sysupdate.nerdctl.d/nerdctl.conf
+    - path: /etc/sysupdate.nerdctl.d/nerdctl.transfer
       contents:
-        source: https://extensions.flatcar.org/extensions/nerdctl.conf
-    - path: /etc/sysupdate.d/noop.conf
+        source: https://extensions.flatcar.org/extensions/nerdctl.transfer
+    - path: /etc/sysupdate.d/noop.transfer
       contents:
-        source: https://extensions.flatcar.org/extensions/noop.conf
+        source: https://extensions.flatcar.org/extensions/noop.transfer
   links:
     - target: /opt/extensions/nerdctl-v2.0.4-x86-64.raw
       path: /etc/extensions/nerdctl.raw

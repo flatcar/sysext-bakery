@@ -35,12 +35,12 @@ storage:
       path: /etc/extensions/kubernetes.raw
       hard: false
   files:
-    - path: /etc/sysupdate.kubernetes.d/kubernetes-v1.32.conf
+    - path: /etc/sysupdate.kubernetes.d/kubernetes-v1.32.transfer
       contents:
-        source: https://extensions.flatcar.org/extensions/kubernetes/kubernetes-v1.32.conf
-    - path: /etc/sysupdate.d/noop.conf
+        source: https://extensions.flatcar.org/extensions/kubernetes/kubernetes-v1.32.transfer
+    - path: /etc/sysupdate.d/noop.transfer
       contents:
-        source: https://extensions.flatcar.org/extensions/noop.conf
+        source: https://extensions.flatcar.org/extensions/noop.transfer
     - path: /opt/extensions/kubernetes/kubernetes-v1.32.2-x86-64.raw
       contents:
         source: https://extensions.flatcar.org/extensions/kubernetes-v1.32.2-x86-64.raw

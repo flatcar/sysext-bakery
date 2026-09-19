@@ -27,12 +27,12 @@ storage:
       mode: 0644
       contents:
         source: https://extensions.flatcar.org/extensions/nvidia-runtime-v1.17.5-x86-64.raw
-    - path: /etc/sysupdate.nvidia-runtime.d/nvidia-runtime.conf
+    - path: /etc/sysupdate.nvidia-runtime.d/nvidia-runtime.transfer
       contents:
-        source: https://extensions.flatcar.org/extensions/nvidia-runtime.conf
-    - path: /etc/sysupdate.d/noop.conf
+        source: https://extensions.flatcar.org/extensions/nvidia-runtime.transfer
+    - path: /etc/sysupdate.d/noop.transfer
       contents:
-        source: https://extensions.flatcar.org/extensions/noop.conf
+        source: https://extensions.flatcar.org/extensions/noop.transfer
   links:
     - target: /opt/extensions/nvidia-runtime/nvidia-runtime-v1.17.5-x86-64.raw
       path: /etc/extensions/nvidia-runtime.raw

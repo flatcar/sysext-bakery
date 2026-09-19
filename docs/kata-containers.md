@@ -48,12 +48,12 @@ storage:
       mode: 0644
       contents:
         source: https://extensions.flatcar.org/extensions/kata-containers-3.21.0-x86-64.raw
-    - path: /etc/sysupdate.kata-containers.d/kata-containers.conf
+    - path: /etc/sysupdate.kata-containers.d/kata-containers.transfer
       contents:
-        source: https://extensions.flatcar.org/extensions/kata-containers.conf
-    - path: /etc/sysupdate.d/noop.conf
+        source: https://extensions.flatcar.org/extensions/kata-containers.transfer
+    - path: /etc/sysupdate.d/noop.transfer
       contents:
-        source: https://extensions.flatcar.org/extensions/noop.conf
+        source: https://extensions.flatcar.org/extensions/noop.transfer
   links:
     - target: /opt/extensions/kata-containers/kata-containers-3.21.0-x86-64.raw
       path: /etc/extensions/kata-containers.raw

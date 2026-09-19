@@ -54,7 +54,7 @@ function populate_sysext_root() {
 
   for bin in kubectl kubeadm kubelet; do
     echo "Verifying ${bin} checksum..."
-    echo "$(cat "${bin}.sha256")  ${sysextroot}/usr/bin/${bin}" | shasum -a 256 --check
+    echo "$(cat "${bin}.sha256")  ${sysextroot}/usr/bin/${bin}" | sha256sum -c
   done
 
   curl --parallel --fail --silent --show-error --location \
@@ -62,7 +62,7 @@ function populate_sysext_root() {
     --output cni.sha256 "https://github.com/containernetworking/plugins/releases/download/${cni_version}/cni-plugins-linux-${rel_arch}-${cni_version}.tgz.sha256"
 
   echo "Verifying CNI checksum..."
-  shasum -a 256 --check cni.sha256
+  sha256sum -c cni.sha256
 
   chmod +x "${sysextroot}/usr/bin/"*
 
@@ -81,8 +81,8 @@ function populate_sysext_root() {
   local sysupdate="$(get_optional_param "sysupdate" "false" "${@}")"
   if [[ ${sysupdate} == true ]] ; then
     local majorver="$(echo "${version}" | sed 's/^\(v[0-9]\+\.[0-9]\+\).*/\1/')"
-    _create_sysupdate "${extname}" "${extname}-${majorver}.@v-%a.raw" "${extname}" "${extname}" "${extname}-${majorver}.conf"
-    mv "${extname}-${majorver}.conf" "${rundir}"
+    _create_sysupdate "${extname}" "${extname}-${majorver}.@v-%a.raw" "${extname}" "${extname}" "${extname}-${majorver}.transfer"
+    mv "${extname}-${majorver}.transfer" "${rundir}"
   fi
 }
 # --

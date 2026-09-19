@@ -30,12 +30,12 @@ storage:
     - path: /opt/extensions/wasmtime/wasmtime-v31.0.0-x86-64.raw
       contents:
         source: https://extensions.flatcar.org/extensions/wasmtime-v31.0.0-x86-64.raw
-    - path: /etc/sysupdate.wasmtime.d/wasmtime.conf
+    - path: /etc/sysupdate.wasmtime.d/wasmtime.transfer
       contents:
-        source: https://extensions.flatcar.org/extensions/wasmtime.conf
-    - path: /etc/sysupdate.d/noop.conf
+        source: https://extensions.flatcar.org/extensions/wasmtime.transfer
+    - path: /etc/sysupdate.d/noop.transfer
       contents:
-      source: https://extensions.flatcar.org/extensions/noop.conf
+      source: https://extensions.flatcar.org/extensions/noop.transfer
  
 systemd:
   units:
