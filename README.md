@@ -37,8 +37,12 @@ If you want to build yourself, the following packages are required:
 - `xz-utils`
 - [`yq`](https://github.com/mikefarah/yq/releases/latest/)
 
-Optional for testing (`bakery.sh boot` command):
+Optional for interactive testing (`bakery.sh boot` command):
 - qemu
+
+For automated testing (`bakery.sh test`), also install Python 3, GnuPG (`gpg`),
+and OpenSSH clients (`ssh` and `ssh-keygen`). QEMU and Docker are required. See
+[the test harness guide](docs/test-harness.md) for usage, coverage, and verification.
 
 First, clone the repository.
 The `bakery.sh` script is used to interact with individual extension build scripts.

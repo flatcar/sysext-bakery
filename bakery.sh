@@ -146,7 +146,12 @@ function create_sysext() {
 # --
 
 case "${1:-}" in
-  list|list-bakery|create|boot|test)
+  test)
+    shift
+    # Keep the CLI PID responsible for signals; the library wrapper is isolated.
+    _test_sysext "${@}"
+    ;;
+  list|list-bakery|create|boot)
     cmd="${1}"
     shift
     "${cmd}"_sysext "${@}"
