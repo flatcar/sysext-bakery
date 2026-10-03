@@ -25,10 +25,9 @@ function _need_os_image_download() {
   done
 
   if ! $download; then
-    local img_arch="$(sed --silent --regexp-extended \
-                        "s/VM_BOARD='(amd64|arm64)-usr'/\1/p" \
-                        flatcar_production_qemu_uefi.sh)"
-    if [[ $arch != $img_arch ]] ; then
+    local img_arch
+    img_arch="$(sed -nE "s/^VM_BOARD='(amd64|arm64)-usr'$/\1/p" flatcar_production_qemu_uefi.sh)"
+    if [[ "${arch}" != "${img_arch}" ]] ; then
       echo "OS image files present but architecture of image '$img_arch' does not match architecture of sysext '$arch'"
       download="true"
     fi
@@ -56,9 +55,23 @@ function _download_os_image() {
 # --
 
 _generate_butane() {
- cat <<EOF
+  local sshkey="${SSH_AUTH_KEY:-}"
+  cat <<EOF
 version: 1.0.0
 variant: flatcar
+EOF
+
+  if [[ -n "${sshkey}" ]]; then
+    cat <<EOF
+passwd:
+  users:
+    - name: core
+      ssh_authorized_keys:
+        - "${sshkey}"
+EOF
+  fi
+
+  cat <<EOF
 
 storage:
   files:
@@ -71,7 +84,7 @@ EOF
       mode: 0644
       contents:
         # QEmu's default traffic-to-host IP
-        source: http://10.0.2.2:12345/${e}
+        source: http://10.0.2.2:${SYSEXT_HTTP_PORT:-12345}/${e}
 EOF
   done
 
