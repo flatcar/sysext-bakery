@@ -1,0 +1,13 @@
+[Unit]
+Description=Uncloud API socket
+Before=docker.service
+
+[Socket]
+ListenStream=/run/uncloud/api/uncloud.sock
+SocketUser=root
+SocketGroup=uncloud
+SocketMode=0660
+DirectoryMode=0750
+
+[Install]
+WantedBy=sockets.target
