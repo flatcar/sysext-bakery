@@ -83,6 +83,8 @@ scx latest
 tailscale v1.76.6
 tailscale latest
 
+uncloud latest
+
 wasmcloud v1.0.0
 wasmcloud v1.1.1
 wasmcloud v1.2.1

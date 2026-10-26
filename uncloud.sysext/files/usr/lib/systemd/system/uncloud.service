@@ -1,0 +1,25 @@
+[Unit]
+Description=Uncloud machine daemon
+Requires=uncloud.socket
+After=network-online.target uncloud.socket docker.service
+Wants=network-online.target
+
+[Service]
+Type=notify
+ExecStart=/usr/bin/uncloudd
+TimeoutStartSec=20
+Restart=always
+RestartSec=2
+
+# Hardening options.
+NoNewPrivileges=true
+ProtectSystem=full
+ProtectControlGroups=true
+ProtectHome=read-only
+ProtectKernelTunables=true
+PrivateTmp=true
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX AF_NETLINK
+RestrictNamespaces=true
+
+[Install]
+WantedBy=multi-user.target
