@@ -1,0 +1,20 @@
+[Unit]
+Description=Pangolin Site
+Wants=network-online.target
+After=network-online.target
+ConditionPathExists=/etc/pangolin/pangolin-site.env
+
+[Service]
+Type=simple
+User=root
+Group=root
+EnvironmentFile=/etc/pangolin/pangolin-site.env
+ExecStart=/usr/local/bin/pangolin up site
+Restart=always
+RestartSec=2
+UMask=0077
+
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
