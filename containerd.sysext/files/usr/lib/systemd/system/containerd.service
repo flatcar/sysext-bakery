@@ -2,6 +2,7 @@
 Description=containerd container runtime
 After=network.target
 [Service]
+Type=notify
 Delegate=yes
 Environment=CONTAINERD_CONFIG=/usr/share/containerd/config.toml
 ExecStart=/usr/bin/containerd --config ${CONTAINERD_CONFIG}
