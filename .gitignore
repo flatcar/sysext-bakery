@@ -13,6 +13,8 @@ prev_release_sysexts.txt
 tags
 .env
 .env.backup
+.cache/sysext-test/
+__pycache__/
 
 *test.json
 *test.yaml

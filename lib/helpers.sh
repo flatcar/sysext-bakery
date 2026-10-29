@@ -197,7 +197,12 @@ function transpile() {
   #  to be merged into the provisioning JSON can be specified there.
   local yamldir="$(dirname "${yamlfile}")"
 
-  docker run --rm \
+  local container_options=()
+  if [[ -n "${BUTANE_CONTAINER_NAME:-}" ]]; then
+    container_options+=(--name "${BUTANE_CONTAINER_NAME}")
+  fi
+
+  docker run --rm "${container_options[@]}" \
       -v "${yamldir}":/files \
       -i quay.io/coreos/butane:latest \
       --files-dir /files  \

@@ -55,7 +55,8 @@ function _list_all_sysexts() {
       has_files="Yes"
     fi
     local has_build="$(_has_function "${dir}/create.sh" "populate_sysext_root")"
-    local has_test="$(_has_function "${dir}/create.sh" "run_tests")"
+    local has_test="No"
+    if _test_has_commands "${dir}/test.sh"; then has_test="Yes"; fi
 
     _print_line "${extname%.sysext}" "${has_files}" "${has_build}" "${has_test}"
   done
