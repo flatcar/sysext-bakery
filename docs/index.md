@@ -81,6 +81,7 @@ Check out documentation on specific extensions at the navigation menu on the lef
 | `kubernetes`     |  released    | [kubernetes versions](https://github.com/flatcar/sysext-bakery/releases/tag/kubernetes) |
 | `llamaedge`      |  released    | [llamaedge versions](https://github.com/flatcar/sysext-bakery/releases/tag/llamaedge) |
 | `nebula`         |  released    | [nebula versions](https://github.com/flatcar/sysext-bakery/releases/tag/nebula) |
+| `node-exporter`  |  released    | [node-exporter versions](https://github.com/flatcar/sysext-bakery/releases/tag/node-exporter) |
 | `nerdctl`        |  released    | [nerdctl versions](https://github.com/flatcar/sysext-bakery/releases/tag/nerdctl) |
 | `nomad`          |  released    | [nomad versions](https://github.com/flatcar/sysext-bakery/releases/tag/nomad) |
 | `nvidia-runtime` |  released    | [nvidia-runtime versions](https://github.com/flatcar/sysext-bakery/releases/tag/nvidia-runtime) |
@@ -153,7 +154,7 @@ Sysupdate will then re-create the symlink to point to the new sysext.
 
 At this point, the update will have been _staged_ but not activated.
 
-`/etc/sysupdate.EXTNAME.d/EXTNAME.conf` sysupdate configuration.
+`/etc/sysupdate.EXTNAME.d/EXTNAME.transfer` sysupdate configuration.
 The pattern `@v-%a` signifies the semver part of the extension's file name.
 `InstancesMax=3` tells sysupdate to keep a maximum of 3 versions of the extension (for roll-back).
 ```ini
@@ -219,7 +220,7 @@ storage:
       mode: 0644
       contents:
         source: https://extensions.flatcar.org/extensions/EXTNAME-3.13.5-x86-64.raw
-    - path: /etc/sysupdate.EXTNAME.d/EXTNAME.conf
+    - path: /etc/sysupdate.EXTNAME.d/EXTNAME.transfer
       contents:
         inline: |
           [Transfer]
@@ -235,7 +236,7 @@ storage:
           Type=regular-file
           Path=/opt/extensions/EXTNAME/
           CurrentSymlink=/etc/extensions/EXTNAME.raw
-    - path: /etc/sysupdate.d/noop.conf
+    - path: /etc/sysupdate.d/noop.transfer
       contents:
         inline: |
           [Source]
@@ -269,7 +270,7 @@ Most extensions published in the Bakery ship sysupdate configuration as part of 
 (And consequently, that's what most of the configuration examples of individual extensions do).
 Check out the respective extensions' readme for details.
 
-Also, we include a dummy `noop.conf` for systemd-sysupdate to work around a spurious error message.
+Also, we include a dummy `noop.transfer` for systemd-sysupdate to work around a spurious error message.
 
 ### Where are bakery extension images hosted?
 

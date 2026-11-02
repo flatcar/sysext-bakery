@@ -30,12 +30,12 @@ storage:
     - path: /opt/extensions/ollama/ollama-v0.6.3-x86-64.raw
       contents:
         source: https://extensions.flatcar.org/extensions/ollama-v0.6.3-x86-64.raw
-    - path: /etc/sysupdate.ollama.d/ollama.conf
+    - path: /etc/sysupdate.ollama.d/ollama.transfer
       contents:
-        source: https://extensions.flatcar.org/extensions/ollama.conf
-    - path: /etc/sysupdate.d/noop.conf
+        source: https://extensions.flatcar.org/extensions/ollama.transfer
+    - path: /etc/sysupdate.d/noop.transfer
       contents:
-        source: https://extensions.flatcar.org/extensions/noop.conf
+        source: https://extensions.flatcar.org/extensions/noop.transfer
   links:
     - target: /opt/extensions/ollama/ollama-v0.6.3-x86-64.raw
       path: /etc/extensions/ollama.raw

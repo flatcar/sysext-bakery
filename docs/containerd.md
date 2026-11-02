@@ -28,12 +28,12 @@ storage:
       mode: 0644
       contents:
         source: https://extensions.flatcar.org/extensions/containerd-2.0.4-x86-64.raw
-    - path: /etc/sysupdate.containerd.d/containerd.conf
+    - path: /etc/sysupdate.containerd.d/containerd.transfer
       contents:
-        source: https://extensions.flatcar.org/extensions/containerd.conf
-    - path: /etc/sysupdate.d/noop.conf
+        source: https://extensions.flatcar.org/extensions/containerd.transfer
+    - path: /etc/sysupdate.d/noop.transfer
       contents:
-        source: https://extensions.flatcar.org/extensions/noop.conf
+        source: https://extensions.flatcar.org/extensions/noop.transfer
   links:
     - target: /opt/extensions/containerd/containerd-2.0.4-x86-64.raw
       path: /etc/extensions/containerd.raw

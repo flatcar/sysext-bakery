@@ -31,12 +31,12 @@ storage:
       mode: 0644
       contents:
         source: https://extensions.flatcar.org/extensions/tailscale-v1.80.3-x86-64.raw
-    - path: /etc/sysupdate.tailscale.d/tailscale.conf
+    - path: /etc/sysupdate.tailscale.d/tailscale.transfer
       contents:
-        source: https://extensions.flatcar.org/extensions/tailscale.conf
-    - path: /etc/sysupdate.d/noop.conf
+        source: https://extensions.flatcar.org/extensions/tailscale.transfer
+    - path: /etc/sysupdate.d/noop.transfer
       contents:
-        source: https://extensions.flatcar.org/extensions/noop.conf
+        source: https://extensions.flatcar.org/extensions/noop.transfer
   links:
     - path: /etc/systemd/system/multi-user.target.wants/tailscaled.service
       target: /usr/local/lib/systemd/system/tailscaled.service

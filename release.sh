@@ -11,7 +11,7 @@ source "lib/libbakery.sh"
 
 output="${GITHUB_OUTPUT:-release-tag.txt}"
 
-rm -f *.raw SHA256SUMS.* SHA256SUMS *.conf Release.md
+rm -f *.raw SHA256SUMS.* SHA256SUMS *.conf *.transfer Release.md
 
 extension="${1%:*}"
 version="${1#*:}"

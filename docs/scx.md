@@ -54,12 +54,12 @@ storage:
       mode: 0644
       contents:
         source: https://extensions.flatcar.org/extensions/scx-v1.0.19-x86-64.raw
-    - path: /etc/sysupdate.scx.d/scx.conf
+    - path: /etc/sysupdate.scx.d/scx.transfer
       contents:
-        source: https://extensions.flatcar.org/extensions/scx.conf
-    - path: /etc/sysupdate.d/noop.conf
+        source: https://extensions.flatcar.org/extensions/scx.transfer
+    - path: /etc/sysupdate.d/noop.transfer
       contents:
-        source: https://extensions.flatcar.org/extensions/noop.conf
+        source: https://extensions.flatcar.org/extensions/noop.transfer
   links:
     - target: /opt/extensions/scx/scx-v1.0.19-x86-64.raw
       path: /etc/extensions/scx.raw

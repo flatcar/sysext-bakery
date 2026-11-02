@@ -40,12 +40,12 @@ storage:
     - path: /opt/extensions/opkssh/opkssh-v0.5.1-arm64.raw
       contents:
         source: https://extensions.flatcar.org/extensions/opkssh-v0.5.1-arm64.raw
-    - path: /etc/sysupdate.opkssh.d/opkssh-v0.5.1.conf
+    - path: /etc/sysupdate.opkssh.d/opkssh-v0.5.1.transfer
       contents:
-        source: https://extensions.flatcar.org/extensions/opkssh/opkssh-v0.5.1.conf
-    - path: /etc/sysupdate.d/noop.conf
+        source: https://extensions.flatcar.org/extensions/opkssh/opkssh-v0.5.1.transfer
+    - path: /etc/sysupdate.d/noop.transfer
       contents:
-        source: https://extensions.flatcar.org/extensions/noop.conf
+        source: https://extensions.flatcar.org/extensions/noop.transfer
     - path: /etc/opk/providers
       mode: 0640
       group:
