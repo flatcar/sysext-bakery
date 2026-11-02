@@ -35,13 +35,6 @@ function populate_sysext_root() {
   local cni_version="$(get_optional_param "cni-version" "" "$@")"
   local rel_arch="$(arch_transform "x86-64" "amd64" "$arch")"
 
-  if [[ -z ${cni_version} ]] ; then
-    cni_version="$(curl_api_wrapper https://api.github.com/repos/containernetworking/plugins/releases/latest \
-                   | jq -r .tag_name)"
-  fi
-
-  announce "Using CNI version '${cni_version}'"
-
   mkdir -p "${sysextroot}/usr/bin"
 
   curl --parallel --fail --silent --show-error --location \
@@ -57,21 +50,17 @@ function populate_sysext_root() {
     echo "$(cat "${bin}.sha256")  ${sysextroot}/usr/bin/${bin}" | shasum -a 256 --check
   done
 
-  curl --parallel --fail --silent --show-error --location \
-    --output "cni-plugins-linux-${rel_arch}-${cni_version}.tgz" "https://github.com/containernetworking/plugins/releases/download/${cni_version}/cni-plugins-linux-${rel_arch}-${cni_version}.tgz" \
-    --output cni.sha256 "https://github.com/containernetworking/plugins/releases/download/${cni_version}/cni-plugins-linux-${rel_arch}-${cni_version}.tgz.sha256"
-
-  echo "Verifying CNI checksum..."
-  shasum -a 256 --check cni.sha256
-
   chmod +x "${sysextroot}/usr/bin/"*
 
-  mkdir -p "${sysextroot}/usr/local/bin/cni"
-  tar --force-local -xf "cni-plugins-linux-${rel_arch}-${cni_version}.tgz" -C "${sysextroot}/usr/local/bin/cni"
+  # An empty --cni-version resolves to the latest upstream release. Keep the
+  # plugins at /usr/local/bin/cni, where this extension has always put them, so
+  # existing kubelet configuration keeps working.
+  install_cni_plugins "${sysextroot}" "${arch}" "${cni_version}" "usr/local/bin/cni"
+  announce "Using CNI version '${CNI_PLUGINS_VERSION}'"
 
   mkdir -p "${sysextroot}/usr/local/share/"
   echo "${version}" > "${sysextroot}/usr/local/share/kubernetes-version"
-  echo "${cni_version}" > "${sysextroot}/usr/local/share/kubernetes-cni-version"
+  echo "${CNI_PLUGINS_VERSION}" > "${sysextroot}/usr/local/share/kubernetes-cni-version"
 
   mkdir -p "${sysextroot}/usr/libexec/kubernetes/kubelet-plugins/volume/"
   # /var/kubernetes/... will be created at runtime by the kubelet unit.
