@@ -1,0 +1,121 @@
+name: Build and validate extensions changed by a pull request
+
+on:
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      extensions:
+        description: 'space separated list of extensions to build and validate'
+        type: string
+        required: false
+
+permissions:
+  contents: read
+
+jobs:
+  list-extensions:
+    runs-on: ubuntu-24.04
+    outputs:
+      extensions: ${{ steps.list.outputs.extensions }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # the full history is needed to diff against the pull request's base
+          fetch-depth: 0
+          path: bakery
+
+      - name: list extensions to validate
+        id: list
+        env:
+          # Never interpolate inputs into the script itself; they are attacker
+          #  controlled and would be executed by the shell.
+          requested_extensions: ${{ inputs.extensions }}
+          base_ref: ${{ github.base_ref }}
+          # Extensions to validate when the bakery itself changed. These are
+          #  cheap to build and cover both a plain binary and a service unit.
+          fallback_extensions: 'docker-compose tailscale'
+        run: |
+          set -euo pipefail
+          pushd bakery
+
+          if [[ -n "${requested_extensions}" ]] ; then
+            extensions="${requested_extensions}"
+          elif [[ -n "${base_ref}" ]] ; then
+            git fetch --quiet origin "${base_ref}"
+            files="$(git diff --name-only "origin/${base_ref}...HEAD")"
+
+            # Extensions the pull request touches, plus the fallback set if it
+            #  touches the build and test tooling all extensions share.
+            extensions="$(echo "${files}" | sed --silent -r 's,^([^/]+)\.sysext/.*,\1,p')"
+            if echo "${files}" | grep -qE '^(bakery\.sh|lib/|tools/)' ; then
+              extensions+=" ${fallback_extensions}"
+            fi
+          else
+            extensions="${fallback_extensions}"
+          fi
+
+          # The skeleton is a template, not a buildable extension.
+          extensions="$(echo "${extensions}" | tr ' ' '\n' | { grep -v '^_skel$' || true ; } | sort -u)"
+
+          echo "Extensions to validate: $(echo ${extensions})"
+          echo "extensions=$(echo "${extensions}" | jq -R -s -c 'split("\n") | map(select(length > 0))')" \
+            >> "${GITHUB_OUTPUT}"
+
+  validate-extensions:
+    needs: list-extensions
+    if: ${{ needs.list-extensions.outputs.extensions != '[]' && needs.list-extensions.outputs.extensions != '' }}
+    strategy:
+      # Report all broken extensions / architectures, not just the first one.
+      fail-fast: false
+      matrix:
+        extension: ${{ fromJson(needs.list-extensions.outputs.extensions) }}
+        arch: [ x86-64, arm64 ]
+
+    runs-on: ubuntu-24.04
+    env:
+      extension: ${{ matrix.extension }}
+      arch: ${{ matrix.arch }}
+    steps:
+      - name: Set up qemu / binfmt misc for cross-platform builds
+        uses: docker/setup-qemu-action@v3
+
+      - uses: actions/checkout@v4
+        with:
+          path: bakery
+
+      - name: install prerequisites
+        run: |
+          set -euxo pipefail
+
+          sudo apt update -qq && sudo apt install -yqq \
+            curl \
+            jq \
+            squashfs-tools \
+            xz-utils \
+            erofs-utils
+
+      - name: build the extension
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          pushd bakery
+
+          version="$(./bakery.sh list "${extension}" --latest true | head -n 1)"
+          if [[ -z "${version}" ]] ; then
+            echo "ERROR: no version to build. Does '${extension}.sysext/create.sh'"
+            echo "       implement list_available_versions()?"
+            exit 1
+          fi
+
+          echo "Building ${extension} ${version} for ${arch}"
+          ./bakery.sh create "${extension}" "${version}" --arch "${arch}"
+
+      - name: validate the extension image
+        run: |
+          set -euo pipefail
+          pushd bakery
+
+          # Image validation only; the extensions' smoke tests need a VM and are
+          #  run locally via './bakery.sh test <extension> --vm true'.
+          ./bakery.sh test "${extension}" --arch "${arch}"
