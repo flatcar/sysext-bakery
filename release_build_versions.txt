@@ -109,6 +109,9 @@ haproxy latest
 bird 3.1.2
 bird latest
 
+bluez 5.82
+bluez latest
+
 btop 1.4.0
 btop latest
 
