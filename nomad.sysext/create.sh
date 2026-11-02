@@ -17,10 +17,22 @@ function list_available_versions() {
 }
 # --
 
+function populate_sysext_root_options() {
+  echo "  --with-cni <version> : Also ship CNI plugin <version> in the sysext, and"
+  echo "                  point Nomad's cni_path at it. Pass 'latest' for the newest"
+  echo "                  release. Nomad needs these for its bridge network mode."
+  echo "                  For a list of CNI plugin versions, please refer to"
+  echo "                  https://github.com/containernetworking/plugins/releases"
+}
+# --
+
 function populate_sysext_root() {
   local sysextroot="$1"
   local arch="$2"
   local version="$3"
+
+  local cni
+  cni="$(get_optional_param "with-cni" "" "$@")"
 
   local rel_arch
   rel_arch="$(arch_transform "x86-64" "amd64" "$arch")"
@@ -31,5 +43,15 @@ function populate_sysext_root() {
   mkdir -p "${sysextroot}/usr/bin"
   unzip -q "nomad_${version}_linux_${rel_arch}.zip"
   install -m 0755 nomad "${sysextroot}/usr/bin"
+
+  if [[ -n "${cni}" ]] ; then
+    install_cni_plugins "${sysextroot}" "${arch}" "${cni}" "usr/libexec/cni"
+    announce "Bundled CNI plugins ${CNI_PLUGINS_VERSION}"
+  else
+    # Without the plugins the cni_path drop-in would point Nomad at an empty
+    # directory, so drop it and leave the stock config alone.
+    rm -f "${sysextroot}/usr/share/nomad/cni.hcl" \
+          "${sysextroot}/usr/lib/tmpfiles.d/11-nomad-cni.conf"
+  fi
 }
 # --
